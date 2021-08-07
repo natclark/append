@@ -1,0 +1,47 @@
+{
+    "name": "append",
+    "version": "0.0.0",
+    "description": "Create a pixel-perfect Web 3.0 blog, store, or app.",
+    "private": "true",
+    "type": "module",
+    "scripts": {
+        "dev": "svelte-kit dev",
+        "build": "svelte-kit build",
+        "preview": "svelte-kit preview",
+        "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
+        "format": "prettier --write --plugin-search-dir=. ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/natclark/append.git"
+    },
+    "author": "Nathan Clark",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/natclark/append/issues"
+    },
+    "devDependencies": {
+        "@sveltejs/adapter-static": "^1.0.0-next.13",
+        "@sveltejs/kit": "next",
+        "@typescript-eslint/eslint-plugin": "^4.29.0",
+        "@typescript-eslint/parser": "^4.29.0",
+        "autoprefixer": "^10.3.1",
+        "cssnano": "^5.0.7",
+        "eslint": "^7.22.0",
+        "eslint-config-prettier": "^8.1.0",
+        "eslint-plugin-svelte3": "^3.2.0",
+        "postcss": "^8.3.6",
+        "postcss-nested": "^5.0.5",
+        "prettier": "~2.2.1",
+        "prettier-plugin-svelte": "^2.2.0",
+        "sass": "^1.37.5",
+        "svelte": "^3.34.0",
+        "svelte-preprocess": "^4.7.4",
+        "svelte2tsx": "^0.4.4",
+        "tslib": "^1.14.1",
+        "typescript": "^4.3.5"
+    },
+    "dependencies": {
+        "web3w": "^0.3.1"
+    }
+}

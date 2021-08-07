@@ -1,0 +1,5 @@
+# Folders
+.svelte-kit/**
+node_modules/**
+src/build/**
+src/static/**

@@ -1,0 +1,10 @@
+# Folders
+.svelte-kit
+.textile
+node_modules
+src/build
+
+# Files
+.DS_Store
+.textileseed
+package-lock.json
