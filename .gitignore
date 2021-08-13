@@ -5,6 +5,8 @@ node_modules
 src/build
 
 # Files
+.env
+!.env.example
 .DS_Store
 .textileseed
 package-lock.json

@@ -6,6 +6,8 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 
 **WARNING: Currently, Append is best enjoyed on laptops and desktop devices.**
 
+**WARNING: Currently, Append relies on a third party, [Web3.Storage](https://web3.storage), which is maintained by [Protocol Labs](https://protocol.ai). Implementing fallbacks and ultimately full decentralization is on the roadmap.**
+
 ## Features
 
 - 🛡 **Unstoppable** No one can censor you or shut you down

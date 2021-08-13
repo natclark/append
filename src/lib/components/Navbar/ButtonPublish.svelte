@@ -51,20 +51,6 @@
     };
 </script>
 
-<button bind:this={walletButton} class="button{$wallet.address === undefined ? `` : ` connected`}" on:click={publish}>
-    {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish`}
+<button bind:this={walletButton} class="button primary{$wallet.address === undefined ? `` : ` connected`}" on:click={publish}>
+    {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish (Coming Soon!)`}
 </button>
-
-<style>
-    button {
-        background-color: #444;
-        border-radius: 2px;
-        color: #ddd;
-        font-size: 18px;
-        font-weight: 500;
-        padding: 4px;
-        &:hover {
-            color: #f8f8f8;
-        }
-    }
-</style>

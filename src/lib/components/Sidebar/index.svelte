@@ -50,6 +50,14 @@
             </g>
         </svg>
     </Button>
+    <Button text="CSS">
+        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 111.23" style="enable-background:new 0 0 122.88 111.23" xml:space="preserve">
+            <g>
+                <polygon fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" points="18.29,0.01 14.16,20.64 98.14,20.64 95.51,33.97 11.49,33.96 7.42,54.59 91.39,54.59 86.7,78.12 52.86,89.33 23.53,78.12 25.54,67.91 4.91,67.91 0,92.67 48.51,111.23 104.43,92.67 122.88,0 18.29,0.01"></polygon>
+            </g>
+        </svg>
+    </Button>
+    <!--
     <Button text="Help">
         <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 122.88" style="enable-background:new 0 0 122.88 122.88" xml:space="preserve">
             <g>
@@ -57,6 +65,7 @@
             </g>
         </svg>
     </Button>
+    -->
 </aside>
 
 <style>

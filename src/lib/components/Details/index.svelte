@@ -24,9 +24,10 @@
         flex-flow: column wrap;
         flex-direction: column;
         height: calc(100vh - 40px);
+        min-width: 20em;
         padding: 0;
         position: relative;
         right: 0;
-        min-width: 20em;
+        z-index: -1;
     }
 </style>

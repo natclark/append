@@ -4,7 +4,7 @@
 </script>
 
 {#if show}
-    <div>
+    <div class="banner">
         <p>{text}</p>
     </div>
 {/if}
@@ -22,5 +22,6 @@
         left: 45px;
         position: absolute;
         width: 80px;
+        z-index: 3;
     }
 </style>

@@ -5,7 +5,7 @@
 <style>
     .grid {
         display: grid;
-        grid-template-columns: auto auto auto;
+        grid-template-columns: 1fr 1fr 1fr;
     }
     :global(.grid > *) {
         border: 1px solid;
