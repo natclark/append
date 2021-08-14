@@ -1,14 +1,16 @@
 <script>
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
+    import iframe from '$lib/stores/iframe';
+    import element from '$lib/stores/element';
     import { flip } from 'svelte/animate';
     import { onMount } from 'svelte';
 
     // * The current page:
     let page = {
         css: {
-            custom: $css,
-            generated: ``,
+            custom: $css.custom,
+            generated: $css.generated,
         },
         file: null,
         html: ``,
@@ -57,7 +59,7 @@
             id: 2,
             text: `This is my unstoppable blog.`,
             type: `paragraph`,
-        },
+        }
     ];
 
     // * Increments each time a component is created, to ensure all components have a unique ID:
@@ -81,37 +83,51 @@
         el.style.transition = `.1s outline`;
         el.style.willChange = `box-shadow`;
         el.addEventListener(`mouseover`, () => {
-            if (el !== dom.activeElement) {
+            if (el !== dom.activeElement && selection !== el.getAttribute(`data-id`)) {
                 components.forEach((component) => {
-                    if (component !== dom.activeElement) component.element.style.outline = ``;
+                    if (component.element !== dom.activeElement && selection !== component.element.getAttribute(`data-id`)) component.element.style.outline = ``;
                 });
                 el.style.outline = `2px dotted #6fbcff`;
             }
         });
         el.addEventListener(`mouseout`, () => {
-            if (el !== dom.activeElement) el.style.outline = ``;
+            if (el !== dom.activeElement && selection !== el.getAttribute(`data-id`)) el.style.outline = ``;
         });
-        el.addEventListener(`dragover`, (e) => {
-            selection = el.getAttribute(`data-id`);
+        el.addEventListener(`dragstart`, (e) => {
+            e.dataTransfer.setData(`text/plain`, null);
         });
         el.addEventListener(`click`, () => {
+            selection = el.getAttribute(`data-id`);
+            const obj = { id: selection, el, };
+            element.update(() => obj);
             el.focus();
             components.forEach((component) => component.element.style.outline = ``);
             el.style.outline = `2px solid #08f`;
         });
         el.addEventListener(`dblclick`, () => {
             if (editable) el.contentEditable = true;
+            selection = el.getAttribute(`data-id`);
+            const obj = { id: selection, el, };
+            element.update(() => obj);
             el.focus();
             if (editable) el.style.cursor = 'text';
             components.forEach((component) => component.element.style.outline = ``);
             el.style.outline = `2px solid #08f`;
+        });
+        el.addEventListener(`keydown`, (e) => {
+            if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable !== true) {
+                selection = -1;
+                const obj = { id: -1, el, };
+                element.update(() => obj);
+                unsetComponent(dom, el.getAttribute(`data-id`));
+            }
         });
         el.addEventListener(`focusout`, () => {
             if (editable) el.contentEditable = false;
             el.style.cursor = 'pointer';
             el.style.outline = ``;
         });
-        components.push({ element: el, children: [], });
+        components.push({ id: el.getAttribute(`data-id`), element: el, children: [], });
         parent.appendChild(el);
         page.html = `<!DOCTYPE html>${dom.getElementsByTagName(`html`)[0].outerHTML}`;
         return el;
@@ -203,32 +219,114 @@
         .append-contextMenu__item:last-child {
             margin-bottom: 0;
         }
-
-        .append-contextMenu__link {
-            color: #0066aa;
-            display: block;
-            padding: 4px 12px;
-            text-decoration: none;
-        }
-
-        .append-contextMenu__link:hover {
-            background-color: #0066aa;
-            color: #fff;
-        }
     `;
 
     // * Markup for the custom context menu:
     const menuMarkup = `<ul class="append-contextMenu__items"></ul>`;
 
+    // * Styling for the shortcut menu:
+    const shortcutStyles = `
+        .append-shortcutMenu {
+            /*TODO*/
+        }
+
+        .append-shortcutMenu.append-shortcutMenu--active {
+            /*TODO*/
+        }
+
+        .append-shortcutMenu__items {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            /*TODO*/
+        }
+
+        .append-shortcutMenu__item {
+            /*TODO*/
+        }
+
+        .append-shortcutMenu__item:last-child {
+            /*TODO*/
+        }
+    `;
+
+    // * Markup for the shortcut menu:
+    const shortcutMarkup = `
+        <ul class="append-shortcutMenu__items">
+            <li class="append-shortcutMenu__item">Bold</li>
+            <li class="append-shortcutMenu__item">Italic</li>
+            <li class="append-shortcutMenu__item">Underline</li>
+            <li class="append-shortcutMenu__item">Strike</li>
+            <li class="append-shortcutMenu__item">Highlight</li>
+            <li class="append-shortcutMenu__item">Link</li>
+        </ul>
+    `;
+
+    // * The text currently selected by the user:
+    let selectedText = ``;
+
     // * Actions to perform once the iframe has loaded:
     const load = (e) => {
+        iframe.update(() => window.frames[`canvas`]);
         doc = window.frames[`canvas`].document;
         html = doc.getElementsByTagName(`html`)[0];
         head = doc.getElementsByTagName(`head`)[0];
         body = doc.getElementsByTagName(`body`)[0];
 
-        body.addEventListener(`dragover`, (e) => {
+        let dragged;
+
+        doc.addEventListener(`drag`, (e) => {
+            // TODO
+        }, false);
+        doc.addEventListener(`dragstart`, (e) => {
+            dragged = e.target;
+            e.target.style.opacity = .8;
+        }, false);
+        doc.addEventListener(`dragend`, (e) => {
+            e.target.style.opacity = ``;
+        }, false);
+        doc.addEventListener(`dragover`, (e) => {
             e.preventDefault();
+        }, false);
+        doc.addEventListener(`dragenter`, (e) => {
+            try {
+                if (e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
+                    if (e.target.tagName === `H1` || e.target.tagName === `H2` || e.target.tagName === `H3` || e.target.tagName === `H4` || e.target.tagName === `H5` || e.target.tagName === `H6` || e.target.tagName === `P`) {
+                        e.target.style.backgroundColor = `#fcabab`;
+                        e.target.style.outline = `2px solid #f00`;
+                    } else {
+                        e.target.style.backgroundColor = `#c7e3fc`;
+                        e.target.style.outline = `2px solid #08f`;
+                    }
+                }
+            } catch (err) {}
+        }, false);
+        doc.addEventListener(`dragleave`, (e) => {
+            try {
+                e.target.style.backgroundColor = ``;
+                e.target.style.outline = ``;
+            } catch (err) {}
+        }, false);
+        doc.addEventListener(`drop`, (e) => {
+            e.preventDefault();
+            e.target.style.backgroundColor = ``;
+            e.target.style.outline = ``;
+            if (e.target.tagName !== `HTML` && e.target.tagName !== `H1` && e.target.tagName !== `H2` && e.target.tagName !== `H3` && e.target.tagName !== `H4` && e.target.tagName !== `H5` && e.target.tagName !== `H6` && e.target.tagName !== `P`) {
+                dragged.parentNode.removeChild(dragged);
+                try {
+                    e.target.appendChild(dragged);
+                } catch (err) {
+                    //e.target.parentNode.appendChild(dragged);
+                    body.appendChild(dragged);
+                }
+            }
+        }, false);
+
+        doc.addEventListener(`selectionchange`, () => {
+            selectedText = doc.getSelection();
+            if (selectedText.anchorNode.data !== ``) {
+                
+            }
         });
 
         createComponent(doc, body, `style`, { type: `text/css`, innerHTML: page.css.generated.trim(), });
@@ -248,7 +346,7 @@
         }, true);
 
         items.forEach((item) => {
-            components.push({ element: body, children: [], });
+            components.push({ id: -1, element: body, children: [], });
             switch (item.type) {
                 case `header`:
                     createComponent(doc, body, `h1`, { contentEditable: true, textContent: item.text, });
@@ -292,12 +390,6 @@
                         // * This is the "catch-all" for creating any other kind of element:
                         createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, });
                 }
-            } else {
-                // * If the dropped element already exists within the iframe and was moved from another location:
-                const id = selection;
-                const el = doc.querySelector(`[data-id="${id}"]`);
-                createComponent(doc, body, el.tagName.toLowerCase(), { contentEditable: el.contentEditable, textContent: el.textContent, });
-                unsetComponent(doc, id);
             }
         });
     };
@@ -318,8 +410,16 @@
 
     // * Automatically update the iframe with user-generated custom CSS as it is being typed:
     css.subscribe((val) => {
-        page.css.custom = val;
-        if (body) body.getElementsByTagName(`style`)[1].innerHTML = val;
+        page.css.custom = val.custom.trim();
+        page.css.generated = val.generated.trim();
+        if (body) body.getElementsByTagName(`style`)[1].innerHTML = val.trim();
+        if (body) body.getElementsByTagName(`style`)[1].innerHTML = val.generated();
+    });
+
+    element.subscribe((val) => {
+        if (doc !== null && typeof val !== `undefined`) {
+            // TODO
+        }
     });
 
     // * Actions to perform once this component has been mounted to the page:

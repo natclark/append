@@ -45,7 +45,7 @@
 </script>
 
 <div class="container">
-    <button class={classList} on:mouseover={showBanner} on:focus={showBanner} on:blur={hideBanner} on:mouseout={hideBanner} on:click={toggleMenu}>
+    <button class={classList} aria-label={text} on:mouseover={showBanner} on:focus={showBanner} on:blur={hideBanner} on:mouseout={hideBanner} on:click={toggleMenu}>
         <slot />
     </button>
     <Banner {text} {show} />

@@ -7,7 +7,7 @@
 <nav class="flex">
     <div class="flex container">
         <div class="flex container__left">
-            <a href="/" sveltekit:prefetch>Append</a>
+            <a href="/" draggable="false" sveltekit:prefetch>Append</a>
         </div>
         <!--
             TODO
