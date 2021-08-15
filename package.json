@@ -42,6 +42,8 @@
         "typescript": "^4.3.5"
     },
     "dependencies": {
+        "@eastdesire/jscolor": "^2.4.5",
+        "@simonwep/pickr": "^1.8.1",
         "dotenv": "^10.0.0",
         "marked": "^2.1.3",
         "svelte-simple-modal": "^1.0.0",

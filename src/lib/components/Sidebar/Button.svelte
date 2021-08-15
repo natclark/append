@@ -19,7 +19,6 @@
     let show = false;
     let active = false;
     let currentTab;
-    let custom = $css;
 
     let metadata = true;
     let wrap = false;
@@ -29,10 +28,6 @@
     const hideBanner = () => show = false;
 
     const toggleMenu = () => !active ? tab.update(() => text) : tab.update(() => false);
-
-    const updateCss = () => {
-        css.update(() => custom);
-    };
 
     const unsubscribe = tab.subscribe((val) => {
         currentTab = val;
@@ -54,6 +49,22 @@
             <h2>{text}</h2>
             {#if text === `Elements`}
                 <p>Layouts</p>
+                <Grid>
+                    <Element text="Container" element="div">
+                        <svg version="1.1" x="0px" y="0px" width="122.88px" height="122.566px" viewBox="0 0 122.88 122.566" enable-background="new 0 0 122.88 122.566" xml:space="preserve">
+                            <g>
+                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M3.78,66.082h47.875c2.045,0,3.717,1.988,3.717,4.414v46.479 c0,2.43-1.671,4.416-3.717,4.416H3.78c-2.043,0-3.717-1.986-3.717-4.416V70.496C0.063,68.07,1.737,66.082,3.78,66.082L3.78,66.082z M71.224,0H119.1c2.046,0,3.717,1.986,3.717,4.415v46.479c0,2.429-1.671,4.413-3.717,4.413H71.224 c-2.045,0-3.714-1.984-3.714-4.413V4.415C67.51,1.986,69.179,0,71.224,0L71.224,0z M3.714,0h47.878 c2.045,0,3.717,1.986,3.717,4.415v46.479c0,2.429-1.671,4.413-3.717,4.413H3.714C1.671,55.307,0,53.323,0,50.894V4.415 C0,1.986,1.671,0,3.714,0L3.714,0z M71.287,67.26h47.876c2.043,0,3.717,1.986,3.717,4.416v46.479c0,2.426-1.674,4.412-3.717,4.412 H71.287c-2.045,0-3.717-1.986-3.717-4.412V71.676C67.57,69.246,69.242,67.26,71.287,67.26L71.287,67.26z"></path>
+                            </g>
+                        </svg>
+                    </Element>
+                    <Element text="Item" element="p">
+                        <svg version="1.1" x="0px" y="0px" width="122.883px" height="122.882px" viewBox="0 0 122.883 122.882" enable-background="new 0 0 122.883 122.882" xml:space="preserve">
+                            <g>
+                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M13.002,0h96.878c7.15,0,13.002,5.851,13.002,13.002v96.877 c0,7.151-5.852,13.002-13.002,13.002H13.002C5.851,122.882,0,117.031,0,109.88V13.002C0,5.851,5.851,0,13.002,0L13.002,0z"></path>
+                            </g>
+                        </svg>
+                    </Element>
+                </Grid>
                 <p>Text</p>
                 <Grid>
                     <Element text="Paragraph" element="p">
@@ -240,7 +251,7 @@
                 <p class="normal">If you'd like, you can write custom CSS below.</p>
                 <p class="normal">This will override your other styles.</p>
                 <Center>
-                    <textarea bind:value={custom} class="editor" rows="32" wrap={wrap ? "on" : "off"} on:keydown={updateCss}></textarea>
+                    <textarea bind:value={$css.custom} class="editor" rows="32" wrap={wrap ? "on" : "off"}></textarea>
                 </Center>
                 <Breaker />
                 <Center>

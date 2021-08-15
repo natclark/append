@@ -1,4 +1,6 @@
 <script>
+    import ButtonSave from './ButtonSave.svelte';
+    import ButtonExport from './ButtonExport.svelte';
     import ButtonPublish from './ButtonPublish.svelte';
 
     // TODO let title = `Append`;
@@ -31,6 +33,8 @@
             </div>
         -->
         <div class="flex container__right">
+            <ButtonSave />
+            <ButtonExport />
             <ButtonPublish />
         </div>
     </div>
@@ -94,5 +98,8 @@
                 width: 100%;
             }
         }
+    }
+    :global(.container__right > button) {
+        margin-left: 12px;
     }
 </style>

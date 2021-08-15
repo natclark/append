@@ -8,13 +8,8 @@
 
     // * The current page:
     let page = {
-        css: {
-            custom: $css.custom,
-            generated: $css.generated,
-        },
         file: null,
         html: ``,
-        js: ``,
     };
     // * The array of all pages:
     let pages = [
@@ -57,7 +52,7 @@
         },
         {
             id: 2,
-            text: `This is my unstoppable blog.`,
+            text: `This is my unstoppable blog. (Warning: progress will not be saved!)`,
             type: `paragraph`,
         }
     ];
@@ -137,10 +132,7 @@
 
     };
 
-    const unsetComponent = (dom, id) => {
-        let el = dom.querySelector(`[data-id="${id}"]`);
-        el.remove();
-    };
+    const unsetComponent = (dom, id) => dom.querySelector(`[data-id="${id}"]`).remove();
 
     // * The custom context menu element:
     let menu = null;
@@ -312,12 +304,18 @@
             e.target.style.backgroundColor = ``;
             e.target.style.outline = ``;
             if (e.target.tagName !== `HTML` && e.target.tagName !== `H1` && e.target.tagName !== `H2` && e.target.tagName !== `H3` && e.target.tagName !== `H4` && e.target.tagName !== `H5` && e.target.tagName !== `H6` && e.target.tagName !== `P`) {
-                dragged.parentNode.removeChild(dragged);
-                try {
-                    e.target.appendChild(dragged);
-                } catch (err) {
-                    //e.target.parentNode.appendChild(dragged);
-                    body.appendChild(dragged);
+                if (typeof dragged !== `undefined`) {
+                    // * An existing element has been dropped:
+                    dragged.parentNode.removeChild(dragged);
+                    try {
+                        e.target.appendChild(dragged);
+                    } catch (err) {
+                        //e.target.parentNode.appendChild(dragged);
+                        body.appendChild(dragged);
+                    }
+                } else {
+                    // * A new element has been dropped:
+                    // TODO
                 }
             }
         }, false);
@@ -325,12 +323,19 @@
         doc.addEventListener(`selectionchange`, () => {
             selectedText = doc.getSelection();
             if (selectedText.anchorNode.data !== ``) {
-                
+                // TODO: Show options for bold/underline/linking/etc.
             }
         });
 
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: page.css.generated.trim(), });
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: page.css.custom.trim(), });
+        let generatedStyles = ``;
+        $css.generated.forEach((selector) => {
+            let rules = ``;
+            selector.rules.forEach((rule) => rules.push(`${rule.key}: ${rule.val}; `));
+            generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`)
+        });
+
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: generatedStyles.trim(), });
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.custom.trim(), });
         createComponent(doc, body, `style`, { type: `text/css`, innerHTML: menuStyles.trim(), });
         createComponent(doc, body, `nav`, { class: `append-contextMenu`, innerHTML: menuMarkup.trim(), });
 
@@ -410,15 +415,19 @@
 
     // * Automatically update the iframe with user-generated custom CSS as it is being typed:
     css.subscribe((val) => {
-        page.css.custom = val.custom.trim();
-        page.css.generated = val.generated.trim();
-        if (body) body.getElementsByTagName(`style`)[1].innerHTML = val.trim();
-        if (body) body.getElementsByTagName(`style`)[1].innerHTML = val.generated();
+        let generatedStyles = ``;
+        $css.generated.forEach((selector) => {
+            let rules = ``;
+            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+            generatedStyles += `[data-id="${selector.id}"] { ${rules}} `;
+        });
+        if (body) body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
+        if (body) body.getElementsByTagName(`style`)[1].innerHTML = $css.custom.trim();
     });
 
     element.subscribe((val) => {
         if (doc !== null && typeof val !== `undefined`) {
-            // TODO
+            //doc.querySelector(`[data-id="${val.id}"]`) = val.el;
         }
     });
 
