@@ -7,8 +7,6 @@ export default writable({
     lastHash: null,
     defaultLang: `en`,
     defaultDirection: `ltr`,
-    customCSS: ``,
-    customJS: null,
     webmanifest: {
         short_name: ``,
         categories: [],

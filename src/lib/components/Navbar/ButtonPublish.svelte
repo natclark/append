@@ -2,11 +2,9 @@
     import { wallet, builtin, chain, flow, fallback } from '$lib/stores/wallet';
     let walletButton;
 
-    const refresh = () => {
-        if ($wallet.address !== undefined) walletButton.classList.add(`connected`);
-    };
+    const refresh = () => $wallet.address !== undefined && (walletButton.classList.add(`connected`));
 
-    const publish = () => {
+    const click = () => {
         if (typeof $wallet.address === `undefined`) {
             try {
                 if ($chain.notSupported) {
@@ -51,6 +49,6 @@
     };
 </script>
 
-<button bind:this={walletButton} class="button primary{$wallet.address === undefined ? `` : ` connected`}" on:click={publish}>
+<button bind:this={walletButton} class="button primary{$wallet.address === undefined ? `` : ` connected`}" on:click={click}>
     {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish (Coming Soon!)`}
 </button>

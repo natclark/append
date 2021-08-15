@@ -2,15 +2,22 @@
     import Banner from './Banner.svelte';
     import Grid from '$lib/components/Layout/Grid.svelte';
     import Element from './Element.svelte';
+    import { Web3Storage } from 'web3.storage';
+    //import IPFS from 'ipfs/dist/index.min.js';
+    //import IPFS from 'ipfs-core';
     import Center from '$lib/components/Layout/Center.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import Modal from 'svelte-simple-modal';
     import CreatePageButton from '$lib/components/modals/CreatePageButton.svelte';
     import UploadPageButton from '$lib/components/modals/UploadPageButton.svelte';
     import CreateRedirectButton from '$lib/components/modals/CreateRedirectButton.svelte';
+    import pages from '$lib/stores/pages';
     import UploadFileButton from '$lib/components/modals/UploadFileButton.svelte';
+    import Upload from './Upload.svelte';
+    import EditFaviconsButton from '$lib/components/modals/EditFaviconsButton.svelte';
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
+    import { onMount } from 'svelte';
     import { onDestroy } from 'svelte';
 
     export let text;
@@ -29,11 +36,40 @@
 
     const toggleMenu = () => !active ? tab.update(() => text) : tab.update(() => false);
 
+    // * The below method is TEMPORARY. Yes, of course this is bad practice. If someone abuses the below API key before I switch to something else, I'll add a new default one ASAP.
+    const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGI0MEIzZGU3Y0Y2Mjk3MTZBNDM2NGQ2NWY2NTJBMzNCOTU5N2E0QzEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Mjc1OTAzMTc0MzMsIm5hbWUiOiJFVEhHbG9iYWwgVGVzdCJ9.wpGMGBuvu4n2f4hXTYyU7n13u-gMe6I_KOCTtHkQ280`;
+
+    let files;
+    let ls;
+    let uploads;
+
+    const uploadFiles = async () => {
+        if (metadata) {
+            // TODO: Strip image metadata like EXIF
+        }
+        const client = new Web3Storage({ token, });
+        const cid = await client.put(files);
+        if (ls) {
+            if (ls.getItem(`uploads`) !== null) ls.setItem(`uploads`, ``);
+            let newUploads = ls.getItem(`uploads`).split(`,`);
+            newUploads.push(cid);
+            uploads = newUploads.join(`,`);
+            ls.setItem(`uploads`, uploads);
+        }
+    };
+
     const unsubscribe = tab.subscribe((val) => {
         currentTab = val;
         active = currentTab === text ? true : false;
         classList = active ? `active` : ``;
         if (active) hideBanner();
+    });
+
+    onMount(() => {
+        if (typeof localStorage !== `undefined`) {
+            ls = localStorage;
+            uploads = ls.getItem(`uploads`).split(`,`);
+        }
     });
 
     onDestroy(unsubscribe);
@@ -57,7 +93,7 @@
                             </g>
                         </svg>
                     </Element>
-                    <Element text="Item" element="p">
+                    <Element text="Item" element="div">
                         <svg version="1.1" x="0px" y="0px" width="122.883px" height="122.882px" viewBox="0 0 122.883 122.882" enable-background="new 0 0 122.883 122.882" xml:space="preserve">
                             <g>
                                 <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M13.002,0h96.878c7.15,0,13.002,5.851,13.002,13.002v96.877 c0,7.151-5.852,13.002-13.002,13.002H13.002C5.851,122.882,0,117.031,0,109.88V13.002C0,5.851,5.851,0,13.002,0L13.002,0z"></path>
@@ -180,24 +216,141 @@
                         </Modal>
                     </Center>
                 <p>My Pages</p>
+                {#each $pages as page}
+                    {#if page.type === `page`}
+                        <div class="page">
+                            <div class="flex">
+                                <div>
+                                    <p class="normal title">{page.title}</p>
+                                    <p class="normal faint">{page.path}</p>
+                                </div>
+                                <button class="primary">Edit</button>
+                            </div>
+                        </div>
+                    {/if}
+                {/each}
+                <p>My Redirects</p>
                 <p>Special Pages</p>
+                {#each $pages as page}
+                    {#if page.type !== `page`}
+                        <div class="page">
+                            {#if page.type === `stylesheet`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Stylesheet</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `redirect`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">IPFS 404</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `security`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Security.txt File</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `ads`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Ads.txt File</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `browserconfig`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Browserconfig.xml File</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `humans`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Humans.txt File</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `webmanifest`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Web app manifest</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `robots`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Robots.txt File</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `feed`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">RSS/Atom Feed</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else if page.type === `sitemap`}
+                                <div class="flex">
+                                    <div>
+                                        <p class="normal title">Sitemap</p>
+                                        <p class="normal faint">{page.path}</p>
+                                    </div>
+                                    <button class="primary">Edit</button>
+                                </div>
+                            {:else}
+                            {/if}
+                        </div>
+                    {/if}
+                {/each}
             {:else if text === `Products`}
                 <p>This feature is coming soon!</p>
             {:else if text === `Files`}
                 <p>Upload File</p>
                 <Center>
+                    <!--
+                    TODO - Modal for easy file dragging-and-dropping
                     <Modal>
                         <UploadFileButton />
                     </Modal>
+                    -->
+                    <input class="primary" type="file" multiple bind:files={files} on:change={uploadFiles}>
                 </Center>
                 <Breaker />
                 <Center>
                     <div class="checkbox">
                         <input id="metadata" name="metadata" type="checkbox" bind:checked={metadata}>
-                        <label for="metadata">Strip image metadata</label>
+                        <label for="metadata">Strip image metadata (WIP)</label>
                     </div>
                 </Center>
+                <Breaker />
+                <Center>
+                    <p class="normal"><em>You might want to avoid uploading private or personally identifying files to IPFS! They might not be able to be removed later, as long as at least one node is still replicating them.</em></p>
+                </Center>
                 <p>My Files</p>
+                <Grid>
+                    {#each uploads as cid}
+                        {#if cid !== ``}
+                            <Upload {cid} />
+                        {/if}
+                    {/each}
+                </Grid>
             {:else if text === `Globals`}
                 <p>Font</p>
                 <Grid>
@@ -245,6 +398,12 @@
                 <p>RSS/Atom</p>
                 <p>Scraping & robots.txt</p>
                 <p>Web App Manifest</p>
+                <p>Favicons</p>
+                <Center>
+                    <Modal>
+                        <EditFaviconsButton />
+                    </Modal>
+                </Center>
             {:else if text === `Plugins`}
                 <p>This feature is coming soon!</p>
             {:else if text === `CSS`}
@@ -303,6 +462,30 @@
                 &:not(.normal) {
                     background-color: #333;
                     padding: 4px 8px;
+                }
+            }
+            .page {
+                padding: 4px 0;
+                .flex {
+                    align-items: center;
+                    display: flex;
+                    justify-content: space-between;
+                    p {
+                        margin: 0 0 4px 0;
+                        &.title {
+                            color: #fff;
+                            font-weight: 700;
+                        }
+                        &.faint {
+                            font-weight: 400;
+                        }
+                    }
+                    button {
+                        margin-right: 4px;
+                    }
+                }
+                &:hover {
+                    background-color: #444;
                 }
             }
             .checkbox {

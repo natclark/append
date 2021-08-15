@@ -4,6 +4,9 @@
 
     let classList = !element ? `button` : ``;
 
+    if (text === `Container`) element = `container`;
+    else if (text === `Item`) element = `item`;
+
     let items = [
         {
             id: 1,

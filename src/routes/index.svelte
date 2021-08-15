@@ -1,23 +1,14 @@
 <script>
+    import pages from '$lib/stores/pages';
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
     import { flip } from 'svelte/animate';
-    import { onMount } from 'svelte';
+    import isModified from '$lib/stores/ismodified';
 
-    // * The current page:
-    let page = {
-        file: null,
-        html: ``,
-    };
-    // * The array of all pages:
-    let pages = [
-        {
-            page,
-            url: `/`,
-        }
-    ];
+    // * The index of the current page:
+    let pageIndex = 0;
 
     // * The iframe (not an actual JS canvas) in which a preview of the selected page lies:
     let canvas;
@@ -27,9 +18,6 @@
     let classList = ``;
     // * The source URL of the iframe:
     const src = `/preview.html`;
-
-    // * Returns whether the user made any changes:
-    let isModified = false;
 
     // * The canvas document:
     let doc = null;
@@ -52,7 +40,22 @@
         },
         {
             id: 2,
-            text: `This is my unstoppable blog. (Warning: progress will not be saved!)`,
+            text: `Welcome to YOUR very own unstoppable website.`,
+            type: `paragraph`,
+        },
+        {
+            id: 3,
+            text: `WARNING: Progress will not be saved (yet)!`,
+            type: `paragraph`,
+        },
+        {
+            id: 4,
+            text: `IMPORTANT: There are some issues with dragging and layers at the moment, so please don't try to build a full site for now, because it may be a very frustrating experience. This will be fixed shortly!`,
+            type: `paragraph`,
+        },
+        {
+            id: 5,
+            text: `Anyways, have fun playing with this!`,
             type: `paragraph`,
         }
     ];
@@ -75,7 +78,7 @@
         counter++;
         el.style.cursor = 'pointer';
         el.draggable = 'true';
-        el.style.transition = `.1s outline`;
+        el.style.transition = `.1s outline ease-out`;
         el.style.willChange = `box-shadow`;
         el.addEventListener(`mouseover`, () => {
             if (el !== dom.activeElement && selection !== el.getAttribute(`data-id`)) {
@@ -109,7 +112,7 @@
             components.forEach((component) => component.element.style.outline = ``);
             el.style.outline = `2px solid #08f`;
         });
-        el.addEventListener(`keydown`, (e) => {
+        el.addEventListener(`keydown`, (e) => { // TODO - fix two bugs related to this function
             if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable !== true) {
                 selection = -1;
                 const obj = { id: -1, el, };
@@ -124,7 +127,6 @@
         });
         components.push({ id: el.getAttribute(`data-id`), element: el, children: [], });
         parent.appendChild(el);
-        page.html = `<!DOCTYPE html>${dom.getElementsByTagName(`html`)[0].outerHTML}`;
         return el;
     };
 
@@ -305,7 +307,24 @@
             e.target.style.outline = ``;
             if (e.target.tagName !== `HTML` && e.target.tagName !== `H1` && e.target.tagName !== `H2` && e.target.tagName !== `H3` && e.target.tagName !== `H4` && e.target.tagName !== `H5` && e.target.tagName !== `H6` && e.target.tagName !== `P`) {
                 if (typeof dragged !== `undefined`) {
-                    // * An existing element has been dropped:
+                    // * An existing element has been dropped and was moved from another location within the iframe:
+                    /*
+                    TODO: Consider an approach like the following:
+                    const id = <ID>;
+                    const el = doc.querySelector(`[data-id="${id}"]`);
+                    // * Get the sibling components:
+                    let siblings = [];
+                    const firstChild = el.parentNode.firstChild;
+                    do {
+                        if (parent.nodeType === 3) continue; // if text node, then skip over
+                        if (!filter || filter(firstChild)) siblings.push(firstChild); // otherwise, push
+                    } while (firstChild = firstChild.nextSibling);
+                    // do something with sibs
+                    console.log(sibs);
+                    // like maybe creating a new component and reseting the old one?
+                    // createComponent(doc, body, el.tagName.toLowerCase(), { contentEditable: el.contentEditable, textContent: el.textContent, });
+                    // unsetComponent(doc, id);
+                    */
                     dragged.parentNode.removeChild(dragged);
                     try {
                         e.target.appendChild(dragged);
@@ -315,7 +334,7 @@
                     }
                 } else {
                     // * A new element has been dropped:
-                    // TODO
+                    // This is currently handled by the other "drop" event listener, which is attached to the body. Scroll below to find it.
                 }
             }
         }, false);
@@ -370,6 +389,14 @@
                 const tagName = e.dataTransfer.getData(`element`);
                 switch (tagName) {
                     // * These are some special cases for creating "exception" elements:
+                    case `container`:
+                        createComponent(doc, body, `div`, { className: `container`, });
+                        break;
+                    case `item`:
+                        createComponent(doc, body, `div`, { className: `item`, });
+                        break;
+                    case `item`:
+                        break;
                     case `ul`:
                         createComponent(doc, createComponent(doc, body, `ul`, {}), `li`, { contentEditable: true, textContent: `This is some dummy text.`, });
                         break;
@@ -421,8 +448,10 @@
             selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
             generatedStyles += `[data-id="${selector.id}"] { ${rules}} `;
         });
-        if (body) body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
-        if (body) body.getElementsByTagName(`style`)[1].innerHTML = $css.custom.trim();
+        if (body) {
+            body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
+            body.getElementsByTagName(`style`)[1].innerHTML = $css.custom.trim();
+        }
     });
 
     element.subscribe((val) => {
@@ -431,11 +460,12 @@
         }
     });
 
-    // * Actions to perform once this component has been mounted to the page:
-    onMount(() => {
-        //isModified = true;
-    });
-
+    $: {
+        if (doc) {
+            $pages[pageIndex].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
+            isModified.update(() => true);
+        }
+    }
 </script>
 
 <svelte:window on:beforeunload={beforeunload} on:keyup={keyup} />

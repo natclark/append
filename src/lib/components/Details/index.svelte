@@ -28,7 +28,7 @@
         { tag: `IMG`, name: `Image`, },
         { tag: `VIDEO`, name: `Video`, },
         { tag: `AUDIO`, name: `Audio`, }
-    ]
+    ];
 
     let currentElement = null;
 
@@ -88,6 +88,10 @@
 
     const backgroundColorChange = (e) => newStyle(`background-color`, e.target.getAttribute(`data-current-color`));
 
+    const marginChange = (e) => newStyle(`margin`, e.target.value);
+
+    const paddingChange = (e) => newStyle(`padding`, e.target.value);
+
     const textAlignChange = (alignment) => newStyle(`text-align`, alignment);
 
     const fontFamilyChange = (e) => newStyle(`font-family`, e.target.value);
@@ -139,11 +143,11 @@
 
 <aside class={classList}>
     {#if currentElement !== null && typeof currentElement.el !== `undefined`}
-        {#if elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName)) !== -1}
-            <h2>{elements[elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName))].name}</h2>
+        {#if elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName)) !== -1 || currentElement.el.tagName === `DIV`}
+            <h2>{currentElement.el.tagName !== `DIV` ? elements[elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName))].name : `${currentElement.el.className.substring(0, 1).toUpperCase()}${currentElement.el.className.slice(1)}`}</h2>
             <!--
             TODO: Allow for changing header level
-            <p>Basics</p>
+            <p>Level</p>
             <div class="level">
                 <p class="normal">Level</p>
                 <select value={currentElement.el.tagName} on:change={headerChange}>
@@ -156,25 +160,30 @@
                 </select>
             </div>
             -->
-            <p>Color</p>
-            <div class="level">
-                <p class="normal">Text Color</p>
-                <input class="jscolor" value="{attributes.color || `#000000`}" data-jscolor="" on:change={colorChange}>
-            </div>
-            <div class="level">
-                <p class="normal">Background Color</p>
-                <input class="jscolor jscolor-active" value="{attributes.background_color || `#ffffff`}" data-jscolor="" on:change={backgroundColorChange}>
-            </div>
+            {#if currentElement.el.tagName === `DIV`}
+                <p>Flex Settings</p>
+            {/if}
+            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
+                <p>Color</p>
+                <div class="level">
+                    <p class="normal">Text Color</p>
+                    <input class="jscolor" value="{attributes.color || `#000000`}" data-jscolor="" on:change={colorChange}>
+                </div>
+                <div class="level">
+                    <p class="normal">Background Color</p>
+                    <input class="jscolor jscolor-active" value="{attributes.background_color || `#ffffff`}" data-jscolor="" on:change={backgroundColorChange}>
+                </div>
+            {/if}
             <p>Spacing</p>
             <div class="level">
                 <p class="normal">Margin</p>
-                <input type="text">
+                <input type="text" value="{attributes.margin || `0px`}" on:change={marginChange}>
             </div>
             <div class="level">
                 <p class="normal">Padding</p>
-                <input type="text">
+                <input type="text" value="{attributes.padding || `0px`}" on:change={paddingChange}>
             </div>
-            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `L`}
+            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
                 <p>Typography</p>
                 <div class="level">
                     <p class="normal">Alignment</p>
@@ -264,7 +273,7 @@
 <style>
     aside {
         align-items: center;
-        background-color: #444;
+        background-color: #555;
         color: #fff;
         display: inline-flex;
         flex-flow: column wrap;
@@ -300,13 +309,17 @@
                 text-align: left;
             }
             select, input {
-                background-color: #fff;
-                border: 1px solid #eee;
-                color: #000;
-                font-size: 18px;
+                background-color: #444;
+                border: 1px solid #222;
+                border-radius: 4px;
+                color: #fff;
+                font-size: 16px;
                 width: 100%;
                 &:hover {
-                    border-color: #222;
+                    border-color: #555;
+                }
+                &:focus {
+                    outline: 0;
                 }
             }
             .flex {

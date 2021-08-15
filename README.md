@@ -13,11 +13,13 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 - 🛡 **Unstoppable** No one can censor you or shut you down
 - 💾 **Persistent** No reliance on central servers, third-party APIs, or middlemen
 - 🖱 **Drag-and-Drop** Build your website with no code - or with code, if that's your thing
-- ⛓ **Blockchain Domains** "Sign in" with ENS, Unstoppable Domains, and more
+- ⛓ **Blockchain Domains** "Sign in" with [ENS](https://ens.domains/) and [Unstoppable Domains](https://unstoppabledomains.com/)
 - © **Full Ownership** With Append, you actually own your data as on-chain property
 
 ## Feature Roadmap
 
+- 🧼 **Cleaner Code, Better Documentation, Simpler Design**
+- 📊 **More Modern Editor UI**
 - 🛒 **Ecommerce Products**
 - ⚡ **Service Workers**
 - 📷 **Modern Image Formats**
@@ -26,7 +28,29 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 - 💻 **Improved Compatibility**
 - 🏗 **Plugins**
 - 🎨 **Themes**
+- 📦 **"Classes" For Storing Global Styles**
+- 🚂 **More Efficient Static Asset Minification/Bundling Engine**
+- 📄 **All Semantic HTML Tags**
 - 📶 **Further Decentralization Overall**
+
+## Development
+
+### Install
+
+```bash
+npm i
+```
+### Run Local Dev Server
+
+```bash
+npm run dev
+```
+
+### Build
+
+```bash
+npm run build
+```
 
 ## License
 

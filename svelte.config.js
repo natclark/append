@@ -4,6 +4,7 @@ import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
 import autoprefixer from 'autoprefixer';
 import dotenv from 'dotenv';
+import process from 'process';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ export default {
         preprocess({
             defaults: { style: `scss` },
             postcss: { plugins: [autoprefixer()] },
+            replace: [[`process.env.WEB3STORAGE_TOKEN`, process.env.WEB3STORAGE_TOKEN]],
             scss: { prependData: `@charset 'UTF-8';` },
             sourceMap: true,
         }),
