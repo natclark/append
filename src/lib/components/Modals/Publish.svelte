@@ -38,7 +38,7 @@
                     const link = doc.createElement(`link`);
                     link.rel = `stylesheet`;
                     link.type = `text/css`;
-                    link.href = `/style.css`;
+                    link.href = `./style.css`;
                     doc.querySelector(`head`).appendChild(link);
                     blob = new Blob([`<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML.trim()}`], { type: page.mime, });
                     files.push(new File([blob], page.file));
@@ -138,7 +138,7 @@
         {#each publications as pub}
             {#if pub !== ``}
                 <tr>
-                    <td><a href="https://gateway.ipfs.io/ipfs/{pub}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
+                    <td><a href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
                     <td>{pub.split(`;`)[1]}</td>
                     <td>{pub.split(`;`)[2]}</td>
                 </tr>
