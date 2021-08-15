@@ -1,8 +1,13 @@
 <script>
     import { wallet, builtin, chain, flow, fallback } from '$lib/stores/wallet';
+    import { getContext } from 'svelte';
+    import Publish from '$lib/components/Modals/Publish.svelte';
+
+    const { open, } = getContext(`simple-modal`);
+
     let walletButton;
 
-    const refresh = () => $wallet.address !== undefined && (walletButton.classList.add(`connected`));
+    const refresh = () => $wallet.address !== undefined && (walletButton.classList.add(`success`));
 
     const click = () => {
         if (typeof $wallet.address === `undefined`) {
@@ -44,11 +49,11 @@
                 // TODO handle
             }
         } else {
-            alert(`This feature is still in the works!`);
+            open(Publish);
         }
     };
 </script>
 
-<button bind:this={walletButton} class="button primary{$wallet.address === undefined ? `` : ` connected`}" on:click={click}>
-    {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish (Coming Soon!)`}
+<button bind:this={walletButton} class="button {$wallet.address === undefined ? `primary` : `success`}" on:click={click}>
+    {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish`}
 </button>

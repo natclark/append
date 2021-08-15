@@ -1,7 +1,8 @@
 <script>
     import ButtonSave from './ButtonSave.svelte';
     import ButtonExport from './ButtonExport.svelte';
-    import ButtonPublish from './ButtonPublish.svelte';
+    import Modal from 'svelte-simple-modal';
+    import PublishButton from '$lib/components/Modals/PublishButton.svelte';
 
     // TODO let title = `Append`;
 </script>
@@ -9,10 +10,12 @@
 <nav class="flex">
     <div class="flex container">
         <div class="flex container__left">
-            <a href="/" draggable="false" sveltekit:prefetch>Append</a>
+            <a href="/" draggable="false" sveltekit:prefetch>
+                <img src="/logo.svg" height="24px" width="24px" alt="Append">
+            </a>
         </div>
         <!--
-            TODO
+            TODO: Easily edit title and quickly swap current page via navbar
             <div class="flex container__center">
                 <div>
                     <label for="page">Page:</label>
@@ -35,7 +38,9 @@
         <div class="flex container__right">
             <ButtonSave />
             <ButtonExport />
-            <ButtonPublish />
+            <Modal>
+                <PublishButton /><!-- TODO: fix this being backwards, or vice-versa -->
+            </Modal>
         </div>
     </div>
 </nav>

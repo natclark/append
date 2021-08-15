@@ -50,7 +50,7 @@
         const client = new Web3Storage({ token, });
         const cid = await client.put(files);
         if (ls) {
-            if (ls.getItem(`uploads`) !== null) ls.setItem(`uploads`, ``);
+            ls.getItem(`uploads`) === null && (ls.setItem(`uploads`, ``));
             let newUploads = ls.getItem(`uploads`).split(`,`);
             newUploads.push(cid);
             uploads = newUploads.join(`,`);
@@ -62,12 +62,13 @@
         currentTab = val;
         active = currentTab === text ? true : false;
         classList = active ? `active` : ``;
-        if (active) hideBanner();
+        active && (hideBanner());
     });
 
     onMount(() => {
         if (typeof localStorage !== `undefined`) {
             ls = localStorage;
+            ls.getItem(`uploads`) === null && (ls.setItem(`uploads`, ``));
             uploads = ls.getItem(`uploads`).split(`,`);
         }
     });

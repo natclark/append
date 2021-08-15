@@ -15,7 +15,7 @@ button, input[type="submit"], [type="file"] {
     border: 0;
     outline: 0;
     padding: 0;
-    &.primary, &.error {
+    &.primary, &.success, &.error {
         border-radius: 4px;
         box-sizing: border-box;
         color: #fff;
@@ -44,6 +44,21 @@ button, input[type="submit"], [type="file"] {
         &:active {
             background-image: linear-gradient(#3D94D9, #0067B9);
             border-color: #006DBC;
+        }
+    }
+    &.success {
+        background-image: linear-gradient(#31ba51, #1e7800);
+        border: 1px solid #007d1d;
+        &:hover {
+            background-image: linear-gradient(#2b9844, #00671d);
+            border-color: #00580a;
+        }
+        &:focus {
+            box-shadow: rgba(125, 187, 122, 0.5) 0 0 0 2px;
+        }
+        &:active {
+            background-image: linear-gradient(#48c546, #1ba000);
+            border-color: #017813;
         }
     }
     &.error {
