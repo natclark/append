@@ -1,10 +1,17 @@
 <script>
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import { Web3Storage } from 'web3.storage';
+    import { wallet, builtin, chain, flow, fallback } from '$lib/stores/wallet';
+    //import { Resolution } from '@unstoppabledomains/resolution';
+    //import ENS, { getEnsAddress } from '@ensdomains/ensjs'
     import pages from '$lib/stores/pages';
     import css from '$lib/stores/css';
     import { onMount } from 'svelte';
 
+    // TODO: Brush up one-click publishing
+    // const resolution = new Resolution();
+    // const provider = null;
+    // const ens = new ENS({ provider, ensAddress: getEnsAddress('1') })
     let domain;
     let ls;
     let publications = [];
@@ -89,7 +96,7 @@
         if (ls) {
             ls.getItem(`publications`) === null && (ls.setItem(`publications`, ``));
             let newPublications = ls.getItem(`publications`).split(`,`);
-            newPublications.push(`${cid};${domain};${new Date().toUTCString().replace(`,`, ``)}`); // TODO sanitize in case domain has semicolons
+            newPublications.push(`${cid};${null};${new Date().toUTCString().replace(`,`, ``)}`); // TODO sanitize in case domain has semicolons
             publications = newPublications.join(`,`);
             ls.setItem(`publications`, publications);
         }
@@ -116,6 +123,8 @@
         <input class="primary" type="submit" value="Publish">
     </div>
 </form>
+<p><strong>Note:</strong> One-click publishing to blockchain domains is currently disabled.</p>
+<Breaker />
 <h3>Previous Publications</h3>
 <table>
     <thead>
