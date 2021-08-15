@@ -14,6 +14,19 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 - 💾 **Persistent** No reliance on central servers, third-party APIs, or middlemen
 - 🖱 **Drag-and-Drop** Build your website with no code - or with code, if that's your thing
 - ⛓ **Blockchain Domains** "Sign in" with ENS, Unstoppable Domains, and more
+- © **Full Ownership** With Append, you actually own your data as on-chain property
+
+## Feature Roadmap
+
+- 🛒 **Ecommerce Products**
+- ⚡ **Service Workers**
+- 📷 **Modern Image Formats**
+- ♿ **WCAG Compliance**
+- 📱 **Mobile Editor**
+- 💻 **Improved Compatibility**
+- 🏗 **Plugins**
+- 🎨 **Themes**
+- 📶 **Further Decentralization Overall**
 
 ## License
 
