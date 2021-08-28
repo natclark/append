@@ -6,6 +6,7 @@
     //import ENS, { getEnsAddress } from '@ensdomains/ensjs'
     import pages from '$lib/stores/pages';
     import css from '$lib/stores/css';
+    import redirects from '$lib/stores/redirects';
     import { onMount } from 'svelte';
 
     // TODO: Brush up one-click publishing
@@ -16,10 +17,14 @@
     let ls;
     let publications = [];
 
+    // * Disable the publish button when it is loading:
+    let disabled = false;
+
     // * The below method is TEMPORARY. Yes, of course this is bad practice. If someone abuses the below API key before I switch to something else, I'll add a new default one ASAP.
     const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGI0MEIzZGU3Y0Y2Mjk3MTZBNDM2NGQ2NWY2NTJBMzNCOTU5N2E0QzEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Mjc1OTAzMTc0MzMsIm5hbWUiOiJFVEhHbG9iYWwgVGVzdCJ9.wpGMGBuvu4n2f4hXTYyU7n13u-gMe6I_KOCTtHkQ280`;
 
     const submit = async () => {
+        disabled = true;
         const client = new Web3Storage({ token, });
         let files = [];
         const parser = new DOMParser();
@@ -34,7 +39,11 @@
                         el.removeAttribute(`style`);
                     });
                     doc.querySelectorAll(`style`).forEach((el) => el.remove());
-                    doc.querySelector(`.append-contextMenu`).remove();
+                    try {
+                        // TODO - clean up context menu removal
+                        doc.querySelector(`.append-contextMenu__items`).remove();
+                        doc.querySelector(`.append-contextMenu`).remove();
+                    } catch (e) {}
                     const link = doc.createElement(`link`);
                     link.rel = `stylesheet`;
                     link.type = `text/css`;
@@ -47,8 +56,8 @@
                     let generatedStyles = ``;
                     $css.generated.forEach((selector) => {
                         let rules = ``;
-                        selector.rules.forEach((rule) => rules.push(`${rule.key}: ${rule.val}; `));
-                        generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`);
+                        selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+                        generatedStyles += `[data-id="${selector.id}"] { ${rules}}`;
                     });
                     blob = new Blob([`${generatedStyles.trim()}${$css.custom.trim()}`], { type: page.mime, });
                     files.push(new File([blob], page.file));
@@ -92,6 +101,10 @@
                 default:
             }
         });
+        $redirects.forEach((redirect) => {
+            const blob = new Blob([`<!DOCTYPE html><title>.</title>\<script\>window.location=\`${redirect.to}\`\<\/script\><noscript><meta http-equiv="refresh" content="0;url=${redirect.to}"></noscript>`.trim()], { type: redirect.mime, });
+            files.push(new File([blob]), page.file);
+        });
         const cid = await client.put(files);
         if (ls) {
             ls.getItem(`publications`) === null && (ls.setItem(`publications`, ``));
@@ -100,6 +113,7 @@
             publications = newPublications.join(`,`);
             ls.setItem(`publications`, publications);
         }
+        disabled = false;
     };
 
     onMount(() => {
@@ -120,10 +134,10 @@
     <Breaker />
     <div class="flex">
         <span></span>
-        <input class="primary" type="submit" value="Publish">
+        <input class="primary{disabled ? ` disabled` : ``}" type="submit" value={disabled ? `Loading` : `Publish`} {disabled}>
     </div>
 </form>
-<p><strong>Note:</strong> One-click publishing to blockchain domains is currently disabled.</p>
+<p><strong>Note:</strong> One-click publishing to blockchain domains is currently disabled.<Breaker /><Breaker />However, you can still click "Publish" anyway to just publish on IPFS.</p>
 <Breaker />
 <h3>Previous Publications</h3>
 <table>
@@ -159,12 +173,13 @@
         }
     }
     table {
-        border: 1px solid #eee;
+        border: 1px solid #111;
         border-collapse: collapse;
+        border-radius: 2px;
         width: 100%;
         tbody {
             tr:nth-child(odd) {
-                background-color: #e9fdff;
+                background-color: #555;
             }
         }
         tr {
@@ -177,6 +192,18 @@
                 }
             }
             td:first-child {
+                a {
+                    color: #40c9ff;
+                    &:hover {
+                        color: #00b7ff;
+                    }
+                    &:visited {
+                        color: #fb75fb;
+                        &:hover {
+                            color: #ee82ee;
+                        }
+                    }
+                }
                 word-wrap: break-word;
                 max-width: 100px;
             }

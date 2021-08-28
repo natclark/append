@@ -1,45 +1,39 @@
 <script>
-    import ButtonSave from './ButtonSave.svelte';
-    import ButtonExport from './ButtonExport.svelte';
+    import page from '$lib/stores/page';
+    import pages from '$lib/stores/pages';
+    import EditPage from './Buttons/EditPage.svelte';
+    import Save from './Buttons/Save.svelte';
+    import Export from './Buttons/Export.svelte';
     import Modal from 'svelte-simple-modal';
-    import PublishButton from '$lib/components/Modals/PublishButton.svelte';
-
-    // TODO let title = `Append`;
+    import Publish from './Buttons/Publish.svelte';
 </script>
 
 <nav class="flex">
     <div class="flex container">
         <div class="flex container__left">
             <a href="/" draggable="false" sveltekit:prefetch>
-                <img src="/logo.svg" height="24px" width="24px" alt="Append">
+                <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
             </a>
         </div>
-        <!--
-            TODO: Easily edit title and quickly swap current page via navbar
-            <div class="flex container__center">
-                <div>
-                    <label for="page">Page:</label>
-                    <select id="page">
-                        <option>/</option>
-                    </select>
-                </div>
-                <div class="flex">
-                    <h1 contenteditable="true">{title}</h1>
-                    <button>
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 117.74 122.88" style="enable-background:new 0 0 117.74 122.88" xml:space="preserve" width="16px" height="16px">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M94.62,2c-1.46-1.36-3.14-2.09-5.02-1.99c-1.88,0-3.56,0.73-4.92,2.2L73.59,13.72l31.07,30.03l11.19-11.72 c1.36-1.36,1.88-3.14,1.88-5.02s-0.73-3.66-2.09-4.92L94.62,2L94.62,2L94.62,2z M41.44,109.58c-4.08,1.36-8.26,2.62-12.35,3.98 c-4.08,1.36-8.16,2.72-12.35,4.08c-9.73,3.14-15.07,4.92-16.22,5.23c-1.15,0.31-0.42-4.18,1.99-13.6l7.74-29.61l0.64-0.66 l30.56,30.56L41.44,109.58L41.44,109.58L41.44,109.58z M22.2,67.25l42.99-44.82l31.07,29.92L52.75,97.8L22.2,67.25L22.2,67.25z"></path>
-                            </g>
-                        </svg>
-                    </button>
-                </div>
+        <div class="flex container__center">
+            <div class="select">
+                <select bind:value={$page}>
+                    {#each $pages as p}
+                        {#if p.type === `page`}
+                            <option value={p.id} selected={p.id === $page ? true : false}>{p.canonical} ({p.title})</option>
+                        {/if}
+                    {/each}
+                </select>
             </div>
-        -->
-        <div class="flex container__right">
-            <ButtonSave />
-            <ButtonExport />
             <Modal>
-                <PublishButton /><!-- TODO: fix this being backwards, or vice-versa -->
+                <EditPage />
+            </Modal>
+        </div>
+        <div class="flex container__right">
+            <Save />
+            <Export />
+            <Modal>
+                <Publish />
             </Modal>
         </div>
     </div>
@@ -52,13 +46,20 @@
         height: 40px;
         padding: 0 8px;
         width: 100vw;
-        a, label {
-            color: #fff;
-        }
         a {
+            align-items: center;
+            color: #fff;
+            display: flex;
+            margin-left: -4px;
             text-decoration: none;
+            img {
+                pointer-events: none;
+            }
             &:hover {
                 opacity: .8;
+            }
+            &:focus {
+                outline: 0;
             }
         }
         .flex {
@@ -76,24 +77,23 @@
                 width: 100%;
             }
             .container__center {
-                justify-content: space-evenly;
+                margin-top: 1px;
                 max-width: calc((100vw - 16px) / 3);
                 width: 100%;
-                h1 {
-                    color: #fff;
-                    font-size: 16px;
-                    font-weight: 400;
-                }
-                button {
-                    height: 16px;
-                    margin-left: 8px;
-                    width: 16px;
-                    svg {
-                        height: 16px;
-                        width: 16px;
-                    }
-                    &:hover svg path {
-                        fill: #f8f8f8;
+                .select {
+                    width: 100%;
+                    select {
+                        background-color: #222;
+                        border: 1px solid #000;
+                        color: #fff;
+                        font-size: 16px;
+                        width: 100%;
+                        &:hover {
+                            border-color: #333;
+                        }
+                        &:focus {
+                            outline: 0;
+                        }
                     }
                 }
             }

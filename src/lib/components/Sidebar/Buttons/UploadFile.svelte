@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import UploadFile from './UploadFile.svelte';
+    import UploadFile from '../Modals/UploadFile.svelte';
 
     const { open, } = getContext(`simple-modal`);
 

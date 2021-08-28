@@ -1,25 +1,20 @@
 <script>
     export let text;
     export let element;
+    export let disabled;
 
-    let classList = !element ? `button` : ``;
+    let className = !element ? `button` : ``;
+    className += disabled ? ` disabled` : ``;
 
     if (text === `Container`) element = `container`;
     else if (text === `Item`) element = `item`;
-
-    let items = [
-        {
-            id: 1,
-            text,
-        }
-    ];
 
     const dragstart = (e) => element && (e.dataTransfer.setData(`element`, element));
 
     const click = (e) => !element && (alert(`This feature is still in the works. Sorry!`));
 </script>
 
-<div class={classList} draggable={classList === `` ? `true` : `false`} role="button" on:dragstart={dragstart} on:click={click}>
+<div class={className} draggable={className === `` ? `true` : `false`} role="button" on:dragstart={dragstart} on:click={click}>
     <slot />
     <p>{text}</p>
 </div>
@@ -36,10 +31,15 @@
             font-size: 14px;
             margin: 6px 0 0;
         }
-        &:hover {
+        &.disabled {
+            background-color: #222;
+            border-color: #555;
+            cursor: not-allowed !important;
+        }
+        &:not(.disabled):hover {
             background-color: #444;
         }
-        &:active {
+        &:not(.disabled):active {
             cursor: grabbing !important;
         }
     }

@@ -6,8 +6,12 @@
     };
 </script>
 
+<!--
+    TODO
 {#if $isModified}
-    <button class="button primary" on:click={click}>Save</button>
+    <button class="primary" on:click={click}>Save</button>
 {:else}
-    <button class="button primary" disabled>Save</button>
+    <button class="primary" disabled>Save</button>
 {/if}
+-->
+

@@ -1,7 +1,7 @@
 <script>
     import { wallet, builtin, chain, flow, fallback } from '$lib/stores/wallet';
     import { getContext } from 'svelte';
-    import Publish from '$lib/components/Modals/Publish.svelte';
+    import Publish from '../Modals/Publish.svelte';
 
     const { open, } = getContext(`simple-modal`);
 
@@ -54,6 +54,6 @@
     };
 </script>
 
-<button bind:this={walletButton} class="button {$wallet.address === undefined ? `primary` : `success`}" on:click={click}>
+<button bind:this={walletButton} class="{$wallet.address === undefined ? `primary` : `success`}" on:click={click}>
     {typeof $wallet.address === `undefined` ? `Connect Wallet` : `Publish`}
 </button>

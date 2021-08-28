@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import CreatePage from './CreatePage.svelte';
+    import CreatePage from '../Modals/CreatePage.svelte';
 
     const { open, } = getContext(`simple-modal`);
 

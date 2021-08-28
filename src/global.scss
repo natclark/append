@@ -77,3 +77,38 @@ button, input[type="submit"], [type="file"] {
         }
     }
 }
+
+/* Modals */
+
+.window-wrap .window {
+    .close {
+        background-color: #555;
+        &::before, &::after {
+            background-color: #fff;
+        }
+        &:focus {
+            border-color: #40c9ff;
+            box-shadow: 0 0 0 2px #40c9ff;
+        }
+    }
+    .content {
+        background-color: #444;
+        border: 1px solid #000;
+        border-radius: 4px;
+        color: #f8f8f8;
+        select, input:not([type="submit"]) {
+            background-color: #333;
+            border: 1px solid #222;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            width: 100%;
+            &:hover {
+                border-color: #000;
+            }
+            &:focus {
+                outline: 2px solid #40c9ff;
+            }
+        }
+    }
+}

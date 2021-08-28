@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import UploadPage from './UploadPage.svelte';
+    import UploadPage from '../Modals/UploadPage.svelte';
 
     const { open, } = getContext(`simple-modal`);
 

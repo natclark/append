@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import EditFavicons from './EditFavicons.svelte';
+    import EditFavicons from '../Modals/EditFavicons.svelte';
 
     const { open, } = getContext(`simple-modal`);
 

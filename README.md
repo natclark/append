@@ -4,7 +4,7 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 
 **WARNING: This app is a prototype that is still being built. There will be bugs and missing features.**
 
-**WARNING: Currently, Append is best enjoyed on laptops and desktop devices.**
+**WARNING: Currently, Append is best enjoyed with modern browsers on laptops and desktop devices.**
 
 **WARNING: Currently, Append relies on a third party, [Web3.Storage](https://web3.storage), which is maintained by [Protocol Labs](https://protocol.ai). Implementing fallbacks and ultimately full decentralization is on the roadmap.**
 
@@ -31,6 +31,7 @@ Create a pixel-perfect Web 3.0 blog, store, or app.
 - 📦 **"Classes" For Storing Global Styles**
 - 🚂 **More Efficient Static Asset Minification/Bundling Engine**
 - 📄 **All Semantic HTML Tags**
+- 🕸 **IPNS Support**
 - 📶 **Further Decentralization Overall**
 
 ## Development

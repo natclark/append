@@ -1,11 +1,16 @@
 <script>
     import pages from '$lib/stores/pages';
-    import metadata from '$lib/stores/metadata';
+    // TODO import metadata from '$lib/stores/metadata';
     import JSZip from 'jszip';
     import { saveAs } from 'file-saver';
     import css from '$lib/stores/css';
+    import redirects from '$lib/stores/redirects';
+
+    // * Disable the publish button when it is loading:
+    let disabled = false;
 
     const click = () => {
+        disabled = true;
         let zip = new JSZip();
         const parser = new DOMParser();
         $pages.forEach((page) => {
@@ -18,7 +23,11 @@
                         el.removeAttribute(`style`);
                     });
                     doc.querySelectorAll(`style`).forEach((el) => el.remove());
-                    doc.querySelector(`.append-contextMenu`).remove();
+                    try {
+                        // TODO - clean up context menu removal
+                        doc.querySelector(`.append-contextMenu__items`).remove();
+                        doc.querySelector(`.append-contextMenu`).remove();
+                    } catch (e) {}
                     const link = doc.createElement(`link`);
                     link.rel = `stylesheet`;
                     link.type = `text/css`;
@@ -30,8 +39,8 @@
                     let generatedStyles = ``;
                     $css.generated.forEach((selector) => {
                         let rules = ``;
-                        selector.rules.forEach((rule) => rules.push(`${rule.key}: ${rule.val}; `));
-                        generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`)
+                        selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+                        generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`);
                     });
                     zip.file(page.file, `${generatedStyles.trim()}${$css.custom.trim()}`);
                     break;
@@ -65,8 +74,12 @@
                 default:
             }
         });
+        $redirects.forEach((redirect) => {
+            zip.file(redirect.file, `<!DOCTYPE html><title>.</title>\<script\>window.location=\`${redirect.to}\`\<\/script\><noscript><meta http-equiv="refresh" content="0;url=${redirect.to}"></noscript>`.trim());
+        });
         zip.generateAsync({ type: `blob`, }).then((blob) => saveAs(blob, `append.zip`));
+        disabled = false;
     };
 </script>
 
-<button class="button primary" on:click={click}>Export</button>
+<button class="primary{disabled ? ` disabled` : ``}" on:click={click} {disabled}>Export</button>

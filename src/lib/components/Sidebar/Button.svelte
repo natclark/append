@@ -1,23 +1,13 @@
 <script>
     import Banner from './Banner.svelte';
-    import Grid from '$lib/components/Layout/Grid.svelte';
-    import Element from './Element.svelte';
-    import { Web3Storage } from 'web3.storage';
-    //import IPFS from 'ipfs/dist/index.min.js';
-    //import IPFS from 'ipfs-core';
-    import Center from '$lib/components/Layout/Center.svelte';
-    import Breaker from '$lib/components/Layout/Breaker.svelte';
-    import Modal from 'svelte-simple-modal';
-    import CreatePageButton from '$lib/components/modals/CreatePageButton.svelte';
-    import UploadPageButton from '$lib/components/modals/UploadPageButton.svelte';
-    import CreateRedirectButton from '$lib/components/modals/CreateRedirectButton.svelte';
-    import pages from '$lib/stores/pages';
-    import UploadFileButton from '$lib/components/modals/UploadFileButton.svelte';
-    import Upload from './Upload.svelte';
-    import EditFaviconsButton from '$lib/components/modals/EditFaviconsButton.svelte';
+    import Elements from './Tabs/Elements.svelte';
+    import Pages from './Tabs/Pages.svelte';
+    import Products from './Tabs/Products.svelte';
+    import Files from './Tabs/Files.svelte';
+    import Globals from './Tabs/Globals.svelte';
+    import Plugins from './Tabs/Plugins.svelte';
+    import CSS from './Tabs/CSS.svelte';
     import tab from '$lib/stores/tab';
-    import css from '$lib/stores/css';
-    import { onMount } from 'svelte';
     import { onDestroy } from 'svelte';
 
     export let text;
@@ -27,50 +17,27 @@
     let active = false;
     let currentTab;
 
-    let metadata = true;
-    let wrap = false;
-
     const showBanner = () => !active && (show = true);
 
     const hideBanner = () => show = false;
 
     const toggleMenu = () => !active ? tab.update(() => text) : tab.update(() => false);
 
-    // * The below method is TEMPORARY. Yes, of course this is bad practice. If someone abuses the below API key before I switch to something else, I'll add a new default one ASAP.
-    const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGI0MEIzZGU3Y0Y2Mjk3MTZBNDM2NGQ2NWY2NTJBMzNCOTU5N2E0QzEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Mjc1OTAzMTc0MzMsIm5hbWUiOiJFVEhHbG9iYWwgVGVzdCJ9.wpGMGBuvu4n2f4hXTYyU7n13u-gMe6I_KOCTtHkQ280`;
-
-    let files;
-    let ls;
-    let uploads;
-
-    const uploadFiles = async () => {
-        if (metadata) {
-            // TODO: Strip image metadata like EXIF
-        }
-        const client = new Web3Storage({ token, });
-        const cid = await client.put(files);
-        if (ls) {
-            ls.getItem(`uploads`) === null && (ls.setItem(`uploads`, ``));
-            let newUploads = ls.getItem(`uploads`).split(`,`);
-            newUploads.push(cid);
-            uploads = newUploads.join(`,`);
-            ls.setItem(`uploads`, uploads);
-        }
-    };
+    const tabs = [
+        { text: `Elements`, component: Elements, },
+        { text: `Pages`, component: Pages, },
+        { text: `Products`, component: Products, },
+        { text: `Files`, component: Files, },
+        { text: `Globals`, component: Globals, },
+        { text: `Plugins`, component: Plugins, },
+        { text: `CSS`, component: CSS, }
+    ];
 
     const unsubscribe = tab.subscribe((val) => {
         currentTab = val;
         active = currentTab === text ? true : false;
         classList = active ? `active` : ``;
         active && (hideBanner());
-    });
-
-    onMount(() => {
-        if (typeof localStorage !== `undefined`) {
-            ls = localStorage;
-            ls.getItem(`uploads`) === null && (ls.setItem(`uploads`, ``));
-            uploads = ls.getItem(`uploads`).split(`,`);
-        }
     });
 
     onDestroy(unsubscribe);
@@ -84,345 +51,7 @@
     {#if currentTab === text}
         <div class="menu">
             <h2>{text}</h2>
-            {#if text === `Elements`}
-                <p>Layouts</p>
-                <Grid>
-                    <Element text="Container" element="div">
-                        <svg version="1.1" x="0px" y="0px" width="122.88px" height="122.566px" viewBox="0 0 122.88 122.566" enable-background="new 0 0 122.88 122.566" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M3.78,66.082h47.875c2.045,0,3.717,1.988,3.717,4.414v46.479 c0,2.43-1.671,4.416-3.717,4.416H3.78c-2.043,0-3.717-1.986-3.717-4.416V70.496C0.063,68.07,1.737,66.082,3.78,66.082L3.78,66.082z M71.224,0H119.1c2.046,0,3.717,1.986,3.717,4.415v46.479c0,2.429-1.671,4.413-3.717,4.413H71.224 c-2.045,0-3.714-1.984-3.714-4.413V4.415C67.51,1.986,69.179,0,71.224,0L71.224,0z M3.714,0h47.878 c2.045,0,3.717,1.986,3.717,4.415v46.479c0,2.429-1.671,4.413-3.717,4.413H3.714C1.671,55.307,0,53.323,0,50.894V4.415 C0,1.986,1.671,0,3.714,0L3.714,0z M71.287,67.26h47.876c2.043,0,3.717,1.986,3.717,4.416v46.479c0,2.426-1.674,4.412-3.717,4.412 H71.287c-2.045,0-3.717-1.986-3.717-4.412V71.676C67.57,69.246,69.242,67.26,71.287,67.26L71.287,67.26z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Item" element="div">
-                        <svg version="1.1" x="0px" y="0px" width="122.883px" height="122.882px" viewBox="0 0 122.883 122.882" enable-background="new 0 0 122.883 122.882" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M13.002,0h96.878c7.15,0,13.002,5.851,13.002,13.002v96.877 c0,7.151-5.852,13.002-13.002,13.002H13.002C5.851,122.882,0,117.031,0,109.88V13.002C0,5.851,5.851,0,13.002,0L13.002,0z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Text</p>
-                <Grid>
-                    <Element text="Paragraph" element="p">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 100.16 122.88" style="enable-background:new 0 0 100.16 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M89.06,18.28v101c0,1.98-1.64,3.6-3.66,3.6H74.43c-2.01,0-3.66-1.62-3.66-3.6v-101H58.24v100.99 c0,1.98-1.64,3.6-3.66,3.6H43.62c-2.01,0-3.66-1.62-3.66-3.6V79l-0.39,0C17.72,79,0,61.28,0,39.44C0,14.12,20.45,0,43.75,0H96.5 c2.01,0,3.66,1.64,3.66,3.66v10.97c0,2.01-1.65,3.66-3.66,3.66H89.06L89.06,18.28z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Header" element="h2">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 120.26" style="enable-background:new 0 0 122.88 120.26" xml:space="preserve">
-                            <g>
-                                <polygon fill="#ddd" points="0,14.54 0,0 49.81,0 49.81,14.54 36.93,17.03 36.93,51.7 85.98,51.7 85.98,17.03 73.1,14.54 73.1,0 85.98,0 110,0 122.88,0 122.88,14.54 110,17.03 110,103.31 122.88,105.79 122.88,120.26 73.1,120.26 73.1,105.79 85.98,103.31 85.98,70.3 36.93,70.3 36.93,103.31 49.81,105.79 49.81,120.26 0,120.26 0,105.79 12.8,103.31 12.8,17.03 0,14.54"></polygon>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Quote" element="blockquote">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 92.81" style="enable-background:new 0 0 122.88 92.81" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M15.91,0h22.08c8.5,0,15.45,6.95,15.45,15.45c0,31.79,8.13,66.71-30.84,76.68 C4.94,96.64,0.34,77.2,19.12,75.86c11.45-0.82,13.69-8.22,14.04-19.4H15.45C6.95,56.45,0,49.5,0,41.01V15.91C0,7.16,7.16,0,15.91,0 L15.91,0z M84.65,0h22.08c8.5,0,15.45,6.95,15.45,15.45c0,31.79,8.13,66.71-30.84,76.68c-17.65,4.51-22.25-14.93-3.48-16.27 c11.45-0.82,13.69-8.22,14.04-19.4H84.18c-8.5,0-15.45-6.95-15.45-15.45V15.91C68.74,7.16,75.9,0,84.65,0L84.65,0z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Link" element="a">
-                        <svg version="1.1" viewBox="0 0 122.88 122.88">
-                            <path fill="#ddd" d="M60.54,34.07A7.65,7.65,0,0,1,49.72,23.25l13-12.95a35.38,35.38,0,0,1,49.91,0l.07.08a35.37,35.37,0,0,1-.07,49.83l-13,12.95A7.65,7.65,0,0,1,88.81,62.34l13-13a20.08,20.08,0,0,0,0-28.23l-.11-.11a20.08,20.08,0,0,0-28.2.07l-12.95,13Zm14,3.16A7.65,7.65,0,0,1,85.31,48.05L48.05,85.31A7.65,7.65,0,0,1,37.23,74.5L74.5,37.23ZM62.1,89.05A7.65,7.65,0,0,1,72.91,99.87l-12.7,12.71a35.37,35.37,0,0,1-49.76.14l-.28-.27a35.38,35.38,0,0,1,.13-49.78L23,50A7.65,7.65,0,1,1,33.83,60.78L21.12,73.49a20.09,20.09,0,0,0,0,28.25l0,0a20.07,20.07,0,0,0,28.27,0L62.1,89.05Z"></path>
-                        </svg>
-                    </Element>
-                    <Element text="List" element="ul">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 112.5" style="enable-background:new 0 0 122.88 112.5" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M12.56,87.39c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,112.5,0,106.88,0,99.95 C0,93.01,5.62,87.39,12.56,87.39L12.56,87.39z M35.07,88.24h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V89.67C33.64,88.88,34.29,88.24,35.07,88.24L35.07,88.24z M35.07,44.7h86.38 c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43H35.07c-0.79,0-1.43-0.64-1.43-1.43V46.13 C33.64,45.34,34.29,44.7,35.07,44.7L35.07,44.7z M35.07,1.16h86.38c0.79,0,1.43,0.64,1.43,1.43v19.93c0,0.79-0.64,1.43-1.43,1.43 H35.07c-0.79,0-1.43-0.64-1.43-1.43V2.59C33.64,1.8,34.29,1.16,35.07,1.16L35.07,1.16z M12.56,43.69c6.93,0,12.56,5.62,12.56,12.56 c0,6.93-5.62,12.56-12.56,12.56C5.62,68.81,0,63.19,0,56.25C0,49.32,5.62,43.69,12.56,43.69L12.56,43.69z M12.56,0 c6.93,0,12.56,5.62,12.56,12.56c0,6.93-5.62,12.56-12.56,12.56C5.62,25.11,0,19.49,0,12.56C0,5.62,5.62,0,12.56,0L12.56,0z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Code" element="pre">
-                        <svg viewBox="0 0 122.88 76.5">
-                            <path fill="#ddd" d="M47.53,61.26l.15.15a8.91,8.91,0,0,1-.18,12.46s-.11.13-.16.16a8.91,8.91,0,0,1-12.42-.1c-9.66-8.86-23.59-20-32.1-29.25a8.92,8.92,0,0,1,.11-13.12c5.41-6.71,24.44-22.15,32-29A8.93,8.93,0,0,1,49.12,13a1.66,1.66,0,0,1-.44.56l-27,24.78c4.32,4.19,8.09,7.31,11.86,10.43a172.63,172.63,0,0,1,14,12.48Zm27.82,0-.15.15a8.91,8.91,0,0,0,.18,12.46s.11.13.16.16A8.91,8.91,0,0,0,88,73.93c9.66-8.86,23.59-20,32.1-29.25A8.92,8.92,0,0,0,120,31.56c-5.41-6.71-24.44-22.15-32-29A8.93,8.93,0,0,0,73.76,13a1.77,1.77,0,0,0,.43.56l27,24.78c-4.32,4.19-8.1,7.31-11.86,10.43a172.63,172.63,0,0,0-14,12.48Z"></path>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Content</p>
-                <Grid>
-                    <Element text="Markdown" element="markdown">
-                        <svg version="1.1" viewBox="0 0 111.87 122.88">
-                            <path fill="#ddd" fill-rule="evenodd" d="M56.75,113.57V75.07a9.34,9.34,0,0,1,9.31-9.3h36.5a9.34,9.34,0,0,1,9.31,9.3v38.5a9.34,9.34,0,0,1-9.31,9.31H66.06a9.34,9.34,0,0,1-9.31-9.31Zm2.74-102.1L79.08,29.82H59.49V11.47ZM20.72,69.38a2.12,2.12,0,0,0-2,2.21,2.08,2.08,0,0,0,2,2.21H45.3V69.38Zm0,15.83a2.12,2.12,0,0,0-2,2.21,2.08,2.08,0,0,0,2,2.21H45.3V85.21Zm0-47.5a2.12,2.12,0,0,0-2,2.21,2.09,2.09,0,0,0,2,2.21H43.45a2.13,2.13,0,0,0,2-2.2,2.1,2.1,0,0,0-2-2.22Zm0-15.83a2.12,2.12,0,0,0-2,2.21,2.08,2.08,0,0,0,2,2.21h12.5a2.12,2.12,0,0,0,2-2.21,2.1,2.1,0,0,0-2-2.21Zm0,31.67a2.12,2.12,0,0,0-2,2.21,2.1,2.1,0,0,0,2,2.21H59.16a2.13,2.13,0,0,0,2-2.21,2.09,2.09,0,0,0-2-2.21ZM90,32.45a3.26,3.26,0,0,0-2.37-3.14L58.74,1.2A3.21,3.21,0,0,0,56.23,0H5.87A5.86,5.86,0,0,0,0,5.86V106.25a5.84,5.84,0,0,0,1.72,4.15,5.91,5.91,0,0,0,4.15,1.71H45.39v-6.55H6.55v-99H52.94V33.08a3.29,3.29,0,0,0,3.29,3.29h27.2V57.82H90V32.45ZM82.4,106l-11.58,3.09,1.67-12.43L82.4,106ZM75,93.86l12.36-14a1.06,1.06,0,0,1,.76-.36,1.17,1.17,0,0,1,.52.12l8.83,8a.92.92,0,0,1,.28.64.89.89,0,0,1-.31.71L84.92,103.2,75,93.86Z"></path>
-                        </svg>
-                    </Element>
-                    <Element text="Rich Text" element="rich-text">
-                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 110.78" style="enable-background:new 0 0 122.88 110.78" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M7.05,0h100.97c1.92,0,3.68,0.8,4.95,2.07l0,0l0.01,0.01l0.01,0.01L113,2.1c1.27,1.28,2.06,3.03,2.06,4.95 v35.02c-0.53-0.48-1.13-0.91-1.78-1.28c-1.54-0.87-3.06-1.36-4.58-1.52V25.21l0,0c-0.22,0.04-0.45,0.06-0.67,0.06H7.05 c-0.23,0-0.46-0.02-0.67-0.06v78.51c0,0.19,0.07,0.36,0.19,0.48l0,0l0.01,0.01c0.12,0.12,0.28,0.19,0.48,0.19h52.44 c-0.01,2.74,0.52,4.86,1.58,6.38l-54.02,0c-1.92,0-3.68-0.79-4.96-2.07l-0.01-0.01l-0.01-0.01l-0.01-0.01 C0.79,107.4,0,105.65,0,103.73l0-96.7c0.02-1.94,0.81-3.7,2.08-4.97c0.08-0.08,0.15-0.15,0.23-0.22C3.57,0.7,5.23,0,7.05,0L7.05,0 L7.05,0z M55.11,47.78c-1.48,0-2.68-1.3-2.68-2.91c0-1.61,1.2-2.91,2.68-2.91h40.15c1.25,0,2.3,0.93,2.6,2.19l-3.51,3.64H55.11 L55.11,47.78L55.11,47.78z M55.11,62.5c-1.48,0-2.68-1.3-2.68-2.91s1.2-2.91,2.68-2.91h30.65l-5.62,5.82H55.11L55.11,62.5 L55.11,62.5z M89.25,97.9c-2.05,0.65-4.1,1.29-6.15,1.94c-2.05,0.65-4.1,1.4-6.15,2.05c-4.86,1.51-7.55,2.48-8.1,2.59 c-0.54,0.11-0.21-2.05,0.97-6.8l3.88-14.78l0.32-0.32L89.25,97.9L89.25,97.9L89.25,97.9L89.25,97.9L89.25,97.9L89.25,97.9z M79.64,76.85l27.16-28.13c0.65-0.54,1.3-0.75,2.05-0.32l13.6,13.17c0.54,0.65,0.65,1.4-0.11,2.16L94.86,92.18L79.64,76.85 L79.64,76.85L79.64,76.85L79.64,76.85z M115.06,85.16v18.58c0,1.94-0.79,3.7-2.07,4.97c-1.27,1.27-3.03,2.07-4.97,2.07H79.74 l0.51-0.16l0.5-0.14c0.55-0.17,1.86-0.62,3.16-1.07c0.67-0.23,1.34-0.46,2.74-0.9l5.9-1.86l-0.01-0.02 c1.39-0.44,2.7-1.18,3.83-2.23h11.65c0.18,0,0.35-0.08,0.48-0.21c0.12-0.12,0.21-0.29,0.21-0.48V91.74L115.06,85.16L115.06,85.16z M19.51,92.45c-1.46,0-2.65-1.3-2.65-2.91s1.19-2.91,2.65-2.91h43.62l-1.53,5.82H19.51L19.51,92.45L19.51,92.45z M18.45,79.73 c-1.46,0-2.65-1.3-2.65-2.91c0-1.61,1.19-2.91,2.65-2.91h50.92c-0.56,0.37-1.1,0.81-1.6,1.31l-0.05,0.05 c-1.26,1.18-2.24,2.7-2.77,4.46H18.45L18.45,79.73L18.45,79.73z M16.49,34.55h29.25v29.51H16.49V34.55L16.49,34.55L16.49,34.55z M46.94,9.08c2.53,0,4.57,2.05,4.57,4.57c0,2.52-2.05,4.57-4.57,4.57c-2.52,0-4.57-2.05-4.57-4.57 C42.37,11.13,44.42,9.08,46.94,9.08L46.94,9.08L46.94,9.08z M30.96,9.08c2.53,0,4.57,2.05,4.57,4.57c0,2.52-2.05,4.57-4.57,4.57 c-2.53,0-4.57-2.05-4.57-4.57C26.39,11.13,28.44,9.08,30.96,9.08L30.96,9.08L30.96,9.08z M14.99,9.08c2.53,0,4.57,2.05,4.57,4.57 c0,2.52-2.05,4.57-4.57,4.57c-2.53,0-4.57-2.05-4.57-4.57C10.42,11.13,12.46,9.08,14.99,9.08L14.99,9.08L14.99,9.08z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Interactive</p>
-                <Grid>
-                    <Element text="Button" element="button">
-                        <svg version="1.1" viewBox="0 0 122.88 83.68">
-                            <path fill="#ddd" fill-rule="evenodd" d="M14.48,0H108.4a14.63,14.63,0,0,1,14.48,14.69V69A14.63,14.63,0,0,1,108.4,83.68H14.48A14.62,14.62,0,0,1,0,69V14.69A14.62,14.62,0,0,1,14.48,0Zm.28,7.59h93.36a7.27,7.27,0,0,1,7.25,7.24v54a7.27,7.27,0,0,1-7.25,7.25H14.76a7.27,7.27,0,0,1-7.25-7.25v-54a7.27,7.27,0,0,1,7.25-7.24Z"></path>
-                        </svg>
-                    </Element>
-                    <Element text="Dropdown" element="details">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 63.9" style="enable-background:new 0 0 122.88 63.9" xml:space="preserve">
-                            <g>
-                                <polygon fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" points="61.44,63.9 122.88,0 0,0 61.44,63.9"></polygon>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Media</p>
-                <Grid>
-                    <Element text="Image" element="img">
-                        <svg version="1.1" x="0px" y="0px" width="122.88px" height="122.151px" viewBox="0 0 122.88 122.151" enable-background="new 0 0 122.88 122.151" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" d="M8.676,0h105.529c2.405,0,4.557,0.984,6.124,2.552c1.567,1.567,2.551,3.754,2.551,6.124v104.8 c0,2.405-0.983,4.557-2.551,6.124c-1.568,1.567-3.755,2.552-6.124,2.552H8.676c-2.406,0-4.557-0.984-6.124-2.553 C0.984,118.032,0,115.845,0,113.476V8.675C0,6.27,0.984,4.119,2.552,2.552C4.12,0.984,6.307,0,8.676,0L8.676,0z M9.097,88.323 l35.411-33.9c1.421-1.313,3.645-1.167,4.921,0.255c0.037,0.036,0.037,0.073,0.073,0.073l31.459,37.218l4.812-29.6 c0.328-1.896,2.114-3.208,4.01-2.879c0.729,0.109,1.385,0.474,1.895,0.948l22.07,23.184V10.773c0-0.474-0.183-0.875-0.511-1.166 c-0.291-0.292-0.729-0.511-1.166-0.511H10.737c-0.474,0-0.875,0.182-1.166,0.511c-0.292,0.291-0.511,0.729-0.511,1.166v77.55H9.097 L9.097,88.323z M90.526,19.866c3.464,0,6.635,1.422,8.895,3.682c2.297,2.296,3.682,5.431,3.682,8.895 c0,3.463-1.421,6.634-3.682,8.894c-2.296,2.297-5.431,3.682-8.895,3.682c-3.462,0-6.634-1.421-8.894-3.682 c-2.297-2.296-3.682-5.431-3.682-8.894c0-3.463,1.421-6.634,3.682-8.895C83.929,21.251,87.064,19.866,90.526,19.866L90.526,19.866z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Video" element="video">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 122.88" style="enable-background:new 0 0 122.88 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M61.44,0c33.93,0,61.44,27.51,61.44,61.44s-27.51,61.44-61.44,61.44S0,95.37,0,61.44S27.51,0,61.44,0L61.44,0z M84.91,65.52c3.41-2.2,3.41-4.66,0-6.61L49.63,38.63c-2.78-1.75-5.69-0.72-5.61,2.92l0.11,40.98c0.24,3.94,2.49,5.02,5.8,3.19 L84.91,65.52L84.91,65.52z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Audio" element="audio">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 104.23 122.88" style="enable-background:new 0 0 104.23 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M87.9,78.04c2.74-0.48,5.33-0.4,7.6,0.13V24.82L39.05,41.03v61.95c0.03,0.34,0.05,0.69,0.05,1.03 c0,0,0,0.01,0,0.01c0,8.34-8.75,16.62-19.55,18.49C8.76,124.37,0,119.12,0,110.77c0-8.34,8.76-16.62,19.55-18.48 c4.06-0.7,7.84-0.39,10.97,0.71l0-76.26h0.47L104.04,0v85.92c0.13,0.63,0.2,1.27,0.2,1.91c0,0,0,0,0,0.01 c0,6.97-7.32,13.89-16.33,15.44c-9.02,1.56-16.33-2.83-16.33-9.8C71.57,86.51,78.88,79.59,87.9,78.04L87.9,78.04L87.9,78.04z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-            {:else if text === `Pages`}
-                <p>Create Page</p>
-                    <Center>
-                        <Modal>
-                            <CreatePageButton />
-                        </Modal>
-                    </Center>
-                    <Breaker />
-                    <Center>
-                        <Modal>
-                            <UploadPageButton />
-                        </Modal>
-                    </Center>
-                    <Breaker />
-                    <Center>
-                        <Modal>
-                            <CreateRedirectButton />
-                        </Modal>
-                    </Center>
-                <p>My Pages</p>
-                {#each $pages as page}
-                    {#if page.type === `page`}
-                        <div class="page">
-                            <div class="flex">
-                                <div>
-                                    <p class="normal title">{page.title}</p>
-                                    <p class="normal faint">{page.path}</p>
-                                </div>
-                                <button class="primary">Edit</button>
-                            </div>
-                        </div>
-                    {/if}
-                {/each}
-                <p>My Redirects</p>
-                <p>Special Pages</p>
-                {#each $pages as page}
-                    {#if page.type !== `page`}
-                        <div class="page">
-                            {#if page.type === `stylesheet`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Stylesheet</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `redirect`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">IPFS 404</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `security`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Security.txt File</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `ads`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Ads.txt File</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `browserconfig`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Browserconfig.xml File</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `humans`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Humans.txt File</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `webmanifest`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Web app manifest</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `robots`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Robots.txt File</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `feed`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">RSS/Atom Feed</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else if page.type === `sitemap`}
-                                <div class="flex">
-                                    <div>
-                                        <p class="normal title">Sitemap</p>
-                                        <p class="normal faint">{page.path}</p>
-                                    </div>
-                                    <button class="primary">Edit</button>
-                                </div>
-                            {:else}
-                            {/if}
-                        </div>
-                    {/if}
-                {/each}
-            {:else if text === `Products`}
-                <p>This feature is coming soon!</p>
-            {:else if text === `Files`}
-                <p>Upload File</p>
-                <Center>
-                    <!--
-                    TODO - Modal for easy file dragging-and-dropping
-                    <Modal>
-                        <UploadFileButton />
-                    </Modal>
-                    -->
-                    <input class="primary" type="file" multiple bind:files={files} on:change={uploadFiles}>
-                </Center>
-                <Breaker />
-                <Center>
-                    <div class="checkbox">
-                        <input id="metadata" name="metadata" type="checkbox" bind:checked={metadata}>
-                        <label for="metadata">Strip image metadata (WIP)</label>
-                    </div>
-                </Center>
-                <Breaker />
-                <Center>
-                    <p class="normal"><em>You might want to avoid uploading private or personally identifying files to IPFS! They might not be able to be removed later, as long as at least one node is still replicating them.</em></p>
-                </Center>
-                <p>My Files</p>
-                <Grid>
-                    {#each uploads as cid}
-                        {#if cid !== ``}
-                            <Upload {cid} />
-                        {/if}
-                    {/each}
-                </Grid>
-            {:else if text === `Globals`}
-                <p>Font</p>
-                <Grid>
-                    <Element text="Font Family">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 118.1" style="enable-background:new 0 0 122.88 118.1" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" d="M71.33,85.16H30.47L25.6,96.43c-1.6,3.76-2.39,6.84-2.39,9.29c0,3.26,1.31,5.65,3.93,7.16c1.51,0.93,5.3,1.6,11.33,2.07 v3.15H0v-3.15c4.14-0.64,7.57-2.36,10.22-5.18c2.68-2.79,6-8.62,9.9-17.44L61.51,0h1.63l41.71,94.89c3.99,9,7.25,14.65,9.82,16.98 c1.95,1.78,4.69,2.8,8.21,3.09v3.15H66.9v-3.15h2.3c4.48,0,7.66-0.64,9.47-1.89c1.25-0.9,1.89-2.21,1.89-3.93 c0-1.02-0.18-2.07-0.52-3.15c-0.12-0.52-0.96-2.65-2.56-6.41L71.33,85.16L71.33,85.16z M68.42,78.84L51.2,39L33.44,78.84H68.42 L68.42,78.84z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Font Size">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 97.36" style="enable-background:new 0 0 122.88 97.36" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" d="M87.28,0v26.32h-2.57c-1.54-6.09-3.23-10.45-5.09-13.09c-1.86-2.67-4.43-4.77-7.68-6.33 c-1.81-0.88-4.99-1.3-9.52-1.3l-7.24,0v74.95c0,4.97,0.27,8.07,0.81,9.32c0.56,1.25,1.64,2.32,3.23,3.25 c1.62,0.95,3.79,1.42,6.56,1.42h3.23v2.64H18.13v-2.64h3.23c2.81,0,5.09-0.51,6.8-1.52c1.25-0.66,2.23-1.81,2.94-3.45 c0.54-1.12,0.81-4.13,0.81-9.03l0-74.95h-7.05c-6.53,0-11.3,1.37-14.26,4.16c-4.16,3.86-6.78,9.39-7.88,16.56l-2.72,0V0H87.28 L87.28,0z M103.7,79.33v-61.3h-9.14L108.72,0l14.16,18.03h-9.14v61.3h9.14l-14.16,18.03L94.56,79.33H103.7L103.7,79.33z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Mouse</p>
-                <Grid>
-                    <Element text="Scrollbars">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 79.37 122.88" style="enable-background:new 0 0 79.37 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" d="M50.2,121.63c6.71-1.85,12.72-5.44,17.51-10.23c7.19-7.19,11.65-17.11,11.65-28.03V39.68c0-10.92-4.46-20.84-11.65-28.03 C60.52,4.46,50.6,0,39.68,0C28.77,0,18.84,4.46,11.65,11.65C4.46,18.84,0,28.77,0,39.68v43.68c0,10.92,4.46,20.84,11.65,28.03 c5.59,5.59,12.82,9.53,20.89,11.01C37.42,123.3,45.7,122.87,50.2,121.63L50.2,121.63L50.2,121.63z M39.23,92.06 c4.15,0,7.55-3.4,7.55-7.55v-7.78c0-4.15-3.4-7.55-7.55-7.55c-4.15,0-7.55,3.4-7.55,7.55v7.78C31.68,88.66,35.07,92.06,39.23,92.06 L39.23,92.06z M61.08,104.77c-5.49,5.49-13.07,8.91-21.4,8.91c-8.33,0-15.9-3.41-21.4-8.91c-5.49-5.49-8.91-13.07-8.91-21.4V39.68 c0-8.33,3.41-15.9,8.91-21.4c5.49-5.49,13.07-8.91,21.4-8.91c8.33,0,15.9,3.41,21.4,8.91c5.49,5.49,8.91,13.07,8.91,21.4v43.68 C69.99,91.7,66.58,99.27,61.08,104.77L61.08,104.77L61.08,104.77z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Selection">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 43.84 122.88" style="enable-background:new 0 0 43.84 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" d="M3.28,64.8C1.47,64.8,0,63.33,0,61.52c0-1.81,1.47-3.28,3.28-3.28h15.24V21.51c-0.47-4.53-1.86-7.89-3.98-10.26 c-2.3-2.58-5.57-4.09-9.53-4.74c-1.78-0.29-2.99-1.97-2.7-3.76c0.29-1.78,1.97-2.99,3.76-2.7c5.41,0.89,9.98,3.07,13.34,6.84 c0.86,0.96,1.63,2.02,2.31,3.17c0.86-1.49,1.88-2.8,3.05-3.96c3.51-3.48,8.21-5.38,13.82-6.08c1.8-0.22,3.43,1.06,3.65,2.86 c0.22,1.8-1.06,3.43-2.86,3.65c-4.2,0.52-7.61,1.84-10,4.21c-2.37,2.35-3.87,5.85-4.3,10.78v36.71h15.48 c1.81,0,3.28,1.47,3.28,3.28c0,1.81-1.47,3.28-3.28,3.28H25.08v36.56c0.43,4.93,1.93,8.44,4.3,10.78c2.39,2.36,5.8,3.69,10,4.21 c1.8,0.22,3.08,1.86,2.86,3.65c-0.22,1.8-1.85,3.08-3.65,2.86c-5.61-0.7-10.31-2.6-13.82-6.08c-1.17-1.16-2.19-2.47-3.05-3.96 c-0.68,1.16-1.45,2.21-2.31,3.17c-3.37,3.77-7.94,5.95-13.34,6.84c-1.78,0.29-3.46-0.92-3.76-2.7c-0.29-1.78,0.92-3.46,2.7-3.76 c3.96-0.65,7.23-2.16,9.53-4.74c2.12-2.37,3.51-5.74,3.98-10.26V64.8H3.28L3.28,64.8z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                    <Element text="Cursor">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 96.09 122.88" style="enable-background:new 0 0 96.09 122.88" xml:space="preserve">
-                            <g>
-                                <path fill="#ddd" d="M61.61,122.31c-1.34,0.62-2.82,0.72-4.15,0.37c-1.46-0.39-2.75-1.31-3.55-2.67L39.03,94.36l-14.15,15.88 c-1.97,2.21-4.21,3.88-6.37,4.75c-1.66,0.67-3.31,0.88-4.84,0.56c-1.69-0.36-3.14-1.33-4.2-3.01c-0.84-1.33-1.4-3.11-1.57-5.39 L0.01,4.41C0,4.33,0,4.25,0,4.18c-0.01-0.64,0.11-1.27,0.37-1.84c0.29-0.66,0.76-1.26,1.37-1.7C2,0.44,2.28,0.31,2.58,0.23 c0.59-0.2,1.2-0.27,1.79-0.2C4.94,0.09,5.5,0.26,6.01,0.55C6.18,0.63,6.35,0.73,6.5,0.85l84.88,58.11 c1.88,1.29,3.14,2.66,3.88,4.05c0.93,1.75,1.04,3.49,0.5,5.14c-0.48,1.49-1.5,2.81-2.9,3.91c-1.82,1.43-4.39,2.54-7.3,3.14 c-0.03,0.01-0.07,0.01-0.1,0.02l-20.73,4.29l14.77,25.73c0.78,1.36,0.93,2.94,0.54,4.39c-0.38,1.41-1.27,2.71-2.59,3.56 c-0.05,0.04-0.11,0.07-0.17,0.1l-15.34,8.86C61.84,122.21,61.73,122.26,61.61,122.31L61.61,122.31z M58.84,117.48 c0.15,0.04,0.3,0.04,0.44-0.01c0.05-0.03,0.1-0.06,0.16-0.08l15.14-8.74c0.14-0.1,0.23-0.25,0.28-0.41 c0.03-0.13,0.03-0.25-0.01-0.33L58.23,78.97l0.01,0c-0.14-0.24-0.24-0.51-0.3-0.8c-0.3-1.45,0.64-2.87,2.09-3.17l24.36-5.04 c0.03-0.01,0.06-0.02,0.1-0.02c2.1-0.44,3.88-1.18,5.07-2.11c0.58-0.46,0.97-0.91,1.11-1.35c0.09-0.27,0.05-0.6-0.15-0.97 c-0.34-0.64-1.03-1.34-2.15-2.11L5.58,6.74l7.69,100.02c0.1,1.36,0.37,2.32,0.75,2.92c0.22,0.35,0.49,0.55,0.77,0.61 c0.45,0.1,1.04-0.01,1.72-0.28c1.39-0.56,2.92-1.73,4.35-3.34l16.62-18.65l0,0c0.19-0.21,0.41-0.39,0.66-0.54 c1.28-0.74,2.93-0.31,3.67,0.98l16.75,28.85C58.62,117.39,58.71,117.45,58.84,117.48L58.84,117.48z M59.43,117.39 c0.35-0.17,0.75-0.27,1.17-0.27L59.43,117.39L59.43,117.39z"></path>
-                            </g>
-                        </svg>
-                    </Element>
-                </Grid>
-                <p>Meta Tags</p>
-                <p>Sitemap</p>
-                <p>RSS/Atom</p>
-                <p>Scraping & robots.txt</p>
-                <p>Web App Manifest</p>
-                <p>Favicons</p>
-                <Center>
-                    <Modal>
-                        <EditFaviconsButton />
-                    </Modal>
-                </Center>
-            {:else if text === `Plugins`}
-                <p>This feature is coming soon!</p>
-            {:else if text === `CSS`}
-                <p class="normal">If you'd like, you can write custom CSS below.</p>
-                <p class="normal">This will override your other styles.</p>
-                <Center>
-                    <textarea bind:value={$css.custom} class="editor" rows="32" wrap={wrap ? "on" : "off"}></textarea>
-                </Center>
-                <Breaker />
-                <Center>
-                    <div class="checkbox">
-                        <input id="wrap" name="wrap" type="checkbox" bind:checked={wrap}>
-                        <label for="wrap">Enable word wrap</label>
-                    </div>
-                </Center>
-            {:else}
-                <p>Coming soon</p>
-            {/if}
+            <svelte:component this={tabs[tabs.indexOf(tabs.find((e) => e.text === text))].component} />
         </div>
     {/if}
 </div>
@@ -445,7 +74,9 @@
             background-color: #555;
             height: calc(100vh - 40px);
             left: 40px;
-            position: absolute;
+            overflow-y: auto;
+            padding-bottom: 24px;
+            position: fixed;
             top: 40px;
             width: 20em;
             z-index: 2;
@@ -454,60 +85,6 @@
                 font-weight: 400;
                 margin: 0;
                 padding: 8px 8px 0 8px;
-            }
-            p {
-                color: #f8f8f8;
-                font-size: 14px;
-                font-weight: 600;
-                padding: 0 8px;
-                &:not(.normal) {
-                    background-color: #333;
-                    padding: 4px 8px;
-                }
-            }
-            .page {
-                padding: 4px 0;
-                .flex {
-                    align-items: center;
-                    display: flex;
-                    justify-content: space-between;
-                    p {
-                        margin: 0 0 4px 0;
-                        &.title {
-                            color: #fff;
-                            font-weight: 700;
-                        }
-                        &.faint {
-                            font-weight: 400;
-                        }
-                    }
-                    button {
-                        margin-right: 4px;
-                    }
-                }
-                &:hover {
-                    background-color: #444;
-                }
-            }
-            .checkbox {
-                input {
-                    filter: hue-rotate(340deg);
-                }
-                label {
-                    color: #fafafa;
-                    cursor: pointer;
-                    
-                }
-            }
-            textarea.editor {
-                background-color: #333;
-                border: 1px solid #777;
-                color: #fafafa;
-                font-family: monospace, BlinkMacSystemFont, -apple-system, system-ui, sans-serif;
-                font-size: 14px;
-                outline: 0;
-                margin: 0 8px;
-                width: 100%;
             }
         }
     }

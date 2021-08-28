@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import CreateRedirect from './CreateRedirect.svelte';
+    import CreateRedirect from '../Modals/CreateRedirect.svelte';
 
     const { open, } = getContext(`simple-modal`);
 

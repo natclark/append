@@ -30,10 +30,10 @@ export default {
     },
     preprocess: [
         preprocess({
-            defaults: { style: `scss` },
-            postcss: { plugins: [autoprefixer()] },
+            defaults: { style: `scss`, },
+            postcss: { plugins: [autoprefixer()], },
             replace: [[`process.env.WEB3STORAGE_TOKEN`, process.env.WEB3STORAGE_TOKEN]],
-            scss: { prependData: `@charset 'UTF-8';` },
+            scss: { prependData: `@charset 'UTF-8';`, },
             sourceMap: true,
         }),
     ],

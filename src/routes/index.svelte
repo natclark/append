@@ -1,4 +1,5 @@
 <script>
+    import page from '$lib/stores/page';
     import pages from '$lib/stores/pages';
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
@@ -6,9 +7,11 @@
     import element from '$lib/stores/element';
     import { flip } from 'svelte/animate';
     import isModified from '$lib/stores/ismodified';
+    import ContextMenu from '$lib/editor/ContextMenu';
+    import ShortcutMenu from '$lib/editor/ShortcutMenu';
 
     // * The index of the current page:
-    let pageIndex = 0;
+    let currentPage = $page;
 
     // * The iframe (not an actual JS canvas) in which a preview of the selected page lies:
     let canvas;
@@ -31,65 +34,72 @@
     // * The current selected element:
     let selection = -1;
 
-    // * The default elements to be rendered:
-    let items = [
-        {
-            id: 1,
-            text: `Hello World`,
-            type: `header`,
-        },
-        {
-            id: 2,
-            text: `Welcome to YOUR very own unstoppable website.`,
-            type: `paragraph`,
-        },
-        {
-            id: 3,
-            text: `WARNING: Progress will not be saved (yet)!`,
-            type: `paragraph`,
-        },
-        {
-            id: 4,
-            text: `IMPORTANT: There are some issues with dragging and layers at the moment, so please don't try to build a full site for now, because it may be a very frustrating experience. This will be fixed shortly!`,
-            type: `paragraph`,
-        },
-        {
-            id: 5,
-            text: `Anyways, have fun playing with this!`,
-            type: `paragraph`,
-        }
-    ];
-
     // * Increments each time a component is created, to ensure all components have a unique ID:
     let counter = 0;
 
     // * The object array of components:
-    let components = [];
+    let components = $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components;
 
     // * The object array of items within the custom context menu:
     let menuOptions = [];
 
-    const createComponent = (dom, parent, tag, options) => {
+    // * Reset an existing component:
+    const resetComponent = (component, el) => {
+        if (component.element === null || typeof component.element === `undefined`) {
+            if (component.id == el.getAttribute(`data-id`)) {
+                components[components.indexOf(component)].element = el;
+            }
+        }
+    };
+
+    // * Create a new component:
+    const createComponent = (dom, parent, tag, options, push) => {
         let el = dom.createElement(tag);
-        Object.keys(options).forEach((key) => el[key] = options[key]);
+        Object.keys(options).forEach((key) => el[key === `dataId` ? `data-id` : key] = options[key]);
         let editable = el.contentEditable === `inherit` ? false : true;
-        if (editable) el.contentEditable = false;
-        el.setAttribute(`data-id`, counter);
-        counter++;
-        el.style.cursor = 'pointer';
-        el.draggable = 'true';
-        el.style.transition = `.1s outline ease-out`;
+        editable && (el.contentEditable = false);
+        if (typeof el[`data-id`] === `undefined`) {
+            el.setAttribute(`data-id`, counter);
+            counter++;
+        } else {
+            el.setAttribute(`data-id`, el[`data-id`]);
+            reactive();
+        }
+        el.style.cursor = `pointer`;
+        el.draggable = `true`;
         el.style.willChange = `box-shadow`;
         el.addEventListener(`mouseover`, () => {
-            if (el !== dom.activeElement && selection !== el.getAttribute(`data-id`)) {
+            if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
                 components.forEach((component) => {
-                    if (component.element !== dom.activeElement && selection !== component.element.getAttribute(`data-id`)) component.element.style.outline = ``;
+                    resetComponent(component, el);
+                    try {
+                        if (component.element !== dom.activeElement && selection != component.element.getAttribute(`data-id`)) {
+                            dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
+                            dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
+                            components[components.indexOf(component)].element.style.outline = ``;
+                            components[components.indexOf(component)].element.style.boxShadow = ``;
+                        }
+                    } catch (e) {}
                 });
+                // * There is 100% a better way to do this. Not worries about optimizing everything right now.
+                const elStyle = el.currentStyle || window.frames[`canvas`].getComputedStyle(el);
+                el.style.boxShadow = ``;
+                elStyle.marginTop.slice(0, -2) > 0 && (el.style.boxShadow += `0 -${elStyle.marginTop} 0 rgba(255, 255, 0, 0.15)`);
+                elStyle.marginRight.slice(0, -2) > 0 && (el.style.boxShadow += `${elStyle.marginRight} 0 0 rgba(255, 255, 0, 0.15)`);
+                elStyle.marginBottom.slice(0, -2) > 0 && (el.style.boxShadow += `0 ${elStyle.marginBottom} 0 rgba(255, 255, 0, 0.15)`);
+                elStyle.marginLeft.slice(0, -2) > 0 && (el.style.boxShadow += `-${elStyle.marginLeft} 0 0 rgba(255, 255, 0, 0.15)`);
+                elStyle.paddingTop.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 -${elStyle.paddingTop} 0 rgba(128, 0, 128, 0.15)`);
+                elStyle.paddingRight.slice(0, -2) > 0 && (el.style.boxShadow += `inset ${elStyle.paddingRight} 0 0 rgba(128, 0, 128, 0.15)`);
+                elStyle.paddingBottom.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 ${elStyle.paddingBottom} 0 rgba(128, 0, 128, 0.15)`);
+                elStyle.paddingLeft.slice(0, -2) > 0 && (el.style.boxShadow += `inset -${elStyle.paddingLeft} 0 0 rgba(128, 0, 128, 0.15)`);
                 el.style.outline = `2px dotted #6fbcff`;
             }
         });
         el.addEventListener(`mouseout`, () => {
-            if (el !== dom.activeElement && selection !== el.getAttribute(`data-id`)) el.style.outline = ``;
+            if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
+                el.style.outline = ``;
+                el.style.boxShadow = ``;
+            }
         });
         el.addEventListener(`dragstart`, (e) => {
             e.dataTransfer.setData(`text/plain`, null);
@@ -99,21 +109,38 @@
             const obj = { id: selection, el, };
             element.update(() => obj);
             el.focus();
-            components.forEach((component) => component.element.style.outline = ``);
+            const boxShadow = el.style.boxShadow;
+            components.forEach((component) => {
+                resetComponent(component, el);
+                try {
+                    dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
+                    dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
+                    components[components.indexOf(component)].element.style.outline = ``;
+                    components[components.indexOf(component)].element.style.boxShadow = ``;
+                } catch (e) {}
+            });
             el.style.outline = `2px solid #08f`;
+            el.style.boxShadow = boxShadow;
         });
         el.addEventListener(`dblclick`, () => {
-            if (editable) el.contentEditable = true;
+            editable && (el.contentEditable = true);
             selection = el.getAttribute(`data-id`);
             const obj = { id: selection, el, };
             element.update(() => obj);
             el.focus();
-            if (editable) el.style.cursor = 'text';
-            components.forEach((component) => component.element.style.outline = ``);
+            editable && (el.style.cursor = `text`);
+            const boxShadow = el.style.boxShadow;
+            components.forEach((component) => {
+                try {
+                    component.element.style.outline = ``;
+                    component.element.style.boxShadow = ``;
+                } catch (e) {}
+            });
             el.style.outline = `2px solid #08f`;
+            el.style.boxShadow = boxShadow;
         });
         el.addEventListener(`keydown`, (e) => { // TODO - fix two bugs related to this function
-            if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable !== true) {
+            if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable === true) {
                 selection = -1;
                 const obj = { id: -1, el, };
                 element.update(() => obj);
@@ -121,143 +148,71 @@
             }
         });
         el.addEventListener(`focusout`, () => {
-            if (editable) el.contentEditable = false;
-            el.style.cursor = 'pointer';
+            editable && (el.contentEditable = false);
+            element.update(() => false);
+            el.style.cursor = `pointer`;
             el.style.outline = ``;
+            el.style.boxShadow = ``;
         });
-        components.push({ id: el.getAttribute(`data-id`), element: el, children: [], });
+        el.addEventListener(`input`, () => {
+            push ? options[`textContent`] = el.textContent : components[components.indexOf(components.find((e) => e.id == el.getAttribute(`data-id`)))].options[`textContent`] = el.textContent;
+        });
+        push && (components.push({ id: el.getAttribute(`data-id`), element: el, children: [], tag, options, }));
         parent.appendChild(el);
         return el;
     };
 
-    const moveComponent = (dom, id, newParent, newPosition) => {
-
+    const moveItem = (array, from, to) => {
+        const el = array[from];
+        array.splice(from, 1);
+        array.splice(to, 0, el);
+        return array;
     };
 
-    const unsetComponent = (dom, id) => dom.querySelector(`[data-id="${id}"]`).remove();
-
-    // * The custom context menu element:
-    let menu = null;
-
-    // * Boolean based on whether the custom context menu is active:
-    let menuVisible = false;
-
-    // * Shows the custom context menu, if there's any options available:
-    const showMenu = () => {
-        if (!menuVisible) {
-            menuVisible = true;
-            let listCounter = 0;
-            menuOptions.forEach((option) => {
-                menu.innerHTML = option.markup;
-                menu.querySelectorAll(`li`)[listCounter].addEventListener(`click`, option.event);
-                listCounter++;
-            });
-            if (menuOptions.length > 0) menu.className = `append-contextMenu append-contextMenu--active`;
+    // * Move an existing component:
+    const moveComponent = (dom, from, to, mouseY) => {
+        let fromEl = dom.querySelector(`[data-id="${from}"]`);
+        let toEl = dom.querySelector(`[data-id="${to}"]`);
+        switch (toEl.tagName) {
+            case `BODY`:
+                // TODO - redo this (this is a sloppy and unsustainble solution. but good enough for most pages for now.)
+                const last = dom.body.lastElementChild;
+                const bodyStyle = dom.body.getBoundingClientRect();
+                const elStyle = last.getBoundingClientRect();
+                if ((mouseY - 240) > (bodyStyle.top + elStyle.top)) {
+                    dom.body.appendChild(fromEl);
+                }
+                break;
+            case `DIV`:
+                break;
+            default:
+                let toIndex = Array.prototype.indexOf.call(dom.querySelectorAll(`*`), toEl);
+                let fromIndex = Array.prototype.indexOf.call(dom.querySelectorAll(`*`), fromEl);
+                if (fromIndex > toIndex) {
+                    // * prepend
+                    toEl.parentElement.insertBefore(fromEl, toEl);
+                    components = moveItem(components, components.indexOf(components.find((e) => e.id === parseInt(from))), components.indexOf(components.find((e) => e.id === parseInt(to))));
+                } else {
+                    // * append
+                    toEl.parentElement.insertBefore(fromEl, toEl.nextSibling);
+                    components = moveItem(components, components.indexOf(components.find((e) => e.id === parseInt(from))), components.indexOf(components.find((e) => e.id === parseInt(to))));
+                }
         }
+        reactive();
     };
 
-    // * Positions the custom context menu at the cursor:
-    const moveMenu = (dom, e) => {
-        let offsetX = 0;
-        let offsetY = 0;
-
-        if (e.pageX || e.pageY) {
-            offsetX = e.pageX;
-            offsetY = e.pageY;
-        } else if (e.clientX || e.clientY) {
-            offsetX = e.clientX + dom.body.scrollLeft + dom.documentElement.scrollLeft;
-            offsetY = e.clientY + dom.body.scrollTop + dom.documentElement.scrollTop;
-        }
-
-        const menuWidth = menu.offsetWidth + 4;
-        const menuHeight = menu.offsetHeight + 4;
-
-        menu.style.left = ((window.innerWidth - offsetX) < menuWidth) ? `${window.innerWidth - menuWidth}px` : `${offsetX}px`;
-        menu.style.top = ((window.innerHeight - offsetY) < menuHeight) ? `${window.innerHeight - menuHeight}px` : `${offsetY}px`;
+    // * Remove a component:
+    const unsetComponent = (dom, id) => {
+        components.splice(components.indexOf(components.find((e) => e.id === id)), 1);
+        reactive();
+        dom.querySelector(`[data-id="${id}"]`).remove();
     };
 
-    // * Hides the custom context menu:
-    const hideMenu = () => {
-        menuVisible = false;
-        menu.className = `append-contextMenu`;
-    };
+    const contextMenu = new ContextMenu();
+    const shortcutMenu = new ShortcutMenu();
 
-    // * Styling for the custom context menu:
-    const menuStyles = `
-        .append-contextMenu {
-            background-color: #fff;
-            border: 1px solid #dfdfdf;
-            box-shadow: 1px 1px 2px #cfcfcf;
-            display: none;
-            padding: 12px 0;
-            position: absolute;
-            width: 240px;
-            z-index: 999999 !important;
-        }
-
-        .append-contextMenu.append-contextMenu--active {
-            display: block;
-        }
-
-        .append-contextMenu__items {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .append-contextMenu__item {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .append-contextMenu__item:last-child {
-            margin-bottom: 0;
-        }
-    `;
-
-    // * Markup for the custom context menu:
-    const menuMarkup = `<ul class="append-contextMenu__items"></ul>`;
-
-    // * Styling for the shortcut menu:
-    const shortcutStyles = `
-        .append-shortcutMenu {
-            /*TODO*/
-        }
-
-        .append-shortcutMenu.append-shortcutMenu--active {
-            /*TODO*/
-        }
-
-        .append-shortcutMenu__items {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            /*TODO*/
-        }
-
-        .append-shortcutMenu__item {
-            /*TODO*/
-        }
-
-        .append-shortcutMenu__item:last-child {
-            /*TODO*/
-        }
-    `;
-
-    // * Markup for the shortcut menu:
-    const shortcutMarkup = `
-        <ul class="append-shortcutMenu__items">
-            <li class="append-shortcutMenu__item">Bold</li>
-            <li class="append-shortcutMenu__item">Italic</li>
-            <li class="append-shortcutMenu__item">Underline</li>
-            <li class="append-shortcutMenu__item">Strike</li>
-            <li class="append-shortcutMenu__item">Highlight</li>
-            <li class="append-shortcutMenu__item">Link</li>
-        </ul>
-    `;
-
-    // * The text currently selected by the user:
-    let selectedText = ``;
+    // * Returns whether the iframe been loaded once yet:
+    let hasLoaded = false;
 
     // * Actions to perform once the iframe has loaded:
     const load = (e) => {
@@ -274,74 +229,148 @@
         }, false);
         doc.addEventListener(`dragstart`, (e) => {
             dragged = e.target;
+            try {
+                if (dragged.getAttribute(`data-id`) === null) {
+                    let draggedId = counter;
+                    counter++;
+                    dragged.setAttribute(`data-id`, draggedId);
+                }
+            } catch (err) {
+                if (dragged.parentElement.getAttribute(`data-id`) === null) {
+                    let draggedId = counter;
+                    counter++;
+                    dragged.parentElement.setAttribute(`data-id`, draggedId);
+                }
+            }
             e.target.style.opacity = .8;
         }, false);
         doc.addEventListener(`dragend`, (e) => {
-            e.target.style.opacity = ``;
+            typeof e.target.style !== `undefined` && (e.target.style.opacity = ``);
         }, false);
         doc.addEventListener(`dragover`, (e) => {
             e.preventDefault();
         }, false);
         doc.addEventListener(`dragenter`, (e) => {
-            try {
-                if (e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
-                    if (e.target.tagName === `H1` || e.target.tagName === `H2` || e.target.tagName === `H3` || e.target.tagName === `H4` || e.target.tagName === `H5` || e.target.tagName === `H6` || e.target.tagName === `P`) {
-                        e.target.style.backgroundColor = `#fcabab`;
-                        e.target.style.outline = `2px solid #f00`;
-                    } else {
+            if (e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
+                if (e.target.tagName === `H1` || e.target.tagName === `H2` || e.target.tagName === `H3` || e.target.tagName === `H4` || e.target.tagName === `H5` || e.target.tagName === `H6` || e.target.tagName === `P`) {
+                    e.target.style.backgroundColor = `#fcabab`;
+                    e.target.style.outline = `2px solid #f00`;
+                } else {
+                    try {
                         e.target.style.backgroundColor = `#c7e3fc`;
                         e.target.style.outline = `2px solid #08f`;
+                    } catch (err) {
+                        e.target.parentElement.style.backgroundColor = `#c7e3fc`;
+                        e.target.parentElement.style.outline = `2px solid #08f`;
                     }
                 }
-            } catch (err) {}
+            }
+            // TODO: Consider an approach like the following:
+            let id = -1;
+            try {
+                id = e.target.getAttribute(`data-id`);
+            } catch (err) {
+                id = e.target.parentElement.getAttribute(`data-id`);
+            }
+            if (id === null) {
+                id = counter++
+                e.target.setAttribute(`data-id`, id);
+            }
         }, false);
         doc.addEventListener(`dragleave`, (e) => {
             try {
                 e.target.style.backgroundColor = ``;
+                e.target.style.boxShadow = ``;
                 e.target.style.outline = ``;
-            } catch (err) {}
+            } catch (err) {
+                e.target.parentElement.style.backgroundColor = ``;
+                e.target.parentElement.style.boxShadow = ``;
+                e.target.parentElement.style.outline = ``;
+            }
         }, false);
         doc.addEventListener(`drop`, (e) => {
             e.preventDefault();
-            e.target.style.backgroundColor = ``;
-            e.target.style.outline = ``;
-            if (e.target.tagName !== `HTML` && e.target.tagName !== `H1` && e.target.tagName !== `H2` && e.target.tagName !== `H3` && e.target.tagName !== `H4` && e.target.tagName !== `H5` && e.target.tagName !== `H6` && e.target.tagName !== `P`) {
-                if (typeof dragged !== `undefined`) {
-                    // * An existing element has been dropped and was moved from another location within the iframe:
-                    /*
-                    TODO: Consider an approach like the following:
-                    const id = <ID>;
-                    const el = doc.querySelector(`[data-id="${id}"]`);
-                    // * Get the sibling components:
-                    let siblings = [];
-                    const firstChild = el.parentNode.firstChild;
-                    do {
-                        if (parent.nodeType === 3) continue; // if text node, then skip over
-                        if (!filter || filter(firstChild)) siblings.push(firstChild); // otherwise, push
-                    } while (firstChild = firstChild.nextSibling);
-                    // do something with sibs
-                    console.log(sibs);
-                    // like maybe creating a new component and reseting the old one?
-                    // createComponent(doc, body, el.tagName.toLowerCase(), { contentEditable: el.contentEditable, textContent: el.textContent, });
-                    // unsetComponent(doc, id);
-                    */
-                    dragged.parentNode.removeChild(dragged);
-                    try {
-                        e.target.appendChild(dragged);
-                    } catch (err) {
-                        //e.target.parentNode.appendChild(dragged);
-                        body.appendChild(dragged);
+            if (typeof e.target.style !== `undefined`) { // * ensure some stray text wasn't dragged
+                e.target.style.backgroundColor = ``;
+                e.target.style.outline = ``;
+                if (e.target.tagName !== `HTML`) {
+                    if (typeof dragged !== `undefined`) { // * An existing element has been dropped and was moved from another location within the iframe:
+                        if (dragged.tagName !== `BODY`) {
+                            let id = e.target.getAttribute(`data-id`);
+                            if (id === null) {
+                                id = counter++;
+                                e.target.setAttribute(`data-id`, id);
+                            }
+                            try {
+                                moveComponent(doc, dragged.getAttribute(`data-id`), id, e.screenY);
+                                doc.activeElement.blur();
+                                dragged.click();
+                                dragged.focus();
+                            } catch (e) {
+                                console.log(`Non fatal error:`, e.message);
+                            }
+                        }
+                    } else { // * A new element has been dropped:
+                        let id = counter;
+                        counter++;
+                        let idExtra = counter;
+                        counter++;
+                        let targetId = e.target.getAttribute(`data-id`);
+                        if (targetId === null) {
+                            targetId = counter;
+                            counter++;
+                            e.target.setAttribute(`data-id`, targetId);
+                        }
+                        if (e.dataTransfer.getData(`element`)) {
+                            // * If the dropped element came from the sidebar:
+                            const tagName = e.dataTransfer.getData(`element`);
+                            switch (tagName) {
+                                // * These are some special cases for creating "exception" elements:
+                                case `container`:
+                                    createComponent(doc, body, `div`, { className: `container`, dataId: id, }, true);
+                                    break;
+                                case `item`:
+                                    createComponent(doc, body, `div`, { className: `item`, dataId: id, }, true);
+                                    break;
+                                case `ul`:
+                                    createComponent(doc, createComponent(doc, body, `ul`, { dataId: id, }, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: idExtra, }, true);
+                                    break;
+                                case `markdown`:
+                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, dataId: id, }, true);
+                                    break;
+                                case `rich-text`:
+                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, dataId: id, }, true);
+                                    break;
+                                case `details`:
+                                    createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, dataId: idExtra, }, true);
+                                    break;
+                                case `img`:
+                                    createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, dataId: id, }, true);
+                                    break;
+                                case `video`:
+                                    alert(`This component is still in the works! Sorry.`);
+                                    break;
+                                case `audio`:
+                                    alert(`This component is still in the works! Sorry.`);
+                                    break;
+                                default:
+                                    // * This is the "catch-all" for creating any other kind of element:
+                                    createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true);
+                            }
+                            try {
+                                moveComponent(doc, id, targetId, e.screenY);
+                            } catch (e) {
+                                console.log(`Non fatal error:`, e.message);
+                            }
+                        }
                     }
-                } else {
-                    // * A new element has been dropped:
-                    // This is currently handled by the other "drop" event listener, which is attached to the body. Scroll below to find it.
                 }
             }
         }, false);
 
         doc.addEventListener(`selectionchange`, () => {
-            selectedText = doc.getSelection();
-            if (selectedText.anchorNode.data !== ``) {
+            shortcutMenu.selectedText = doc.getSelection();
+            if (shortcutMenu.selectedText.anchorNode.data !== ``) {
                 // TODO: Show options for bold/underline/linking/etc.
             }
         });
@@ -349,93 +378,64 @@
         let generatedStyles = ``;
         $css.generated.forEach((selector) => {
             let rules = ``;
-            selector.rules.forEach((rule) => rules.push(`${rule.key}: ${rule.val}; `));
-            generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`)
+            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+            generatedStyles += `[data-id="${selector.id}"] { ${rules}}`;
         });
 
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: generatedStyles.trim(), });
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.custom.trim(), });
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: menuStyles.trim(), });
-        createComponent(doc, body, `nav`, { class: `append-contextMenu`, innerHTML: menuMarkup.trim(), });
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: generatedStyles.trim(), }, false);
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.custom.trim(), }, false);
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: contextMenu.menuStyles.trim(), }, false);
+        createComponent(doc, body, `nav`, { class: `append-contextMenu`, innerHTML: contextMenu.menuMarkup.trim(), }, false);
 
-        menu = doc.querySelector(`[data-id="3"]`);
-        hideMenu();
-        doc.addEventListener(`click`, () => {
-            hideMenu();
+        contextMenu.menu = doc.querySelector(`.append-contextMenu`);
+        contextMenu.hide();
+        doc.addEventListener(`click`, (e) => {
+            if (e.target.tagName === `BODY`) {
+                const componentIndex = components.indexOf(components.find((component) => component.id === selection));
+                if (componentIndex > -1) {
+                    selection = -1;
+                    components[componentIndex].element.blur();
+                    components[componentIndex].element.contentEditable !== `inherit` && (components[componentIndex].element.contentEditable = false);
+                    element.update(() => false);
+                    components[componentIndex].element.style.cursor = `pointer`;
+                    components[componentIndex].element.style.outline = ``;
+                    components[componentIndex].element.style.boxShadow = ``;
+                }
+            }
+            contextMenu.hide();
         });
         doc.addEventListener(`contextmenu`, (e) => {
             e.preventDefault();
-            showMenu();
-            moveMenu(doc, e);
+            contextMenu.show();
+            contextMenu.move(doc, e);
         }, true);
 
-        items.forEach((item) => {
-            components.push({ id: -1, element: body, children: [], });
-            switch (item.type) {
-                case `header`:
-                    createComponent(doc, body, `h1`, { contentEditable: true, textContent: item.text, });
-                    break;
-                case `paragraph`:
-                    createComponent(doc, body, `p`, { contentEditable: true, textContent: item.text, });
-                    break;
+        components = $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components;
+        components.forEach((component) => {
+            if (component.id === null) {
+                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[components.indexOf(component)].id = counter;
+                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[components.indexOf(component)].options.dataId = counter;
+                components[components.indexOf(component)].id = counter;
+                components[components.indexOf(component)].options.dataId = counter;
+                counter++;
             }
+            let options = component.options || {};
+            options.dataId = component.id;
+            createComponent(doc, body, component.tag, options, false);
         });
-
-        // * This listens for elements dropped into the iframe body:
-        body.addEventListener(`drop`, (e) => {
-            e.preventDefault();
-            if (e.dataTransfer.getData(`element`)) {
-                // * If the dropped element came from the sidebar:
-                const tagName = e.dataTransfer.getData(`element`);
-                switch (tagName) {
-                    // * These are some special cases for creating "exception" elements:
-                    case `container`:
-                        createComponent(doc, body, `div`, { className: `container`, });
-                        break;
-                    case `item`:
-                        createComponent(doc, body, `div`, { className: `item`, });
-                        break;
-                    case `item`:
-                        break;
-                    case `ul`:
-                        createComponent(doc, createComponent(doc, body, `ul`, {}), `li`, { contentEditable: true, textContent: `This is some dummy text.`, });
-                        break;
-                    case `markdown`:
-                        createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, });
-                        break;
-                    case `rich-text`:
-                        createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, });
-                        break;
-                    case `details`:
-                        createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, }), `summary`, { contentEditable: true, textContent: `Dropdown`, });
-                        break;
-                    case `img`:
-                        createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, });
-                        break;
-                    case `video`:
-                        alert(`This component is still in the works! Sorry.`);
-                        break;
-                    case `audio`:
-                        alert(`This component is still in the works! Sorry.`);
-                        break;
-                    default:
-                        // * This is the "catch-all" for creating any other kind of element:
-                        createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, });
-                }
-            }
-        });
+        hasLoaded = true;
     };
 
     // * If changes have been made but not saved, alert the user before they close the page:
     const beforeunload = (e) => {
-        if (!isModified) return null;
+        if (!!$isModified) return null;
         e = e || window.event;
         if (e) e.returnValue = `Are you sure?`;
         return `Are you sure?`;
     };
 
     // * If the custom context menu is showing and the escape key has been pressed, then hide it:
-    const keyup = (e) => (e.keyCode === 27 && menu && menuVisible) && (hideMenu());
+    const keyup = (e) => (e.keyCode === 27 && contextMenu.menu && contextMenu.menuVisible) && (contextMenu.hide());
 
     // * Automatically set the width of the iframe based on whether the left menu is expanded:
     tab.subscribe((val) => classList = val !== false ? `shrink` : ``);
@@ -454,18 +454,29 @@
         }
     });
 
-    element.subscribe((val) => {
-        if (doc !== null && typeof val !== `undefined`) {
-            //doc.querySelector(`[data-id="${val.id}"]`) = val.el;
+    // * Automatically update the page when it's been changed by another component:
+    page.subscribe((val) => {
+        if (doc) {
+            if (currentPage !== val && canvas !== null) {
+                reactive();
+                currentPage = val;
+                canvas.contentWindow.location.reload();
+            }
         }
     });
 
-    $: {
-        if (doc) {
-            $pages[pageIndex].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
-            isModified.update(() => true);
+    // * Determines whether the following reactive statement has been executed for the first time or any subsequent time:
+    let isFirstLoad = false;
+
+    // * Inform that some part of the project has been modified, and updates the page store with the latest data:
+    const reactive = () => {
+        const index = $pages.indexOf($pages.find((e) => e.id === currentPage));
+        if (index !== -1) {
+            $pages[index].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
+            $pages[index].components = components;
+            $isModified !== true && (isFirstLoad ? isModified.update(() => true) : isFirstLoad = true);
         }
-    }
+    };
 </script>
 
 <svelte:window on:beforeunload={beforeunload} on:keyup={keyup} />
@@ -474,7 +485,7 @@
     <title>Append</title>
 </svelte:head>
 
-<iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load}></iframe>
+<iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load} />
 
 <style>
     iframe {
@@ -486,7 +497,7 @@
     }
     :global {
         .shrink {
-            max-width: calc(100vw - 40em - 40px);
+            max-width: calc(100vw - 40em - 40px) !important;
         }
         .dropContainer {
             overflow: auto !important;

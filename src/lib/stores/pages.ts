@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 export default writable([
     {
+        id: 0,
         type: `page`,
         title: `Home`,
         description: `This is a home page.`,
@@ -9,9 +10,62 @@ export default writable([
         path: `/index.html`,
         file: `index.html`,
         body: ``,
+        components: [
+            {
+                id: null,
+                element: null,
+                children: [],
+                tag: `h1`,
+                options: {
+                    contentEditable: true,
+                    textContent: `Hello World`,
+                },
+            },
+            {
+                id: null,
+                element: null,
+                children: [],
+                tag: `p`,
+                options: {
+                    contentEditable: true,
+                    textContent: `Welcome to YOUR very own unstoppable website.`,
+                },
+            },
+            {
+                id: null,
+                element: null,
+                children: [],
+                tag: `p`,
+                options: {
+                    contentEditable: true,
+                    textContent: `WARNING: Progress will not be saved (yet)!`,
+                },
+            },
+            {
+                id: null,
+                element: null,
+                children: [],
+                tag: `p`,
+                options: {
+                    contentEditable: true,
+                    textContent: `IMPORTANT: Please don't try to build a full site for now, because it may be a very frustrating experience. This is NOT a stable release, and this is just for testing purposes!`,
+                },
+            },
+            {
+                id: null,
+                element: null,
+                children: [],
+                tag: `p`,
+                options: {
+                    contentEditable: true,
+                    textContent: `Anyway, have fun playing with this!`,
+                },
+            }
+        ],
         mime: `text/html`,
     },
     {
+        id: 1,
         type: `stylesheet`,
         path: `/style.css`,
         file: `style.css`,
@@ -19,6 +73,7 @@ export default writable([
         mime: `text/css`,
     },
     {
+        id: 2,
         type: `redirect`,
         path: `/ipfs-404.html`,
         file: `ipfs-404.html`,
@@ -26,6 +81,7 @@ export default writable([
         mime: `text/html`,
     },
     {
+        id: 3,
         type: `security`,
         path: `/.well-known/security.txt`,
         file: `security.txt`,
@@ -33,6 +89,7 @@ export default writable([
         mime: `text/plain`,
     },
     {
+        id: 4,
         type: `ads`,
         path: `/ads.txt`,
         file: `ads.txt`,
@@ -40,6 +97,7 @@ export default writable([
         mime: `text/plain`,
     },
     {
+        id: 5,
         type: `browserconfig`,
         path: `/browserconfig.xml`,
         file: `browserconfig.xml`,
@@ -47,6 +105,7 @@ export default writable([
         mime: `application/xml`,
     },
     {
+        id: 6,
         type: `humans`,
         path: `/humans.txt`,
         file: `humans.txt`,
@@ -54,6 +113,7 @@ export default writable([
         mime: `text/plain`,
     },
     {
+        id: 7,
         type: `webmanifest`,
         path: `/manifest.webmanifest`,
         file: `manifest.webmanifest`,
@@ -61,6 +121,7 @@ export default writable([
         mime: `application/manifest+json`,
     },
     {
+        id: 8,
         type: `robots`,
         path: `/robots.txt`,
         file: `robots.txt`,
@@ -68,6 +129,7 @@ export default writable([
         mime: `text/plain`,
     },
     {
+        id: 9,
         type: `feed`,
         path: `/rss.xml`,
         file: `rss.xml`,
@@ -75,6 +137,7 @@ export default writable([
         mime: `application/rss+xml`,
     },
     {
+        id: 10,
         type: `sitemap`,
         path: `/sitemap.xml`,
         file: `sitemap.xml`,
