@@ -10,6 +10,10 @@
 
 <p>So detailed guides and step-by-step tutorials should be made. Hopefully soon!</p>
 
+<h3>Bugs & Requests</h3>
+
+<p>For now, please open up a new issue on the GitHub page for each bug report and feature request (unless a similar issue has already been opened).</p>
+
 <h3>About Append</h3>
 
 <p>Twitter: <a class="link" href="https://twitter.com/appendweb3" rel="external noopener nofollow" target="_blank">@appendweb3</a></p>
