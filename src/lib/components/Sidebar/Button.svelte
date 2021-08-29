@@ -6,8 +6,9 @@
     import Files from './Tabs/Files.svelte';
     import Globals from './Tabs/Globals.svelte';
     import Plugins from './Tabs/Plugins.svelte';
-    import Help from './Tabs/Help.svelte';
+    import Data from './Tabs/Data.svelte';
     import CSS from './Tabs/CSS.svelte';
+    import Help from './Tabs/Help.svelte';
     import tab from '$lib/stores/tab';
     import { onDestroy } from 'svelte';
 
@@ -31,8 +32,9 @@
         { text: `Files`, component: Files, },
         { text: `Globals`, component: Globals, },
         { text: `Plugins`, component: Plugins, },
-        { text: `Help`, component: Help, },
-        { text: `CSS`, component: CSS, }
+        { text: `Data`, component: Data, },
+        { text: `CSS`, component: CSS, },
+        { text: `Help`, component: Help, }
     ];
 
     const unsubscribe = tab.subscribe((val) => {

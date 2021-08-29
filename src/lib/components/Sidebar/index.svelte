@@ -50,6 +50,15 @@
             </g>
         </svg>
     </Button>
+    <div class="bottom data">
+        <Button text="Data">
+            <svg version="1.1" x="0px" y="0px" viewBox="0 0 105.07 122.88" style="enable-background:new 0 0 105.07 122.88" xml:space="preserve">
+                <g>
+                    <path fill="#ddd" clip-rule="evenodd" fill-rule="evenodd" d="M52.53,0c28.87,0,52.27,10.96,52.27,24.46c0,13.51-23.41,24.46-52.27,24.46c-28.86,0-52.27-10.96-52.27-24.46 C0.26,10.96,23.67,0,52.53,0L52.53,0z M0.26,81.83v18.78c9.3,33.03,101.18,26.65,104.55-1.69V80.16 C100.22,111.27,7.61,113.51,0.26,81.83L0.26,81.83L0.26,81.83z M0,32.94v18.34c9.3,32.26,101.69,27.9,105.07,0.23V33.18 C100.47,63.57,7.35,63.88,0,32.94L0,32.94z M0,56.64v18.78c9.3,33.03,101.69,28.57,105.07,0.23V56.89C100.47,88,7.35,88.32,0,56.64 L0,56.64z" />
+                </g>
+            </svg>
+        </Button>
+    </div>
     <div class="bottom css">
         <Button text="CSS">
             <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 111.23" style="enable-background:new 0 0 122.88 111.23" xml:space="preserve">
@@ -92,6 +101,9 @@
                 .menu {
                     position: fixed !important;
                     top: 0;
+                }
+                &.data {
+                    bottom: 96px;
                 }
                 &.css {
                     bottom: 48px;
