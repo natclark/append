@@ -14,7 +14,7 @@
 </script>
 
 <h2>Edit Robots.txt File</h2>
-<p>The <code>robots.txt</code> file is a widely recognized standard that helps webmasters disallow web scrapers from crawling certain parts of their sites.</p>
+<p>The <code>robots.txt</code> file is a widely recognized standard that helps webmasters disallow web scrapers from crawling certain parts of their sites. More info is available here: <a class="link" href="https://www.robotstxt.org/" rel="external noopener nofollow" target="_blank">https://www.robotstxt.org/</a></p>
 <textarea bind:value class="editor" rows="32" autofocus on:input={update}></textarea>
 <Breaker />
 <Breaker />
