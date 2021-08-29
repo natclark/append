@@ -10,7 +10,7 @@
         pages.update(() => newPages);
     };
 
-    const unset = () => { };
+    const unset = () => {};
 </script>
 
 <h2>Edit Security.txt File</h2>
@@ -28,7 +28,6 @@
         justify-content: flex-end;
         width: 100%;
     }
-
     textarea.editor {
         background-color: #333;
         border: 1px solid #777;
