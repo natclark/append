@@ -50,7 +50,7 @@
                         <p class="faint">{page.path}</p>
                     </div>
                     <div>
-                        <button class="primary" on:click={() => viewPage(page.id)}>View</button>
+                        <button class="secondary" on:click={() => viewPage(page.id)}>View</button>
                         <Modal>
                             <EditPage path={page.path} />
                         </Modal>

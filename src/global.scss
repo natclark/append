@@ -15,7 +15,7 @@ button, input[type="submit"], [type="file"] {
     border: 0;
     outline: 0;
     padding: 0;
-    &.primary, &.success, &.error {
+    &.primary, &.secondary, &.success, &.error {
         border-radius: 4px;
         box-sizing: border-box;
         color: #fff;
@@ -44,6 +44,21 @@ button, input[type="submit"], [type="file"] {
         &:active {
             background-image: linear-gradient(#3D94D9, #0067B9);
             border-color: #006DBC;
+        }
+    }
+    &.secondary {
+        background-image: linear-gradient(#3c3c3c, #222);
+        border: 1px solid #1a1a1a;
+        &:hover {
+            background-image: linear-gradient(#2a2a2a, #1b1b1b);
+            border-color: #0d0d0d;
+        }
+        &:focus {
+            box-shadow: rgba(187, 187, 187, .5) 0 0 0 2px;
+        }
+        &:active {
+            background-image: linear-gradient(#4a4a4a, #2c2c2c);
+            border-color: #1c1c1c;
         }
     }
     &.success {

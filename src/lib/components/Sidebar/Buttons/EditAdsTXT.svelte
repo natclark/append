@@ -9,4 +9,4 @@
     const click = () => open(EditAdsTXT, { path, });
 </script>
 
-<button class="primary" on:click={click}>Edit</button>
+<button class="secondary" on:click={click}>Edit</button>

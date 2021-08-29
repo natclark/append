@@ -9,5 +9,4 @@
     const click = () => open(EditRobotsTXT, { path, });
 </script>
 
-<button class="primary" on:click={click}>Edit</button>
-
+<button class="secondary" on:click={click}>Edit</button>

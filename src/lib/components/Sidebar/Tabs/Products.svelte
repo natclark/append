@@ -63,7 +63,7 @@
             background-color: #444;
         }
     }
-    :global(.page .flex button) {
+    :global(.product .flex button) {
         margin-right: 4px;
     }
 </style>
