@@ -1,6 +1,9 @@
 <script>
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
+    import pages from '$lib/stores/pages';
+    import page from '$lib/stores/page';
+    import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
     import { onMount, tick } from 'svelte';
@@ -118,6 +121,10 @@
 
     const unsetComponent = () => {
         removeSelector();
+        let newComponents = $components;
+        newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id == currentElement.id)), 1);
+        components.update(() => newComponents);
+        $pages[$page].components = $components; // ? What other state changes from this componenet should this var be updated for?
         doc.querySelector(`[data-id="${currentElement.id}"]`).remove();
         currentElement = null;
     }

@@ -1,5 +1,6 @@
 <script>
     import page from '$lib/stores/page';
+    import components from '$lib/stores/components';
     import pages from '$lib/stores/pages';
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
@@ -38,16 +39,22 @@
     let counter = 0;
 
     // * The object array of components:
-    let components = $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components;
+    components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
 
     // * The object array of items within the custom context menu:
     let menuOptions = [];
 
     // * Reset an existing component:
     const resetComponent = (component, el) => {
-        if (component.element === null || typeof component.element === `undefined`) {
-            if (component.id == el.getAttribute(`data-id`)) {
-                components[components.indexOf(component)].element = el;
+        if (component.id == el.getAttribute(`data-id`)) {
+            if (typeof component.element === `undefined`) {
+                let newComponents = $components;
+                newComponents[newComponents.indexOf(component)].element = el;
+                components.update(() => newComponents);
+            } else if (component.element === null) {
+                let newComponents = $components;
+                newComponents[newComponents.indexOf(component)].element = el;
+                components.update(() => newComponents);
             }
         }
     };
@@ -70,17 +77,19 @@
         el.style.willChange = `box-shadow`;
         el.addEventListener(`mouseover`, () => {
             if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
-                components.forEach((component) => {
+                let newComponents = $components;
+                $components.forEach((component) => {
                     resetComponent(component, el);
                     try {
                         if (component.element !== dom.activeElement && selection != component.element.getAttribute(`data-id`)) {
                             dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
                             dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
-                            components[components.indexOf(component)].element.style.outline = ``;
-                            components[components.indexOf(component)].element.style.boxShadow = ``;
+                            newComponents[newComponents.indexOf(component)].element.style.outline = ``;
+                            newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
                         }
                     } catch (e) {}
                 });
+                components.update(() => newComponents);
                 // * There is 100% a better way to do this. Not worries about optimizing everything right now.
                 const elStyle = el.currentStyle || window.frames[`canvas`].getComputedStyle(el);
                 el.style.boxShadow = ``;
@@ -110,15 +119,17 @@
             element.update(() => obj);
             el.focus();
             const boxShadow = el.style.boxShadow;
-            components.forEach((component) => {
+            let newComponents = $components;
+            $components.forEach((component) => {
                 resetComponent(component, el);
                 try {
                     dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
                     dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
-                    components[components.indexOf(component)].element.style.outline = ``;
-                    components[components.indexOf(component)].element.style.boxShadow = ``;
+                    newComponents[newComponents.indexOf(component)].element.style.outline = ``;
+                    newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
                 } catch (e) {}
             });
+            components.update(() => newComponents);
             el.style.outline = `2px solid #08f`;
             el.style.boxShadow = boxShadow;
         });
@@ -130,12 +141,14 @@
             el.focus();
             editable && (el.style.cursor = `text`);
             const boxShadow = el.style.boxShadow;
-            components.forEach((component) => {
+            let newComponents = $components;
+            $components.forEach((component) => {
                 try {
-                    component.element.style.outline = ``;
-                    component.element.style.boxShadow = ``;
+                    newComponents[newComponents.indexOf(component)].element.style.outline = ``;
+                    newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
                 } catch (e) {}
             });
+            components.update(() => newComponents);
             el.style.outline = `2px solid #08f`;
             el.style.boxShadow = boxShadow;
         });
@@ -155,9 +168,13 @@
             el.style.boxShadow = ``;
         });
         el.addEventListener(`input`, () => {
-            push ? options[`textContent`] = el.textContent : components[components.indexOf(components.find((e) => e.id == el.getAttribute(`data-id`)))].options[`textContent`] = el.textContent;
+            push ? options[`textContent`] = el.textContent : $components[$components.indexOf($components.find((e) => e.id == el.getAttribute(`data-id`)))].options[`textContent`] = el.textContent;
         });
-        push && (components.push({ id: el.getAttribute(`data-id`), element: el, children: [], tag, options, }));
+        if (push) {
+            let newComponents = [];
+            newComponents.push({ id: el.getAttribute(`data-id`), element: el, children: [], tag, options, });
+            components.update(() => newComponents);
+        }
         parent.appendChild(el);
         return el;
     };
@@ -191,11 +208,11 @@
                 if (fromIndex > toIndex) {
                     // * prepend
                     toEl.parentElement.insertBefore(fromEl, toEl);
-                    components = moveItem(components, components.indexOf(components.find((e) => e.id === parseInt(from))), components.indexOf(components.find((e) => e.id === parseInt(to))));
+                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
                 } else {
                     // * append
                     toEl.parentElement.insertBefore(fromEl, toEl.nextSibling);
-                    components = moveItem(components, components.indexOf(components.find((e) => e.id === parseInt(from))), components.indexOf(components.find((e) => e.id === parseInt(to))));
+                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
                 }
         }
         reactive();
@@ -203,7 +220,9 @@
 
     // * Remove a component:
     const unsetComponent = (dom, id) => {
-        components.splice(components.indexOf(components.find((e) => e.id === id)), 1);
+        let newComponents = $components;
+        newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id === id)), 1);
+        components.update(() => newComponents);
         reactive();
         dom.querySelector(`[data-id="${id}"]`).remove();
     };
@@ -391,15 +410,17 @@
         contextMenu.hide();
         doc.addEventListener(`click`, (e) => {
             if (e.target.tagName === `BODY`) {
-                const componentIndex = components.indexOf(components.find((component) => component.id === selection));
+                let newComponents = $components;
+                const componentIndex = newComponents.indexOf(newComponents.find((component) => component.id === selection));
                 if (componentIndex > -1) {
                     selection = -1;
-                    components[componentIndex].element.blur();
-                    components[componentIndex].element.contentEditable !== `inherit` && (components[componentIndex].element.contentEditable = false);
+                    newComponents[componentIndex].element.blur();
+                    newComponents[componentIndex].element.contentEditable !== `inherit` && (newComponents[componentIndex].element.contentEditable = false);
                     element.update(() => false);
-                    components[componentIndex].element.style.cursor = `pointer`;
-                    components[componentIndex].element.style.outline = ``;
-                    components[componentIndex].element.style.boxShadow = ``;
+                    newComponents[componentIndex].element.style.cursor = `pointer`;
+                    newComponents[componentIndex].element.style.outline = ``;
+                    newComponents[componentIndex].element.style.boxShadow = ``;
+                    components.update(() => newComponents);
                 }
             }
             contextMenu.hide();
@@ -410,19 +431,24 @@
             contextMenu.move(doc, e);
         }, true);
 
-        components = $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components;
-        components.forEach((component) => {
+        components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
+        let newComponents = $components;
+        $components.forEach((component) => {
             if (component.id === null) {
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[components.indexOf(component)].id = counter;
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[components.indexOf(component)].options.dataId = counter;
-                components[components.indexOf(component)].id = counter;
-                components[components.indexOf(component)].options.dataId = counter;
+                /*
+                TODO - omit? potentially redundant
+                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].id = counter;
+                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].options.dataId = counter;
+                */
+                newComponents[newComponents.indexOf(component)].id = counter;
+                newComponents[newComponents.indexOf(component)].options.dataId = counter;
                 counter++;
             }
             let options = component.options || {};
             options.dataId = component.id;
             createComponent(doc, body, component.tag, options, false);
         });
+        components.update(() => newComponents);
         hasLoaded = true;
     };
 
@@ -473,7 +499,7 @@
         const index = $pages.indexOf($pages.find((e) => e.id === currentPage));
         if (index !== -1) {
             $pages[index].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
-            $pages[index].components = components;
+            $pages[index].components = $components;
             $isModified !== true && (isFirstLoad ? isModified.update(() => true) : isFirstLoad = true);
         }
     };
