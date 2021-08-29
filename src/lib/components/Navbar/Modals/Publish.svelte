@@ -140,26 +140,28 @@
 <p><strong>Note:</strong> One-click publishing to blockchain domains is currently disabled.<Breaker /><Breaker />However, you can still click "Publish" anyway to just publish on IPFS.</p>
 <Breaker />
 <h3>Previous Publications</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Content Hash</th>
-            <th>Domain (if any)</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {#each publications as pub}
-            {#if pub !== ``}
-                <tr>
-                    <td><a class="link" href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
-                    <td>{pub.split(`;`)[1]}</td>
-                    <td>{pub.split(`;`)[2]}</td>
-                </tr>
-            {/if}
-        {/each}
-    </tbody>
-</table>
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>Content Hash</th>
+                <th>Domain (if any)</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#each publications as pub}
+                {#if pub !== ``}
+                    <tr>
+                        <td><a class="link" href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
+                        <td>{pub.split(`;`)[1]}</td>
+                        <td>{pub.split(`;`)[2]}</td>
+                    </tr>
+                {/if}
+            {/each}
+        </tbody>
+    </table>
+</div>
 
 <style>
     .flex {
@@ -172,28 +174,34 @@
             width: 50%;
         }
     }
-    table {
-        border: 1px solid #111;
-        border-collapse: collapse;
-        border-radius: 2px;
-        width: 100%;
-        tbody {
-            tr:nth-child(odd) {
-                background-color: #555;
-            }
-        }
-        tr {
-            height: 35px;
-            th, td {
-                padding: 0 8px;
-                text-align: left;
-                &:last-child {
-                    text-align: right;
+    .container {
+        height: 300px;
+        overflow: hidden scroll;
+        table {
+            border: 1px solid #111;
+            border-collapse: collapse;
+            border-radius: 2px;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            tbody {
+                tr:nth-child(odd) {
+                    background-color: #555;
                 }
             }
-            td:first-child {
-                word-wrap: break-word;
-                max-width: 100px;
+            tr {
+                height: 35px;
+                th, td {
+                    padding: 0 8px;
+                    text-align: left;
+                    &:last-child {
+                        text-align: right;
+                    }
+                }
+                td:first-child {
+                    word-wrap: break-word;
+                    max-width: 100px;
+                }
             }
         }
     }
