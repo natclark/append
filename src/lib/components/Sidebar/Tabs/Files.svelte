@@ -1,4 +1,5 @@
 <script>
+    import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Grid from '$lib/components/Layout/Grid.svelte';
     import Center from '$lib/components/Layout/Center.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
@@ -42,55 +43,57 @@
     });
 </script>
 
-<p>Upload File</p>
-<Center>
-    <!--
-    TODO - Modal for easy file dragging-and-dropping
-    <Modal>
-        <UploadFile />
-    </Modal>
-    -->
-    <input class="primary" type="file" multiple bind:files={files} on:change={uploadFiles}>
-</Center>
-<Breaker />
-<Center>
-    <div class="checkbox">
-        <input id="metadata" name="metadata" type="checkbox" bind:checked={metadata}>
-        <label for="metadata">Strip image metadata (WIP)</label>
-    </div>
-</Center>
-<Breaker />
-<Center>
-    <p class="normal"><em>You might want to avoid uploading private or personally identifying files to IPFS! They might not be able to be removed later, as long as at least one node is still replicating them.</em></p>
-</Center>
-<p>My Files</p>
-<Grid>
-    {#each uploads as cid}
-        {#if cid !== ``}
-            <Upload {cid} />
-        {/if}
-    {/each}
-</Grid>
+<Dropdown text="Upload File">
+    <Center>
+        <!--
+        TODO - Modal for easy file dragging-and-dropping
+        <Modal>
+            <UploadFile />
+        </Modal>
+        -->
+        <input class="primary" type="file" multiple bind:files={files} on:change={uploadFiles}>
+    </Center>
+    <Breaker />
+    <Center>
+        <div class="checkbox">
+            <input id="metadata" name="metadata" type="checkbox" bind:checked={metadata}>
+            <label for="metadata">Strip image metadata (WIP)</label>
+        </div>
+    </Center>
+    <Breaker />
+    <Center>
+        <p class="normal"><em>You might want to avoid uploading private or personally identifying files to IPFS! They might not be able to be removed later, as long as at least one node is still replicating them.</em></p>
+    </Center>
+</Dropdown>
+<Dropdown text="My Files">
+    <Grid>
+        {#each uploads as cid}
+            {#if cid !== ``}
+                <Upload {cid} />
+            {/if}
+        {/each}
+    </Grid>
 
-<style>
-    p {
-        color: #f8f8f8;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 0 8px;
-        &:not(.normal) {
-            background-color: #333;
-            padding: 4px 8px;
+    <style>
+        p {
+            color: #f8f8f8;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0 8px;
+            &:not(.normal) {
+                background-color: #333;
+                padding: 4px 8px;
+            }
         }
-    }
-    .checkbox {
-        input {
-            filter: hue-rotate(340deg);
+        .checkbox {
+            input {
+                filter: hue-rotate(340deg);
+            }
+            label {
+                color: #fafafa;
+                cursor: pointer;
+                
+            }
         }
-        label {
-            color: #fafafa;
-            cursor: pointer;
-            
-        }
-    }
-</style>
+    </style>
+</Dropdown>
