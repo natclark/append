@@ -1,21 +1,26 @@
 <script>
-    let value;
+    import pages from '$lib/stores/pages';
+    import Breaker from '$lib/components/layout/Breaker.svelte';
+
+    let value = $pages[$pages.indexOf($pages.find((e) => e.path === `/robots.txt`))].body;
+
+    const update = () => {
+        let newPages = $pages;
+        newPages[newPages.indexOf(newPages.find((e) => e.path === `/robots.txt`))].body = value;
+        pages.update(() => newPages);
+    };
 
     const unset = () => {};
 </script>
 
 <h2>Edit Robots.txt File</h2>
-<p>Coming Soon!</p>
-<!--
-TODO
 <p>The <code>robots.txt</code> file is a widely recognized standard that helps webmasters disallow web scrapers from crawling certain parts of their sites.</p>
-<textarea bind:{value} class="editor" rows="32" autofocus></textarea>
-<div class="flex flex--reverse">
-    <!- This is reversed so that the delete button is at the bottom of the tab index order ->
-    <input class="primary" type="submit" value="Edit">
+<textarea bind:value class="editor" rows="32" autofocus on:input={update}></textarea>
+<Breaker />
+<Breaker />
+<div class="flex">
     <button class="primary error" on:click={unset}>Delete</button>
 </div>
--->
 
 <style>
     .flex {
@@ -30,9 +35,6 @@ TODO
         input[type="text"] {
             font-size: 18px;
             width: 50%;
-        }
-        &.flex--reverse {
-            flex-direction: row-reverse;
         }
     }
     textarea.editor {
