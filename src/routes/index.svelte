@@ -292,7 +292,8 @@
                 id = e.target.parentElement.getAttribute(`data-id`);
             }
             if (id === null) {
-                id = counter++
+                id = counter;
+                counter++;
                 e.target.setAttribute(`data-id`, id);
             }
         }, false);
@@ -317,7 +318,8 @@
                         if (dragged.tagName !== `BODY`) {
                             let id = e.target.getAttribute(`data-id`);
                             if (id === null) {
-                                id = counter++;
+                                id = counter;
+                                counter++;
                                 e.target.setAttribute(`data-id`, id);
                             }
                             try {
