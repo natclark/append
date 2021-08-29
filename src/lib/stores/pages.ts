@@ -74,7 +74,7 @@ export default writable([
     },
     {
         id: 2,
-        type: `redirect`,
+        type: `ipfs-404`,
         path: `/ipfs-404.html`,
         file: `ipfs-404.html`,
         to: `/`,

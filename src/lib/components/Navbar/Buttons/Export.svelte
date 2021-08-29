@@ -40,11 +40,11 @@
                     $css.generated.forEach((selector) => {
                         let rules = ``;
                         selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
-                        generatedStyles.push(`[data-id="${selector.id}"] { ${rules}}`);
+                        generatedStyles += `[data-id="${selector.id}"] { ${rules}}`;
                     });
                     zip.file(page.file, `${generatedStyles.trim()}${$css.custom.trim()}`);
                     break;
-                case `redirect`:
+                case `ipfs-404`:
                     zip.file(page.file, `<!DOCTYPE html><title>.</title>\<script\>window.location=\`${page.to}\`\<\/script\><noscript><meta http-equiv="refresh" content="0;url=${page.to}"></noscript>`.trim());
                     break;
                 case `security`:

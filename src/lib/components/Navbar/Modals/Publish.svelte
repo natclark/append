@@ -62,7 +62,7 @@
                     blob = new Blob([`${generatedStyles.trim()}${$css.custom.trim()}`], { type: page.mime, });
                     files.push(new File([blob], page.file));
                     break;
-                case `redirect`:
+                case `ipfs-404`:
                     blob = new Blob([`<!DOCTYPE html><title>.</title>\<script\>window.location=\`${page.to}\`\<\/script\><noscript><meta http-equiv="refresh" content="0;url=${page.to}"></noscript>`.trim()], { type: page.mime, });
                     files.push(new File([blob], page.file));
                     break;

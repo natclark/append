@@ -97,7 +97,7 @@
                             <EditStylesheet path={page.path} />
                         </Modal>
                     </div>
-                {:else if page.type === `redirect`}
+                {:else if page.type === `ipfs-404`}
                     <div class="flex">
                         <div>
                             <p class="title">IPFS 404</p>
