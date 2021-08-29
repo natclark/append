@@ -18,7 +18,7 @@
     // * The previous page visited by the user:
     let lastPage = 0;
 
-    // * The current apge:
+    // * The current page:
     let currentPage = $page;
 
     const submit = () => {
