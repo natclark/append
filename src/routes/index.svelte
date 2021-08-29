@@ -485,6 +485,7 @@
         if (doc) {
             if (currentPage !== val && canvas !== null) {
                 reactive();
+                element.update(() => false);
                 currentPage = val;
                 canvas.contentWindow.location.reload();
             }

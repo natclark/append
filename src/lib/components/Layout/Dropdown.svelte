@@ -68,13 +68,14 @@
             margin-right: 8px;
             width: 16px;
         }
-        &:hover {
-            polygon {
-                fill: #f8f8f8;
-            }
-        }
         &::-webkit-details-marker {
             display: none;
+        }
+        &:hover polygon {
+            fill: #f8f8f8;
+        }
+        &:focus {
+            outline: none;
         }
     }
 </style>

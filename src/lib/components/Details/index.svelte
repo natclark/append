@@ -6,8 +6,7 @@
     import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
-    import { onMount, tick } from 'svelte';
-    import '@eastdesire/jscolor/jscolor.js';
+    import '../../../../node_modules/@jaames/iro/dist/iro.js';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
@@ -97,9 +96,15 @@
 
     const justifyContentChange = (e) => newStyle(`justify-content`, e.target.value);
 
-    const colorChange = (e) => newStyle(`color`, e.target.getAttribute(`data-current-color`));
+    const colorChange = (e) => {
+        newStyle(`color`, e.target.value);
+        colorButton.style.backgroundColor = e.target.value;
+    };
 
-    const backgroundColorChange = (e) => newStyle(`background-color`, e.target.getAttribute(`data-current-color`));
+    const backgroundColorChange = (e) => {
+        newStyle(`background-color`, e.target.value);
+        backgroundButton.style.backgroundColor = e.target.value;
+    };
 
     const marginChange = (e) => newStyle(`margin`, e.target.value);
 
@@ -135,10 +140,73 @@
 
     element.subscribe((val) => typeof val !== `undefined` && (currentElement = val));
 
-    onMount(async () => {
-        await tick();
-        jscolor.install(); // TODO - fix bug such because jscolor doesn't work immediately.
-    });
+    let colorModal = null;
+    let color = null;
+    let colorButton = null;
+    let colorInput = null;
+    let backgroundModal = null;
+    let background = null;
+    let backgroundButton = null;
+    let backgroundInput = null;
+    let isMounted = false;
+
+    const mountPickers = () => {
+        isMounted = true;
+        const colorPicker = new iro.ColorPicker(color, {
+            color: attributes.color || `#000000`,
+            layout: [
+                {
+                    component: iro.ui.Box,
+                },
+                {
+                    component: iro.ui.Slider,
+                }
+            ],
+            width: 200,
+        });
+        colorPicker.on([`color:init`, `color:change`], (color) => {
+            newStyle(`color`, color.hexString);
+            colorInput.value = color.hexString;
+            colorButton.style.backgroundColor = color.hexString;
+        });
+        const backgroundPicker = new iro.ColorPicker(background, {
+            color: attributes.background_color || `#ffffff`,
+            layout: [
+                {
+                    component: iro.ui.Box,
+                },
+                {
+                    component: iro.ui.Slider,
+                }
+            ],
+            width: 200,
+        });
+        backgroundPicker.on([`color:init`, `color:change`], (color) => {
+            newStyle(`background-color`, color.hexString);
+            backgroundInput.value = color.hexString;
+            backgroundButton.style.backgroundColor = color.hexString;
+        });
+        colorModal.addEventListener(`click`, () => {
+            backgroundModal.removeAttribute(`open`);
+        });
+        backgroundModal.addEventListener(`click`, () => {
+            colorModal.removeAttribute(`open`);
+        });
+        const pickers = document.querySelectorAll(`.picker`);
+        const contains = (child) => {
+            let res = false;
+            pickers.forEach((picker) => picker === child || picker.contains(child) && (res = true));
+            return res;
+        };
+        document.addEventListener(`click`, (e) => {
+            if (e.target.className !== `picker__modal` && !contains(e.target)) {
+                try {
+                    backgroundModal.removeAttribute(`open`);
+                    colorModal.removeAttribute(`open`);
+                } catch (e) {}
+            }
+        });
+    };
 
     let attributes = {
         type: null,
@@ -157,7 +225,7 @@
 
     $: {
         (currentElement !== null && typeof currentElement.el !== `undefined`) && (Object.keys(attributes).forEach((key) => attributes[key] = getStyle(key.replaceAll(`_`, `-`))));
-        if (typeof jscolor !== `undefined`) jscolor.install();
+        (color && background && colorModal && backgroundModal && !isMounted) && (mountPickers());
     }
 </script>
 
@@ -213,11 +281,23 @@
                 <Dropdown text="Color">
                     <div class="level">
                         <p class="normal">Text Color</p>
-                        <input class="jscolor" value="{attributes.color || `#000000`}" data-jscolor="" on:change={colorChange}>
+                        <div class="flex picker">
+                            <details bind:this={colorModal}>
+                                <summary class="picker__toggle"><div bind:this={colorButton} class="picker__button" style="background-color: {attributes.color || `#000000`};"></div></summary>
+                                <div bind:this={color} class="picker__modal"></div>
+                            </details>
+                            <input bind:this={colorInput} class="picker__input" type="text" value={attributes.color || `#000000`} on:change={colorChange}>
+                        </div>
                     </div>
                     <div class="level">
                         <p class="normal">Background</p>
-                        <input class="jscolor jscolor-active" value="{attributes.background_color || `#ffffff`}" data-jscolor="" on:change={backgroundColorChange}>
+                        <div class="flex picker">
+                            <details bind:this={backgroundModal}>
+                                <summary class="picker__toggle"><div bind:this={backgroundButton} class="picker__button" style="background-color: {attributes.background_color || `#ffffff`};"></div></summary>
+                                <div bind:this={background} class="picker__modal" value={attributes.color || `#000000`}></div>
+                            </details>
+                            <input bind:this={backgroundInput} class="picker__input" type="text" value={attributes.background_color || `#ffffff`} on:change={backgroundColorChange}>
+                        </div>
                     </div>
                 </Dropdown>
             {/if}
@@ -354,6 +434,41 @@
                 font-size: 16px;
                 padding: 0;
                 text-align: left;
+            }
+            .picker {
+                .picker__toggle {
+                    height: 100%;
+                    list-style-type: none;
+                    .picker__button {
+                        background-color: #000;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        display: block;
+                        height: 23px;
+                        margin-right: -1px;
+                        width: 20px;
+                    }
+                    &::-webkit-details-marker {
+                        display: none;
+                    }
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                .picker__modal {
+                    background-color: #181818;
+                    border: 1px solid #000;
+                    border-radius: 6px;
+                    box-shadow: rgba(0, 0, 0, .25) 0 54px 55px, rgba(0, 0, 0, .12) 0 -12px 30px, rgba(0, 0, 0, .12) 0 4px 6px, rgba(0, 0, 0, .17) 0 12px 13px, rgba(0, 0, 0, .09) 0 -3px 5px;
+                    height: 300px;
+                    padding: 25px;
+                    position: fixed;
+                    right: 22px;
+                    width: 250px;
+                }
+                .picker__input {
+                    text-transform: uppercase;
+                }
             }
             select, input {
                 background-color: #444;

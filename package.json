@@ -42,8 +42,8 @@
         "typescript": "^4.3.5"
     },
     "dependencies": {
-        "@eastdesire/jscolor": "^2.4.5",
         "@ensdomains/ensjs": "^2.0.1",
+        "@jaames/iro": "^5.5.2",
         "@unstoppabledomains/resolution": "^5.0.1",
         "dotenv": "^10.0.0",
         "file-saver": "^2.0.5",
