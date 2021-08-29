@@ -112,3 +112,18 @@ button, input[type="submit"], [type="file"] {
         }
     }
 }
+
+/* Links */
+
+a.link {
+    color: #40c9ff;
+    &:hover {
+        color: #00b7ff;
+    }
+    &:visited {
+        color: #fb75fb;
+        &:hover {
+            color: #ee82ee;
+        }
+    }
+}

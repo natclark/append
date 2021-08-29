@@ -152,7 +152,7 @@
         {#each publications as pub}
             {#if pub !== ``}
                 <tr>
-                    <td><a href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
+                    <td><a class="link" href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
                     <td>{pub.split(`;`)[1]}</td>
                     <td>{pub.split(`;`)[2]}</td>
                 </tr>
@@ -192,18 +192,6 @@
                 }
             }
             td:first-child {
-                a {
-                    color: #40c9ff;
-                    &:hover {
-                        color: #00b7ff;
-                    }
-                    &:visited {
-                        color: #fb75fb;
-                        &:hover {
-                            color: #ee82ee;
-                        }
-                    }
-                }
                 word-wrap: break-word;
                 max-width: 100px;
             }
