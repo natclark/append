@@ -20,7 +20,6 @@
     <input bind:value id="to" type="text" placeholder="http://example.com" autofocus required aria-placeholder="http://example.com" aria-required="true" on:change={update}>
 </div>
 <Breaker />
-<Breaker />
 <div class="flex flex--end">
     <button class="primary error" on:click={unset}>Delete</button>
 </div>
