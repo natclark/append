@@ -1,6 +1,6 @@
 <script>
     import pages from '$lib/stores/pages';
-    import Breaker from '$lib/components/layout/Breaker.svelte';
+    import Breaker from '$lib/components/Layout/Breaker.svelte';
 
     let value = $pages[$pages.indexOf($pages.find((e) => e.path === `/ads.txt`))].body;
 
