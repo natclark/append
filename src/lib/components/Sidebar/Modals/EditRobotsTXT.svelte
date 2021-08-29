@@ -26,16 +26,7 @@
     .flex {
         display: flex;
         justify-content: flex-end;
-    }
-    .flex {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
         width: 100%;
-        input[type="text"] {
-            font-size: 18px;
-            width: 50%;
-        }
     }
     textarea.editor {
         background-color: #333;
