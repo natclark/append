@@ -36,12 +36,12 @@
 <p>You can redirect paths to external pages or other pages on your site.</p>
 <form on:submit|preventDefault={submit}>
     <div class="flex">
-        <label for="path">Path</label>
+        <label for="path">Path <span class="required">*</span></label>
         <input bind:value={path} id="path" type="text" placeholder="/example" autofocus required aria-placeholder="placeholder" aria-required="true">
     </div>
     <Breaker />
     <div class="flex">
-        <label for="to">Destination</label>
+        <label for="to">Destination <span class="required">*</span></label>
         <input bind:value={to} id="to" type="text" placeholder="http://example.com" required aria-placeholder="http://example.com" aria-required="true">
     </div>
     <Breaker />

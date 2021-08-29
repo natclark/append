@@ -127,3 +127,10 @@ a.link {
         }
     }
 }
+
+/* Forms */
+
+label > span.required {
+    color: #ff6060;
+    font-weight: 700;
+}

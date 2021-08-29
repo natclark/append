@@ -62,12 +62,12 @@
 <h2>Create Page</h2>
 <form on:submit|preventDefault={submit}>
     <div class="flex">
-        <label for="title">Title</label>
+        <label for="title">Title <span class="required">*</span></label>
         <input bind:value={title} id="title" type="text" placeholder="About" autofocus required aria-placeholder="About" aria-required="true">
     </div>
     <Breaker />
     <div class="flex">
-        <label for="path">Path</label>
+        <label for="path">Path <span class="required">*</span></label>
         <input bind:value={path} id="path" type="text" placeholder="/about" required aria-placeholder="/about" aria-required="true">
     </div>
     <Breaker />

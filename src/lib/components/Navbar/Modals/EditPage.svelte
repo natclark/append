@@ -45,19 +45,18 @@
 <h2>Edit Page</h2>
 <form on:submit|preventDefault={submit}>
     <div class="flex">
-        <label for="title">Title</label>
+        <label for="title">Title <span class="required">*</span></label>
         <input bind:value={title} id="title" type="text" placeholder="About" autofocus required aria-placeholder="About" aria-required="true">
     </div>
     <Breaker />
     <div class="flex">
-        <label for="path">Path</label>
+        <label for="path">Path <span class="required">*</span></label>
         <input bind:value={path} id="path" type="text" placeholder="/about" required aria-placeholder="/about" aria-required="true">
     </div>
     <Breaker />
     <div class="flex">
         <label for="description">Description</label>
-        <input bind:value={description} id="description" type="text" placeholder="This is an example description."
-            aria-required="false" aria-placeholder="This is an example description.">
+        <input bind:value={description} id="description" type="text" placeholder="This is an example description." aria-required="false" aria-placeholder="This is an example description.">
     </div>
     <Breaker />
     <div class="flex flex--end">
