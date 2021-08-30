@@ -4,6 +4,7 @@
 
 <svelte:head>
     <title>Append: Create a pixel perfect Web 3.0 blog, store, or app.</title>
+    <link rel="canonical" href="https://tryappend.com">
 </svelte:head>
 
 <div class="container">

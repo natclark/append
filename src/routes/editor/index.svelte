@@ -511,7 +511,8 @@
 <svelte:window on:beforeunload={beforeunload} on:keyup={keyup} />
 
 <svelte:head>
-    <title>Append</title>
+    <title>Append Editor</title>
+    <link rel="canonical" href="https://tryappend.com/editor/">
 </svelte:head>
 
 <iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load} />
