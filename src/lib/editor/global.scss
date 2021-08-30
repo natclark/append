@@ -4,8 +4,14 @@
     box-sizing: border-box;
 }
 
+html {
+    /* For some reason, the editor can inherit styles from the landing page. This might be due to a Svelte bug. In any case, this prevents duplicate scrollbars in the editor: */
+    overflow: hidden !important;
+}
+
 body {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, system-ui, sans-serif;
+    /* Similarly, adding !important here overrides the inherited styles from the landing page, which will try and set the font to 'Inter var'. */
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, system-ui, sans-serif !important;
     margin: 0;
     overflow: hidden;
 }
