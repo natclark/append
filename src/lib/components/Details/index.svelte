@@ -151,41 +151,45 @@
     let isMounted = false;
 
     const mountPickers = () => {
-        isMounted = true;
-        const colorPicker = new iro.ColorPicker(color, {
-            color: attributes.color || `#000000`,
-            layout: [
-                {
-                    component: iro.ui.Box,
-                },
-                {
-                    component: iro.ui.Slider,
-                }
-            ],
-            width: 200,
-        });
-        colorPicker.on([`color:init`, `color:change`], (color) => {
-            newStyle(`color`, color.hexString);
-            colorInput.value = color.hexString;
-            colorButton.style.backgroundColor = color.hexString;
-        });
-        const backgroundPicker = new iro.ColorPicker(background, {
-            color: attributes.background_color || `#ffffff`,
-            layout: [
-                {
-                    component: iro.ui.Box,
-                },
-                {
-                    component: iro.ui.Slider,
-                }
-            ],
-            width: 200,
-        });
-        backgroundPicker.on([`color:init`, `color:change`], (color) => {
-            newStyle(`background-color`, color.hexString);
-            backgroundInput.value = color.hexString;
-            backgroundButton.style.backgroundColor = color.hexString;
-        });
+        try {
+            isMounted = true;
+            const colorPicker = new iro.ColorPicker(color, {
+                color: attributes.color || `#000000`,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                    },
+                    {
+                        component: iro.ui.Slider,
+                    }
+                ],
+                width: 200,
+            });
+            colorPicker.on([`color:init`, `color:change`], (color) => {
+                newStyle(`color`, color.hexString);
+                colorInput.value = color.hexString;
+                colorButton.style.backgroundColor = color.hexString;
+            });
+            const backgroundPicker = new iro.ColorPicker(background, {
+                color: attributes.background_color || `#ffffff`,
+                layout: [
+                    {
+                        component: iro.ui.Box,
+                    },
+                    {
+                        component: iro.ui.Slider,
+                    }
+                ],
+                width: 200,
+            });
+            backgroundPicker.on([`color:init`, `color:change`], (color) => {
+                newStyle(`background-color`, color.hexString);
+                backgroundInput.value = color.hexString;
+                backgroundButton.style.backgroundColor = color.hexString;
+            });
+        } catch (e) {
+            console.log(`Color picker error`, e.message);
+        }
         colorModal.addEventListener(`click`, () => {
             backgroundModal.removeAttribute(`open`);
         });

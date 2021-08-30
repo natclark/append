@@ -1,5 +1,12 @@
 @charset 'UTF-8';
 
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition-duration: 0s !important;
+    }
+}
+
 * {
     box-sizing: border-box;
 }
