@@ -9,16 +9,16 @@
 
 <div class="container">
     <nav class="navbar">
-        <a class="navbar__logo" href="/" draggable="false" sveltekit:prefetch>
+        <a class="navbar__logo" href="/" draggable="false">
             <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
             <span>Append</span>
         </a>
-        <a class="navbar__button" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+        <a class="navbar__button" href="/editor/" draggable="false">Launch App</a>
     </nav>
     <section class="columns">
         <div class="column">
             <h1>Create a pixel perfect Web 3.0 blog, store, or app.</h1>
-            <a class="cta" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+            <a class="cta" href="/editor/" draggable="false">Launch App</a>
         </div>
         <div class="column"></div>
     </section>

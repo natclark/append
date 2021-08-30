@@ -1,0 +1,28 @@
+@charset 'UTF-8';
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition-duration: 0s !important;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Inter var';
+    src: local('Inter var'), url('/fonts/Inter.var.woff2') format('woff2');
+}
+
+html {
+    overflow: hidden scroll;
+}
+
+body {
+    background-color: #000;
+    font-family: 'Inter var', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, system-ui, sans-serif;
+    margin: 0;
+}

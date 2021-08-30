@@ -11,7 +11,7 @@
 <nav class="flex">
     <div class="flex container">
         <div class="flex container__left">
-            <a href="/" draggable="false" sveltekit:prefetch>
+            <a href="/" draggable="false">
                 <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
             </a>
         </div>

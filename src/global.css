@@ -14,7 +14,7 @@
 }
 
 html {
-    overflow: hidden scroll;
+    overflow: hidden scroll !important;
 }
 
 body {
