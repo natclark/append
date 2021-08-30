@@ -2,7 +2,7 @@
     export let website;
 </script>
 
-<a class="website" href="/editor/{website.id}">
+<a class="website" href="/editor/">
     <h2 class="website__title">{website.title}</h2>
 </a>
 
