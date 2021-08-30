@@ -1,6 +1,5 @@
 <script context="module">
     import { browser, dev } from '$app/env';
-    import { page } from '$app/stores';
     export const hydrate = dev;
     export const router = browser;
     export const prerender = true;
