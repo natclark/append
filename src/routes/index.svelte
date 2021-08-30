@@ -1,3 +1,7 @@
+<script>
+    import '../global.css';
+</script>
+
 <svelte:head>
     <title>Append: Create a pixel perfect Web 3.0 blog, store, or app.</title>
 </svelte:head>
