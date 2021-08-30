@@ -1,539 +1,190 @@
-<script>
-    import page from '$lib/stores/page';
-    import components from '$lib/stores/components';
-    import pages from '$lib/stores/pages';
-    import tab from '$lib/stores/tab';
-    import css from '$lib/stores/css';
-    import iframe from '$lib/stores/iframe';
-    import element from '$lib/stores/element';
-    import { flip } from 'svelte/animate';
-    import isModified from '$lib/stores/ismodified';
-    import ContextMenu from '$lib/editor/ContextMenu';
-    import ShortcutMenu from '$lib/editor/ShortcutMenu';
-
-    // * The index of the current page:
-    let currentPage = $page;
-
-    // * The iframe (not an actual JS canvas) in which a preview of the selected page lies:
-    let canvas;
-    // * The name of the iframe:
-    let name = `canvas`;
-    // * The class list of the iframe:
-    let classList = ``;
-    // * The source URL of the iframe:
-    const src = `/preview.html`;
-
-    // * The canvas document:
-    let doc = null;
-    // * The canvas "<html>" tag:
-    let html = null;
-    // * The canvas head:
-    let head = null;
-    // * The canvas body:
-    let body = null;
-
-    // * The current selected element:
-    let selection = -1;
-
-    // * Increments each time a component is created, to ensure all components have a unique ID:
-    let counter = 0;
-
-    // * The object array of components:
-    components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
-
-    // * The object array of items within the custom context menu:
-    let menuOptions = [];
-
-    // * Reset an existing component:
-    const resetComponent = (component, el) => {
-        if (component.id == el.getAttribute(`data-id`)) {
-            if (typeof component.element === `undefined`) {
-                let newComponents = $components;
-                newComponents[newComponents.indexOf(component)].element = el;
-                components.update(() => newComponents);
-            } else if (component.element === null) {
-                let newComponents = $components;
-                newComponents[newComponents.indexOf(component)].element = el;
-                components.update(() => newComponents);
-            }
-        }
-    };
-
-    // * Create a new component:
-    const createComponent = (dom, parent, tag, options, push) => {
-        let el = dom.createElement(tag);
-        Object.keys(options).forEach((key) => el[key === `dataId` ? `data-id` : key] = options[key]);
-        let editable = el.contentEditable === `inherit` ? false : true;
-        editable && (el.contentEditable = false);
-        if (typeof el[`data-id`] === `undefined`) {
-            el.setAttribute(`data-id`, counter);
-            counter++;
-        } else {
-            el.setAttribute(`data-id`, el[`data-id`]);
-            reactive();
-        }
-        el.style.cursor = `pointer`;
-        el.draggable = `true`;
-        el.style.willChange = `box-shadow`;
-        el.addEventListener(`mouseover`, () => {
-            if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
-                let newComponents = $components;
-                $components.forEach((component) => {
-                    resetComponent(component, el);
-                    try {
-                        if (component.element !== dom.activeElement && selection != component.element.getAttribute(`data-id`)) {
-                            dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
-                            dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
-                            newComponents[newComponents.indexOf(component)].element.style.outline = ``;
-                            newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
-                        }
-                    } catch (e) {}
-                });
-                components.update(() => newComponents);
-                // * There is 100% a better way to do this. Not worries about optimizing everything right now.
-                const elStyle = el.currentStyle || window.frames[`canvas`].getComputedStyle(el);
-                el.style.boxShadow = ``;
-                elStyle.marginTop.slice(0, -2) > 0 && (el.style.boxShadow += `0 -${elStyle.marginTop} 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginRight.slice(0, -2) > 0 && (el.style.boxShadow += `${elStyle.marginRight} 0 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginBottom.slice(0, -2) > 0 && (el.style.boxShadow += `0 ${elStyle.marginBottom} 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginLeft.slice(0, -2) > 0 && (el.style.boxShadow += `-${elStyle.marginLeft} 0 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.paddingTop.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 -${elStyle.paddingTop} 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingRight.slice(0, -2) > 0 && (el.style.boxShadow += `inset ${elStyle.paddingRight} 0 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingBottom.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 ${elStyle.paddingBottom} 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingLeft.slice(0, -2) > 0 && (el.style.boxShadow += `inset -${elStyle.paddingLeft} 0 0 rgba(128, 0, 128, 0.15)`);
-                el.style.outline = `2px dotted #6fbcff`;
-            }
-        });
-        el.addEventListener(`mouseout`, () => {
-            if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
-                el.style.outline = ``;
-                el.style.boxShadow = ``;
-            }
-        });
-        el.addEventListener(`dragstart`, (e) => {
-            e.dataTransfer.setData(`text/plain`, null);
-        });
-        el.addEventListener(`click`, () => {
-            selection = el.getAttribute(`data-id`);
-            const obj = { id: selection, el, };
-            element.update(() => obj);
-            el.focus();
-            const boxShadow = el.style.boxShadow;
-            let newComponents = $components;
-            $components.forEach((component) => {
-                resetComponent(component, el);
-                try {
-                    dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
-                    dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
-                    newComponents[newComponents.indexOf(component)].element.style.outline = ``;
-                    newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
-                } catch (e) {}
-            });
-            components.update(() => newComponents);
-            el.style.outline = `2px solid #08f`;
-            el.style.boxShadow = boxShadow;
-        });
-        el.addEventListener(`dblclick`, () => {
-            editable && (el.contentEditable = true);
-            selection = el.getAttribute(`data-id`);
-            const obj = { id: selection, el, };
-            element.update(() => obj);
-            el.focus();
-            editable && (el.style.cursor = `text`);
-            const boxShadow = el.style.boxShadow;
-            let newComponents = $components;
-            $components.forEach((component) => {
-                try {
-                    newComponents[newComponents.indexOf(component)].element.style.outline = ``;
-                    newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
-                } catch (e) {}
-            });
-            components.update(() => newComponents);
-            el.style.outline = `2px solid #08f`;
-            el.style.boxShadow = boxShadow;
-        });
-        el.addEventListener(`keydown`, (e) => { // TODO - fix two bugs related to this function
-            if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable === true) {
-                selection = -1;
-                const obj = { id: -1, el, };
-                element.update(() => obj);
-                unsetComponent(dom, el.getAttribute(`data-id`));
-            }
-        });
-        el.addEventListener(`focusout`, () => {
-            editable && (el.contentEditable = false);
-            element.update(() => false);
-            el.style.cursor = `pointer`;
-            el.style.outline = ``;
-            el.style.boxShadow = ``;
-        });
-        el.addEventListener(`input`, () => {
-            push ? options[`textContent`] = el.textContent : $components[$components.indexOf($components.find((e) => e.id == el.getAttribute(`data-id`)))].options[`textContent`] = el.textContent;
-        });
-        if (push) {
-            let newComponents = [];
-            newComponents.push({ id: el.getAttribute(`data-id`), element: el, children: [], tag, options, });
-            components.update(() => newComponents);
-        }
-        parent.appendChild(el);
-        return el;
-    };
-
-    const moveItem = (array, from, to) => {
-        const el = array[from];
-        array.splice(from, 1);
-        array.splice(to, 0, el);
-        return array;
-    };
-
-    // * Move an existing component:
-    const moveComponent = (dom, from, to, mouseY) => {
-        let fromEl = dom.querySelector(`[data-id="${from}"]`);
-        let toEl = dom.querySelector(`[data-id="${to}"]`);
-        switch (toEl.tagName) {
-            case `BODY`:
-                // TODO - redo this (this is a sloppy and unsustainble solution. but good enough for most pages for now.)
-                const last = dom.body.lastElementChild;
-                const bodyStyle = dom.body.getBoundingClientRect();
-                const elStyle = last.getBoundingClientRect();
-                if ((mouseY - 240) > (bodyStyle.top + elStyle.top)) {
-                    dom.body.appendChild(fromEl);
-                }
-                break;
-            case `DIV`:
-                break;
-            default:
-                let toIndex = Array.prototype.indexOf.call(dom.querySelectorAll(`*`), toEl);
-                let fromIndex = Array.prototype.indexOf.call(dom.querySelectorAll(`*`), fromEl);
-                if (fromIndex > toIndex) {
-                    // * prepend
-                    toEl.parentElement.insertBefore(fromEl, toEl);
-                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
-                } else {
-                    // * append
-                    toEl.parentElement.insertBefore(fromEl, toEl.nextSibling);
-                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
-                }
-        }
-        reactive();
-    };
-
-    // * Remove a component:
-    const unsetComponent = (dom, id) => {
-        let newComponents = $components;
-        newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id === id)), 1);
-        components.update(() => newComponents);
-        reactive();
-        dom.querySelector(`[data-id="${id}"]`).remove();
-    };
-
-    const contextMenu = new ContextMenu();
-    const shortcutMenu = new ShortcutMenu();
-
-    // * Returns whether the iframe been loaded once yet:
-    let hasLoaded = false;
-
-    // * Actions to perform once the iframe has loaded:
-    const load = (e) => {
-        iframe.update(() => window.frames[`canvas`]);
-        doc = window.frames[`canvas`].document;
-        html = doc.getElementsByTagName(`html`)[0];
-        head = doc.getElementsByTagName(`head`)[0];
-        body = doc.getElementsByTagName(`body`)[0];
-
-        let dragged;
-
-        doc.addEventListener(`drag`, (e) => {
-            // TODO
-        }, false);
-        doc.addEventListener(`dragstart`, (e) => {
-            dragged = e.target;
-            try {
-                if (dragged.getAttribute(`data-id`) === null) {
-                    let draggedId = counter;
-                    counter++;
-                    dragged.setAttribute(`data-id`, draggedId);
-                }
-            } catch (err) {
-                if (dragged.parentElement.getAttribute(`data-id`) === null) {
-                    let draggedId = counter;
-                    counter++;
-                    dragged.parentElement.setAttribute(`data-id`, draggedId);
-                }
-            }
-            e.target.style.opacity = .8;
-        }, false);
-        doc.addEventListener(`dragend`, (e) => {
-            typeof e.target.style !== `undefined` && (e.target.style.opacity = ``);
-        }, false);
-        doc.addEventListener(`dragover`, (e) => {
-            e.preventDefault();
-        }, false);
-        doc.addEventListener(`dragenter`, (e) => {
-            if (e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
-                if (e.target.tagName === `H1` || e.target.tagName === `H2` || e.target.tagName === `H3` || e.target.tagName === `H4` || e.target.tagName === `H5` || e.target.tagName === `H6` || e.target.tagName === `P`) {
-                    e.target.style.backgroundColor = `#fcabab`;
-                    e.target.style.outline = `2px solid #f00`;
-                } else {
-                    try {
-                        e.target.style.backgroundColor = `#c7e3fc`;
-                        e.target.style.outline = `2px solid #08f`;
-                    } catch (err) {
-                        e.target.parentElement.style.backgroundColor = `#c7e3fc`;
-                        e.target.parentElement.style.outline = `2px solid #08f`;
-                    }
-                }
-            }
-            // TODO: Consider an approach like the following:
-            let id = -1;
-            try {
-                id = e.target.getAttribute(`data-id`);
-            } catch (err) {
-                id = e.target.parentElement.getAttribute(`data-id`);
-            }
-            if (id === null) {
-                id = counter;
-                counter++;
-                e.target.setAttribute(`data-id`, id);
-            }
-        }, false);
-        doc.addEventListener(`dragleave`, (e) => {
-            try {
-                e.target.style.backgroundColor = ``;
-                e.target.style.boxShadow = ``;
-                e.target.style.outline = ``;
-            } catch (err) {
-                e.target.parentElement.style.backgroundColor = ``;
-                e.target.parentElement.style.boxShadow = ``;
-                e.target.parentElement.style.outline = ``;
-            }
-        }, false);
-        doc.addEventListener(`drop`, (e) => {
-            e.preventDefault();
-            if (typeof e.target.style !== `undefined`) { // * ensure some stray text wasn't dragged
-                e.target.style.backgroundColor = ``;
-                e.target.style.outline = ``;
-                if (e.target.tagName !== `HTML`) {
-                    if (typeof dragged !== `undefined`) { // * An existing element has been dropped and was moved from another location within the iframe:
-                        if (dragged.tagName !== `BODY`) {
-                            let id = e.target.getAttribute(`data-id`);
-                            if (id === null) {
-                                id = counter;
-                                counter++;
-                                e.target.setAttribute(`data-id`, id);
-                            }
-                            try {
-                                moveComponent(doc, dragged.getAttribute(`data-id`), id, e.screenY);
-                                doc.activeElement.blur();
-                                dragged.click();
-                                dragged.focus();
-                            } catch (e) {
-                                console.log(`Non fatal error:`, e.message);
-                            }
-                        }
-                    } else { // * A new element has been dropped:
-                        let id = counter;
-                        counter++;
-                        let idExtra = counter;
-                        counter++;
-                        let targetId = e.target.getAttribute(`data-id`);
-                        if (targetId === null) {
-                            targetId = counter;
-                            counter++;
-                            e.target.setAttribute(`data-id`, targetId);
-                        }
-                        if (e.dataTransfer.getData(`element`)) {
-                            // * If the dropped element came from the sidebar:
-                            const tagName = e.dataTransfer.getData(`element`);
-                            switch (tagName) {
-                                // * These are some special cases for creating "exception" elements:
-                                case `container`:
-                                    createComponent(doc, body, `div`, { className: `container`, dataId: id, }, true);
-                                    break;
-                                case `item`:
-                                    createComponent(doc, body, `div`, { className: `item`, dataId: id, }, true);
-                                    break;
-                                case `ul`:
-                                    createComponent(doc, createComponent(doc, body, `ul`, { dataId: id, }, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: idExtra, }, true);
-                                    break;
-                                case `markdown`:
-                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, dataId: id, }, true);
-                                    break;
-                                case `rich-text`:
-                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, dataId: id, }, true);
-                                    break;
-                                case `details`:
-                                    createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, dataId: idExtra, }, true);
-                                    break;
-                                case `img`:
-                                    createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, dataId: id, }, true);
-                                    break;
-                                case `video`:
-                                    alert(`This component is still in the works! Sorry.`);
-                                    break;
-                                case `audio`:
-                                    alert(`This component is still in the works! Sorry.`);
-                                    break;
-                                default:
-                                    // * This is the "catch-all" for creating any other kind of element:
-                                    createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true);
-                            }
-                            try {
-                                moveComponent(doc, id, targetId, e.screenY);
-                            } catch (e) {
-                                console.log(`Non fatal error:`, e.message);
-                            }
-                        }
-                    }
-                }
-            }
-        }, false);
-
-        doc.addEventListener(`selectionchange`, () => {
-            shortcutMenu.selectedText = doc.getSelection();
-            if (shortcutMenu.selectedText.anchorNode.data !== ``) {
-                // TODO: Show options for bold/underline/linking/etc.
-            }
-        });
-
-        let generatedStyles = ``;
-        $css.generated.forEach((selector) => {
-            let rules = ``;
-            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
-            generatedStyles += `[data-id="${selector.id}"] { ${rules}}`;
-        });
-
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: generatedStyles.trim(), }, false);
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.custom.trim(), }, false);
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: contextMenu.menuStyles.trim(), }, false);
-        createComponent(doc, body, `nav`, { class: `append-contextMenu`, innerHTML: contextMenu.menuMarkup.trim(), }, false);
-
-        contextMenu.menu = doc.querySelector(`.append-contextMenu`);
-        contextMenu.hide();
-        doc.addEventListener(`click`, (e) => {
-            if (e.target.tagName === `BODY`) {
-                let newComponents = $components;
-                const componentIndex = newComponents.indexOf(newComponents.find((component) => component.id === selection));
-                if (componentIndex > -1) {
-                    selection = -1;
-                    newComponents[componentIndex].element.blur();
-                    newComponents[componentIndex].element.contentEditable !== `inherit` && (newComponents[componentIndex].element.contentEditable = false);
-                    element.update(() => false);
-                    newComponents[componentIndex].element.style.cursor = `pointer`;
-                    newComponents[componentIndex].element.style.outline = ``;
-                    newComponents[componentIndex].element.style.boxShadow = ``;
-                    components.update(() => newComponents);
-                }
-            }
-            contextMenu.hide();
-        });
-        doc.addEventListener(`contextmenu`, (e) => {
-            e.preventDefault();
-            contextMenu.show();
-            contextMenu.move(doc, e);
-        }, true);
-
-        components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
-        let newComponents = $components;
-        $components.forEach((component) => {
-            if (component.id === null) {
-                /*
-                TODO - omit? potentially redundant
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].id = counter;
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].options.dataId = counter;
-                */
-                newComponents[newComponents.indexOf(component)].id = counter;
-                newComponents[newComponents.indexOf(component)].options.dataId = counter;
-                counter++;
-            }
-            let options = component.options || {};
-            options.dataId = component.id;
-            createComponent(doc, body, component.tag, options, false);
-        });
-        components.update(() => newComponents);
-        hasLoaded = true;
-    };
-
-    // * If changes have been made but not saved, alert the user before they close the page:
-    const beforeunload = (e) => {
-        if (!!$isModified) return null;
-        e = e || window.event;
-        if (e) e.returnValue = `Are you sure?`;
-        return `Are you sure?`;
-    };
-
-    // * If the custom context menu is showing and the escape key has been pressed, then hide it:
-    const keyup = (e) => (e.keyCode === 27 && contextMenu.menu && contextMenu.menuVisible) && (contextMenu.hide());
-
-    // * Automatically set the width of the iframe based on whether the left menu is expanded:
-    tab.subscribe((val) => classList = val !== false ? `shrink` : ``);
-
-    // * Automatically update the iframe with user-generated custom CSS as it is being typed:
-    css.subscribe((val) => {
-        let generatedStyles = ``;
-        $css.generated.forEach((selector) => {
-            let rules = ``;
-            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
-            generatedStyles += `[data-id="${selector.id}"] { ${rules}} `;
-        });
-        if (body) {
-            body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
-            body.getElementsByTagName(`style`)[1].innerHTML = $css.custom.trim();
-        }
-    });
-
-    // * Automatically update the page when it's been changed by another component:
-    page.subscribe((val) => {
-        if (doc) {
-            if (currentPage !== val && canvas !== null) {
-                reactive();
-                element.update(() => false);
-                currentPage = val;
-                canvas.contentWindow.location.reload();
-            }
-        }
-    });
-
-    // * Determines whether the following reactive statement has been executed for the first time or any subsequent time:
-    let isFirstLoad = false;
-
-    // * Inform that some part of the project has been modified, and updates the page store with the latest data:
-    const reactive = () => {
-        const index = $pages.indexOf($pages.find((e) => e.id === currentPage));
-        if (index !== -1) {
-            $pages[index].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
-            $pages[index].components = $components;
-            $isModified !== true && (isFirstLoad ? isModified.update(() => true) : isFirstLoad = true);
-        }
-    };
-</script>
-
-<svelte:window on:beforeunload={beforeunload} on:keyup={keyup} />
-
 <svelte:head>
-    <title>Append</title>
+    <title>Append: Create a pixel perfect Web 3.0 blog, store, or app.</title>
 </svelte:head>
 
-<iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load} />
+<div class="container">
+    <nav class="navbar">
+        <a class="navbar__logo" href="/" draggable="false" sveltekit:prefetch>
+            <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
+            <span>Append</span>
+        </a>
+        <a class="navbar__button" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+    </nav>
+    <section class="columns">
+        <div class="column">
+            <h1>Create a pixel perfect Web 3.0 blog, store, or app.</h1>
+            <a class="cta" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+        </div>
+        <div class="column"></div>
+    </section>
+    <section>
+        <h2 class="text-center">The drag-and-drop builder for decentralized websites.</h2>
+        <div class="wrapper">
+            <img class="image" src="/img/demo.jpg" alt="Screenshot of the Append editor">
+        </div>
+    </section>
+    <section class="text-center">
+        <h2>Free. Open-source. Autonomous.</h2>
+        <div class="columns">
+            <div class="column">
+                <h3>Unlimited everything.</h3>
+                <p>Create as many websites and pages as you want.</p>
+            </div>
+            <div class="column">
+                <h3>Publish in one click.</h3>
+                <p>Publish to IPFS, ENS, and Unstoppable Domains in just one click.</p>
+                <p><em>(This feature is currently WIP.)</em></p>
+            </div>
+            <div class="column">
+                <h3>Display and sell your NFTs.</h3>
+                <p>Display your NFTs or safely sell them through an automated escrow.</p>
+                <p><em>(This feature is currently WIP.)</em></p>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <h3>Own your platform.</h3>
+                <p>You don't just own your content, but also the platform.</p>
+            </div>
+            <div class="column">
+                <h3>Themes, Plugins, & More.</h3>
+                <p>Fine-tune your site, build templates, add plugins, and more.</p>
+                <p><em>(This feature is currently WIP.)</em></p>
+            </div>
+            <div class="column">
+                <h3>Privacy-first.</h3>
+                <p>No tracking. No signups. Your Ethereum wallet is your account.</p>
+            </div>
+        </div>
+    </section>
+    <section class="text-center">
+        <h2>Want to get involved?</h2>
+        <p>Append is currently in beta, so your feeback is greatly appreciated!</p>
+        <br>
+        <div class="columns">
+            <div class="column">
+                <a href="https://twitter.com/appendweb3" rel="external noopener nofollow" target="_blank">
+                    <svg width="192px" height="192px" viewBox="0 0 333333 333333" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd">
+                        <path fill="#1da1f2" d="M333328 63295c-12254 5480-25456 9122-39241 10745 14123-8458 24924-21861 30080-37819-13200 7807-27871 13533-43416 16596-12499-13281-30252-21537-49919-21537-37762 0-68336 30591-68336 68330 0 5326 591 10537 1748 15562-56820-2880-107194-30081-140915-71467-6049 10435-9250 22300-9250 34367v8c0 23696 12031 44654 30389 56876-11202-333-21739-3457-30991-8519v854c0 33138 23554 60789 54852 67039-5734 1557-11787 2417-18023 2417-4417 0-8673-455-12905-1224 8742 27139 33975 46923 63857 47500-23430 18356-52858 29286-84939 29286-5537 0-10931-339-16318-984 30326 19458 66251 30727 104844 30727 125735 0 194551-104198 194551-194543 0-3002-67-5911-191-8852 13354-9553 24932-21609 34097-35333l31-31-6 4z"></path>
+                    </svg>
+                    <br>
+                    <br>
+                    @appendweb3
+                </a>
+            </div>
+            <div class="column">
+                <a href="https://github.com/natclark/append" rel="external noopener nofollow" target="_blank">
+                    <svg width="192px" height="192px" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 640 640">
+                        <path d="M319.988 7.973C143.293 7.973 0 151.242 0 327.96c0 141.392 91.678 261.298 218.826 303.63 16.004 2.964 21.886-6.957 21.886-15.414 0-7.63-.319-32.835-.449-59.552-89.032 19.359-107.8-37.772-107.8-37.772-14.552-36.993-35.529-46.831-35.529-46.831-29.032-19.879 2.209-19.442 2.209-19.442 32.126 2.245 49.04 32.954 49.04 32.954 28.56 48.922 74.883 34.76 93.131 26.598 2.882-20.681 11.15-34.807 20.315-42.803-71.08-8.067-145.797-35.516-145.797-158.14 0-34.926 12.52-63.485 32.965-85.88-3.33-8.078-14.291-40.606 3.083-84.674 0 0 26.87-8.61 88.029 32.8 25.512-7.075 52.878-10.642 80.056-10.76 27.2.118 54.614 3.673 80.162 10.76 61.076-41.386 87.922-32.8 87.922-32.8 17.398 44.08 6.485 76.631 3.154 84.675 20.516 22.394 32.93 50.953 32.93 85.879 0 122.907-74.883 149.93-146.117 157.856 11.481 9.921 21.733 29.398 21.733 59.233 0 42.792-.366 77.28-.366 87.804 0 8.516 5.764 18.473 21.992 15.354 127.076-42.354 218.637-162.274 218.637-303.582 0-176.695-143.269-319.988-320-319.988l-.023.107z"></path>
+                    </svg>
+                    <br>
+                    <br>
+                    natclark/append
+                </a>
+            </div>
+        </div>
+    </section>
+    <footer aria-hidden="true"></footer>
+</div>
 
 <style>
-    iframe {
-        background-color: #fff;
-        color: #000;
-        height: calc(100vh - 40px);
-        max-width: calc(100vw - 20em - 40px);
-        width: 100%;
+    .container {
+        display: grid;
+        grid-template-columns: 1fr min(1000px, 100%) 1fr;
+        > * {
+            grid-column: 2;
+        }
+        .break {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
     }
-    :global {
-        .shrink {
-            max-width: calc(100vw - 40em - 40px) !important;
+    a {
+        text-decoration: none;
+        &:focus {
+            outline: 0;
         }
-        .dropContainer {
-            overflow: auto !important;
+    }
+    .navbar {
+        align-items: center;
+        display: flex;
+        height: 100px;
+        justify-content: space-between;
+        .navbar__logo {
+            align-items: center;
+            color: #000;
+            display: flex;
+            span {
+                font-size: 18px;
+                margin-left: 8px;
+            }
         }
-        .dragContainer {
-            height: auto !important;
-            width: 100% !important;
+        .navbar__button {
+            background-color: rgba(65, 105, 225, .1);
+            border-radius: 1px;
+            color: #4169e1;
+            font-weight: 600;
+            line-height: 1.3;
+            padding: 10px 20px;
+            &:hover {
+                opacity: .9;
+            }
         }
+    }
+    .columns {
+        display: flex;
+        justify-content: space-between;
+        .column {
+            width: 100%;
+            &.column--short {
+                width: 65%;
+            }
+        }
+        &.columns--center {
+            align-items: center;
+        }
+        &.columns--reverse {
+            flex-direction: reverse;
+        }
+    }
+    h1 {
+        font-size: 48px;
+        line-height: 1.3;
+        margin-bottom: 60px;
+    }
+    .cta {
+        background-color: rgba(65, 105, 225, .1);
+        border-radius: 1px;
+        color: #4169e1;
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1.5;
+        padding: 18px 36px;
+        &:hover {
+            opacity: .9;
+        }
+    }
+    .text-center {
+        text-align: center;
+    }
+    h2 {
+        font-size: 36px;
+        margin-top: 60px;
+    }
+    p {
+        font-size: 18px;
+    }
+    .wrapper {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+    .image {
+        box-shadow: rgba(50, 50, 93, .25) 0 13px 27px -5px, rgba(0, 0, 0, .3) 0 8px 16px -8px;
+        margin-top: 20px;
+        max-width: 1000px;
+    }
+    footer {
+        margin-top: 200px;
     }
 </style>
