@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export default writable(0);
+export default writable(-1);

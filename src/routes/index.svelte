@@ -1,7 +1,7 @@
 <svelte:head>
     <title>Append: Create a pixel perfect Web 3.0 blog, store, or app.</title>
     <link rel="canonical" href="https://tryappend.com">
-    <link rel="stylesheet" type="text/css" href="/static.css">
+    <link rel="stylesheet" type="text/css" href="/css/static.css">
 </svelte:head>
 
 <div class="container">
@@ -10,19 +10,19 @@
             <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
             <span>Append</span>
         </a>
-        <a class="navbar__button" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+        <a class="navbar__button" href="/websites/" draggable="false" sveltekit:prefetch>Launch App</a>
     </nav>
     <section class="columns">
         <div class="column">
             <h1>Create a pixel perfect Web 3.0 blog, store, or app.</h1>
-            <a class="cta" href="/editor/" draggable="false" sveltekit:prefetch>Launch App</a>
+            <a class="cta" href="/websites/" draggable="false" sveltekit:prefetch>Launch App</a>
         </div>
         <div class="column"></div>
     </section>
     <section>
         <h2 class="text-center">The drag-and-drop builder for decentralized websites.</h2>
         <div class="wrapper">
-            <img class="image" src="/img/demo.jpg" alt="Screenshot of the Append editor">
+            <img class="image" src="/img/demo.jpg" alt="Screenshot of the Append editor" loading="lazy">
         </div>
     </section>
     <section class="text-center">

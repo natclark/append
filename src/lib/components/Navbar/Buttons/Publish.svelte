@@ -7,8 +7,6 @@
 
     let walletButton;
 
-    const refresh = () => $wallet.address !== undefined && (walletButton.classList.add(`success`));
-
     const click = () => {
         if (typeof $wallet.address === `undefined`) {
             try {

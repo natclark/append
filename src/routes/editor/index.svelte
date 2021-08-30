@@ -1,4 +1,7 @@
 <script>
+    import websites from '$lib/stores/websites';
+    import website from '$lib/stores/website';
+    import { goto } from '$app/navigation';
     import page from '$lib/stores/page';
     import components from '$lib/stores/components';
     import pages from '$lib/stores/pages';
@@ -10,6 +13,13 @@
     import isModified from '$lib/stores/ismodified';
     import ContextMenu from '$lib/editor/ContextMenu';
     import ShortcutMenu from '$lib/editor/ShortcutMenu';
+
+    // * If no website is selected or if there are no websites, then redirect back to the dashboard:
+    const start = () => {
+        if ($websites.length < 1 || $website < 0 || $pages.length < 0 || $page < 0) {
+            goto(`/websites/`);
+        }
+    };
 
     // * The index of the current page:
     let currentPage = $page;
@@ -38,8 +48,12 @@
     // * Increments each time a component is created, to ensure all components have a unique ID:
     let counter = 0;
 
-    // * The object array of components:
-    components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
+    // * The object array of components and the website's CSS (both custom and generated):
+    if ($websites.length > 0 && $website > -1 && $pages.length > -1 && $page > -1) {
+        components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
+        console.log($websites[$websites.indexOf($websites.find((e) => e.id === $website))].css);
+        css.update(() => $websites[$websites.indexOf($websites.find((e) => e.id === $website))].css);
+    }
 
     // * The object array of items within the custom context menu:
     let menuOptions = [];
@@ -433,7 +447,7 @@
             contextMenu.move(doc, e);
         }, true);
 
-        components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
+        ($websites.length > 0 && $website > -1 && $pages.length > -1 && $page > -1) && (components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components));
         let newComponents = $components;
         $components.forEach((component) => {
             if (component.id === null) {
@@ -499,19 +513,22 @@
 
     // * Inform that some part of the project has been modified, and updates the page store with the latest data:
     const reactive = () => {
-        const index = $pages.indexOf($pages.find((e) => e.id === currentPage));
-        if (index !== -1) {
-            $pages[index].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
-            $pages[index].components = $components;
+        const pageIndex = $pages.indexOf($pages.find((e) => e.id === currentPage));
+        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
+        if (pageIndex !== -1 && websiteIndex !== -1) {
+            $pages[pageIndex].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
+            $pages[pageIndex].components = $components;
+            $websites[websiteIndex].pages = $pages;
+            $websites[websiteIndex].css = $css;
             $isModified !== true && (isFirstLoad ? isModified.update(() => true) : isFirstLoad = true);
         }
     };
 </script>
 
-<svelte:window on:beforeunload={beforeunload} on:keyup={keyup} />
+<svelte:window on:sveltekit:start={start} on:beforeunload={beforeunload} on:keyup={keyup} />
 
 <svelte:head>
-    <title>Append Editor</title>
+    <title>Editor - Append</title>
     <link rel="canonical" href="https://tryappend.com/editor/">
 </svelte:head>
 
