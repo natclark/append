@@ -187,9 +187,7 @@
                 backgroundInput.value = color.hexString;
                 backgroundButton.style.backgroundColor = color.hexString;
             });
-        } catch (e) {
-            console.log(`Color picker error`, e.message);
-        }
+        } catch (e) {}
         colorModal.addEventListener(`click`, () => {
             backgroundModal.removeAttribute(`open`);
         });

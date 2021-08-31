@@ -1,2 +1,4 @@
+Sitemap: https://tryappend.com/sitemap.xml
+
 User-agent: *
 Disallow: /editor
