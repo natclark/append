@@ -51,7 +51,6 @@
     // * The object array of components and the website's CSS (both custom and generated):
     if ($websites.length > 0 && $website > -1 && $pages.length > -1 && $page > -1) {
         components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
-        console.log($websites[$websites.indexOf($websites.find((e) => e.id === $website))].css);
         css.update(() => $websites[$websites.indexOf($websites.find((e) => e.id === $website))].css);
     }
 

@@ -6,7 +6,7 @@
     import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
-    import '../../../../node_modules/@jaames/iro/dist/iro.js';
+    import iro from '../../../../node_modules/@jaames/iro/dist/iro.es.js';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
