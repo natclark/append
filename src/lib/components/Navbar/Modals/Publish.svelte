@@ -1,18 +1,17 @@
+<script context="module">
+    import { Resolution } from '@unstoppabledomains/resolution';
+</script>
+
 <script>
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import { Web3Storage } from 'web3.storage';
     import { wallet, builtin, chain, flow, fallback } from '$lib/stores/wallet';
     //import { Resolution } from '@unstoppabledomains/resolution';
-    //import ENS, { getEnsAddress } from '@ensdomains/ensjs'
     import pages from '$lib/stores/pages';
     import css from '$lib/stores/css';
     import redirects from '$lib/stores/redirects';
     import { onMount } from 'svelte';
 
-    // TODO: Brush up one-click publishing
-    // const resolution = new Resolution();
-    // const provider = null;
-    // const ens = new ENS({ provider, ensAddress: getEnsAddress('1') })
     let domain;
     let ls;
     let publications = [];

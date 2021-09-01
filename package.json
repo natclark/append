@@ -43,7 +43,6 @@
         "typescript": "^4.3.5"
     },
     "dependencies": {
-        "@ensdomains/ensjs": "^2.0.1",
         "@jaames/iro": "^5.5.2",
         "@unstoppabledomains/resolution": "^5.0.1",
         "dotenv": "^10.0.0",
