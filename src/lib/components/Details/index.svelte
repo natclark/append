@@ -141,6 +141,9 @@
                     },
                     {
                         component: iro.ui.Slider,
+                        options: {
+                            sliderType: `hue`,
+                        },
                     }
                 ],
                 width: 200,
@@ -158,6 +161,9 @@
                     },
                     {
                         component: iro.ui.Slider,
+                        options: {
+                            sliderType: `hue`,
+                        },
                     }
                 ],
                 width: 200,
