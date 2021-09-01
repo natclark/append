@@ -9,7 +9,7 @@
 <p>If you'd like, you can write custom CSS below.</p>
 <p>This will override your other styles.</p>
 <Center>
-    <textarea bind:value={$css.custom} class="editor" rows="32" wrap={wrap ? "on" : "off" }></textarea>
+    <textarea bind:value={$css} class="editor" rows="32" wrap={wrap ? "on" : "off" }></textarea>
 </Center>
 <Breaker />
 <Center>

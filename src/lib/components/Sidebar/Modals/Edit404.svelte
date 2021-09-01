@@ -10,7 +10,11 @@
         pages.update(() => newPages);
     };
 
-    const unset = () => {};
+    const unset = () => {
+        let newPages = $pages;
+        newPages.splice(newPages.indexOf(newPages.find((e) => e.path === `/ipfs-404.html`)), 1);
+        pages.update(() => newPages);
+    };
 </script>
 
 <h2>Edit IPFS 404</h2>

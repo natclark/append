@@ -1,12 +1,12 @@
 <script>
     import tab from '$lib/stores/tab';
-    import css from '$lib/stores/css';
     import pages from '$lib/stores/pages';
     import page from '$lib/stores/page';
     import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
     import iro from '../../../../node_modules/@jaames/iro/dist/iro.es.js';
+    import { onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
@@ -55,37 +55,18 @@
 
     const newStyle = (key, val) => {
         attributes[key.replaceAll(`-`, `_`)] = val;
-        let generated = $css.generated;
-        const selectorIndex = generated.indexOf(generated.find((e) => e.id === currentElement.id));
-        if (selectorIndex !== -1) {
-            const ruleIndex = generated[selectorIndex].rules.indexOf(generated[selectorIndex].rules.find((e) => e.key === key));
-            ruleIndex !== -1 ? generated[selectorIndex].rules[ruleIndex] = { key, val, } : generated[selectorIndex].rules.push({ key, val, });
-        } else {
-            generated.push({ id: currentElement.id, rules: [{ key, val, }], });
-        }
-        const obj = { custom: $css.custom, generated, };
-        css.update(() => obj);
+        let newComponents = $components;
+        let generated = newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].styles;
+        const ruleIndex = generated.indexOf(generated.find((e) => e.key === key));
+        ruleIndex !== -1 ? generated[ruleIndex] = { key, val, } : generated.push({ key, val, });
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].styles = generated;
+        components.update(() => newComponents);
     };
 
     const getStyle = (key) => {
-        const generated = $css.generated;
-        const selectorIndex = generated.indexOf(generated.find((e) => e.id === currentElement.id));
-        if (selectorIndex !== -1) {
-            const ruleIndex = generated[selectorIndex].rules.indexOf(generated[selectorIndex].rules.find((e) => e.key === key));
-            return ruleIndex !== -1 ? generated[selectorIndex].rules[ruleIndex].val : null;
-        } else {
-            return null;
-        }
-    };
-
-    const removeSelector = () => {
-        let generated = $css.generated;
-        const selectorIndex = generated.indexOf(generated.find((e) => e.id === currentElement.id));
-        if (selectorIndex !== -1) {
-            generated.splice(selectorIndex, 1);
-            const obj = { custom: $css.custom, generated, };
-            css.update(() => obj);
-        }
+        let generated = $components[$components.indexOf($components.find((e) => e.id === currentElement.id))].styles;
+        const ruleIndex = generated.indexOf(generated.find((e) => e.key === key));
+        return ruleIndex !== -1 ? generated[ruleIndex].val : null;
     };
 
     const typeChange = (e) => {
@@ -125,20 +106,19 @@
     const letterSpacingChange = (e) => newStyle(`letter-spacing`, e.target.value);
 
     const unsetComponent = () => {
-        removeSelector();
         let newComponents = $components;
-        newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id == currentElement.id)), 1);
+        newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id)), 1);
         components.update(() => newComponents);
         $pages[$page].components = $components; // ? What other state changes from this componenet should this var be updated for?
         doc.querySelector(`[data-id="${currentElement.id}"]`).remove();
         currentElement = null;
     }
 
-    tab.subscribe((val) => classList = val !== false ? `stretch` : ``);
+    const tabUnsubscribe = tab.subscribe((val) => classList = val !== false ? `stretch` : ``);
 
-    iframe.subscribe((val) => typeof val.document !== `undefined` && (doc = val.document));
+    const iframeUnsubscribe = iframe.subscribe((val) => typeof val.document !== `undefined` && (doc = val.document));
 
-    element.subscribe((val) => typeof val !== `undefined` && (currentElement = val));
+    const elementUnsubscribe = element.subscribe((val) => typeof val !== `undefined` && (currentElement = val));
 
     let colorModal = null;
     let color = null;
@@ -224,6 +204,12 @@
         line_height: null,
         letter_spacing: null,
     };
+
+    onDestroy(() => {
+        tabUnsubscribe();
+        iframeUnsubscribe();
+        elementUnsubscribe();
+    });
 
     $: {
         (currentElement !== null && typeof currentElement.el !== `undefined`) && (Object.keys(attributes).forEach((key) => attributes[key] = getStyle(key.replaceAll(`_`, `-`))));

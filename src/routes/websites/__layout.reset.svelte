@@ -21,7 +21,7 @@
                         // TODO handle
                     } else {
                         wallet.unlock().then((res) => {
-                            if (res === true) close(true);
+                            // TODO handle
                         });
                     }
                 } else if ($chain.state === `Connected`) {

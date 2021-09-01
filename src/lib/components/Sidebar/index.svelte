@@ -1,10 +1,13 @@
 <script>
     import Button from './Button.svelte';
     import tab from '$lib/stores/tab';
+    import { onDestroy } from 'svelte';
 
     let classList = ``;
 
-    tab.subscribe((val) => classList = val !== false ? `expanded` : ``);
+    const unsubscribe = tab.subscribe((val) => classList = val !== false ? `expanded` : ``);
+
+    onDestroy(() => unsubscribe);
 </script>
 
 <aside class={classList}>

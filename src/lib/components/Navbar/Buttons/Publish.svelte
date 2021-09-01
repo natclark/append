@@ -22,9 +22,7 @@
                     if ($wallet.unlocking) {
                         // TODO handle
                     } else {
-                        wallet.unlock().then((res) => {
-                            if (res === true) close(true);
-                        });
+                        wallet.unlock().then((res) => res === true && (close(true)));
                     }
                 } else if ($chain.state === `Connected`) {
                     if ($chain.loadingData) {

@@ -1,22 +1,23 @@
 <script>
+    import init from '$lib/stores/init';
     import websites from '$lib/stores/websites';
     import website from '$lib/stores/website';
-    import { goto } from '$app/navigation';
-    import page from '$lib/stores/page';
-    import components from '$lib/stores/components';
     import pages from '$lib/stores/pages';
+    import page from '$lib/stores/page';
+    import { goto } from '$app/navigation';
+    import components from '$lib/stores/components';
     import tab from '$lib/stores/tab';
     import css from '$lib/stores/css';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
-    import { flip } from 'svelte/animate';
     import isModified from '$lib/stores/ismodified';
     import ContextMenu from '$lib/editor/ContextMenu';
     import ShortcutMenu from '$lib/editor/ShortcutMenu';
+    import { onDestroy } from 'svelte';
 
     // * If no website is selected or if there are no websites, then redirect back to the dashboard:
     const start = () => {
-        if ($websites.length < 1 || $website < 0 || $pages.length < 0 || $page < 0) {
+        if ($init === false || $websites.length < 1 || $website < 0 || $pages.length < 0 || $page < 0) {
             goto(`/websites/`);
         }
     };
@@ -48,43 +49,24 @@
     // * Increments each time a component is created, to ensure all components have a unique ID:
     let counter = 0;
 
-    // * The object array of components and the website's CSS (both custom and generated):
     if ($websites.length > 0 && $website > -1 && $pages.length > -1 && $page > -1) {
+        // * The object array of components:
         components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
+        // * The website's CSS (both custom and generated):
         css.update(() => $websites[$websites.indexOf($websites.find((e) => e.id === $website))].css);
     }
 
     // * The object array of items within the custom context menu:
     let menuOptions = [];
 
-    // * Reset an existing component:
-    const resetComponent = (component, el) => {
-        if (component.id == el.getAttribute(`data-id`)) {
-            if (typeof component.element === `undefined`) {
-                let newComponents = $components;
-                newComponents[newComponents.indexOf(component)].element = el;
-                components.update(() => newComponents);
-            } else if (component.element === null) {
-                let newComponents = $components;
-                newComponents[newComponents.indexOf(component)].element = el;
-                components.update(() => newComponents);
-            }
-        }
-    };
-
     // * Create a new component:
     const createComponent = (dom, parent, tag, options, push) => {
         let el = dom.createElement(tag);
-        Object.keys(options).forEach((key) => el[key === `dataId` ? `data-id` : key] = options[key]);
+        Object.keys(options).forEach((key) => el[key] = options[key]);
         let editable = el.contentEditable === `inherit` ? false : true;
         editable && (el.contentEditable = false);
-        if (typeof el[`data-id`] === `undefined`) {
-            el.setAttribute(`data-id`, counter);
-            counter++;
-        } else {
-            el.setAttribute(`data-id`, el[`data-id`]);
-            reactive();
-        }
+        el.setAttribute(`data-id`, counter);
+        counter++;
         el.style.cursor = `pointer`;
         el.draggable = `true`;
         el.style.willChange = `box-shadow`;
@@ -92,9 +74,8 @@
             if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
                 let newComponents = $components;
                 $components.forEach((component) => {
-                    resetComponent(component, el);
                     try {
-                        if (component.element !== dom.activeElement && selection != component.element.getAttribute(`data-id`)) {
+                        if (component.element !== dom.activeElement && selection !== parseInt(component.element.getAttribute(`data-id`))) {
                             dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
                             dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
                             newComponents[newComponents.indexOf(component)].element.style.outline = ``;
@@ -127,14 +108,13 @@
             e.dataTransfer.setData(`text/plain`, null);
         });
         el.addEventListener(`click`, () => {
-            selection = el.getAttribute(`data-id`);
+            selection = parseInt(el.getAttribute(`data-id`));
             const obj = { id: selection, el, };
             element.update(() => obj);
             el.focus();
             const boxShadow = el.style.boxShadow;
             let newComponents = $components;
             $components.forEach((component) => {
-                resetComponent(component, el);
                 try {
                     dom.querySelector(`[data-id="${component.id}"]`).style.outline = ``;
                     dom.querySelector(`[data-id="${component.id}"]`).style.boxShadow = ``;
@@ -148,7 +128,7 @@
         });
         el.addEventListener(`dblclick`, () => {
             editable && (el.contentEditable = true);
-            selection = el.getAttribute(`data-id`);
+            selection = parseInt(el.getAttribute(`data-id`));
             const obj = { id: selection, el, };
             element.update(() => obj);
             el.focus();
@@ -181,11 +161,17 @@
             el.style.boxShadow = ``;
         });
         el.addEventListener(`input`, () => {
-            push ? options[`textContent`] = el.textContent : $components[$components.indexOf($components.find((e) => e.id == el.getAttribute(`data-id`)))].options[`textContent`] = el.textContent;
+            if (push) {
+                options[`textContent`] = el.textContent;
+            } else {
+                let newComponents = $components;
+                newComponents[newComponents.indexOf(newComponents.find((e) => e.id === parseInt(el.getAttribute(`data-id`))))].options[`textContent`] = el.textContent;
+                components.update(() => newComponents);
+            }
         });
         if (push) {
-            let newComponents = [];
-            newComponents.push({ id: el.getAttribute(`data-id`), element: el, children: [], tag, options, });
+            let newComponents = $components;
+            newComponents.push({ id: parseInt(el.getAttribute(`data-id`)), element: el, children: [], tag, options, styles: [], globals: [], });
             components.update(() => newComponents);
         }
         parent.appendChild(el);
@@ -193,25 +179,24 @@
     };
 
     const moveItem = (array, from, to) => {
-        const el = array[from];
-        array.splice(from, 1);
-        array.splice(to, 0, el);
-        return array;
+        let arr = array;
+        const el = arr[from];
+        arr.splice(from, 1);
+        arr.splice(to, 0, el);
+        return arr;
     };
 
     // * Move an existing component:
     const moveComponent = (dom, from, to, mouseY) => {
         let fromEl = dom.querySelector(`[data-id="${from}"]`);
-        let toEl = dom.querySelector(`[data-id="${to}"]`);
+        let toEl = to === -1 ? dom.querySelector(`body`) : dom.querySelector(`[data-id="${to}"]`);
         switch (toEl.tagName) {
             case `BODY`:
                 // TODO - redo this (this is a sloppy and unsustainble solution. but good enough for most pages for now.)
                 const last = dom.body.lastElementChild;
                 const bodyStyle = dom.body.getBoundingClientRect();
                 const elStyle = last.getBoundingClientRect();
-                if ((mouseY - 240) > (bodyStyle.top + elStyle.top)) {
-                    dom.body.appendChild(fromEl);
-                }
+                ((mouseY - 240) > (bodyStyle.top + elStyle.top)) && (dom.body.appendChild(fromEl));
                 break;
             case `DIV`:
                 break;
@@ -221,11 +206,19 @@
                 if (fromIndex > toIndex) {
                     // * prepend
                     toEl.parentElement.insertBefore(fromEl, toEl);
-                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
+                    if (to === -1) {
+                        components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === from)), $components.length - 1));
+                    } else {
+                        components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === from)), $components.indexOf($components.find((e) => e.id === to))));
+                    }
                 } else {
                     // * append
                     toEl.parentElement.insertBefore(fromEl, toEl.nextSibling);
-                    components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === parseInt(from))), $components.indexOf($components.find((e) => e.id === parseInt(to)))));
+                    if (to === -1) {
+                        components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === from)), $components.length - 1));
+                    } else {
+                        components.update(() => moveItem($components, $components.indexOf($components.find((e) => e.id === from)), $components.indexOf($components.find((e) => e.id === to))));
+                    }
                 }
         }
         reactive();
@@ -248,39 +241,50 @@
 
     // * Actions to perform once the iframe has loaded:
     const load = (e) => {
+        selection = -1;
+        counter = 0;
         iframe.update(() => window.frames[`canvas`]);
         doc = window.frames[`canvas`].document;
         html = doc.getElementsByTagName(`html`)[0];
         head = doc.getElementsByTagName(`head`)[0];
         body = doc.getElementsByTagName(`body`)[0];
 
-        let dragged;
+        let dragged = null;
+        let tagName = ``;
 
         doc.addEventListener(`drag`, (e) => {
             // TODO
         }, false);
         doc.addEventListener(`dragstart`, (e) => {
-            dragged = e.target;
-            try {
-                if (dragged.getAttribute(`data-id`) === null) {
-                    let draggedId = counter;
-                    counter++;
-                    dragged.setAttribute(`data-id`, draggedId);
+            if (e.dataTransfer.getData(`element`) && !e.target.getAttribute(`data-id`)) {
+                dragged = null;
+                tagName = e.dataTransfer.getData(`element`); 
+                e.dataTransfer.setData(`text/plain`, null);
+            } else {
+                dragged = e.target;
+                try {
+                    if (dragged.getAttribute(`data-id`) === null && dragged.tagName !== `BODY`) {
+                        dragged.setAttribute(`data-id`, counter);
+                        counter++;
+                    }
+                } catch (err) {
+                    if (dragged.parentElement.getAttribute(`data-id`) === null && dragged.parentElement.tagName !== `BODY`) {
+                        dragged.parentElement.setAttribute(`data-id`, counter);
+                        counter++;
+                    }
                 }
-            } catch (err) {
-                if (dragged.parentElement.getAttribute(`data-id`) === null) {
-                    let draggedId = counter;
-                    counter++;
-                    dragged.parentElement.setAttribute(`data-id`, draggedId);
-                }
+                e.target.style.opacity = .8;
             }
-            e.target.style.opacity = .8;
         }, false);
         doc.addEventListener(`dragend`, (e) => {
             typeof e.target.style !== `undefined` && (e.target.style.opacity = ``);
         }, false);
         doc.addEventListener(`dragover`, (e) => {
             e.preventDefault();
+            if (e.dataTransfer.getData(`element`) && !parseInt(e.target.getAttribute(`data-id`))) {
+                dragged = null;
+                tagName = e.dataTransfer.getData(`element`);
+            }
         }, false);
         doc.addEventListener(`dragenter`, (e) => {
             if (e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
@@ -297,14 +301,16 @@
                     }
                 }
             }
-            // TODO: Consider an approach like the following:
+            // TODO clean this bit up
             let id = -1;
             try {
-                id = e.target.getAttribute(`data-id`);
+                id = parseInt(e.target.getAttribute(`data-id`));
             } catch (err) {
-                id = e.target.parentElement.getAttribute(`data-id`);
+                try {
+                    id = parseInt(e.target.parentElement.getAttribute(`data-id`));
+                } catch (error) {}
             }
-            if (id === null) {
+            if (id === null && e.target.tagName !== `BODY` && e.target.tagName !== `HTML`) {
                 id = counter;
                 counter++;
                 e.target.setAttribute(`data-id`, id);
@@ -323,81 +329,64 @@
         }, false);
         doc.addEventListener(`drop`, (e) => {
             e.preventDefault();
-            if (typeof e.target.style !== `undefined`) { // * ensure some stray text wasn't dragged
-                e.target.style.backgroundColor = ``;
-                e.target.style.outline = ``;
-                if (e.target.tagName !== `HTML`) {
-                    if (typeof dragged !== `undefined`) { // * An existing element has been dropped and was moved from another location within the iframe:
-                        if (dragged.tagName !== `BODY`) {
-                            let id = e.target.getAttribute(`data-id`);
-                            if (id === null) {
-                                id = counter;
-                                counter++;
-                                e.target.setAttribute(`data-id`, id);
-                            }
-                            try {
-                                moveComponent(doc, dragged.getAttribute(`data-id`), id, e.screenY);
-                                doc.activeElement.blur();
-                                dragged.click();
-                                dragged.focus();
-                            } catch (e) {
-                                console.log(`Non fatal error:`, e.message);
-                            }
-                        }
-                    } else { // * A new element has been dropped:
-                        let id = counter;
-                        counter++;
-                        let idExtra = counter;
-                        counter++;
-                        let targetId = e.target.getAttribute(`data-id`);
-                        if (targetId === null) {
-                            targetId = counter;
+            e.target.style.backgroundColor = ``;
+            e.target.style.outline = ``;
+            if (e.target.tagName !== `HTML`) {
+                if (dragged !== null && typeof e.target.style !== `undefined`) { // * ensure some stray text wasn't dragged
+                    // * An existing element has been dropped and was moved from another location within the iframe:
+                    if (e.target.tagName !== `BODY` && dragged.tagName !== `BODY`) {
+                        let id = parseInt(e.target.getAttribute(`data-id`));
+                        if (id === null) {
+                            id = counter;
                             counter++;
-                            e.target.setAttribute(`data-id`, targetId);
+                            e.target.setAttribute(`data-id`, id);
                         }
-                        if (e.dataTransfer.getData(`element`)) {
-                            // * If the dropped element came from the sidebar:
-                            const tagName = e.dataTransfer.getData(`element`);
-                            switch (tagName) {
-                                // * These are some special cases for creating "exception" elements:
-                                case `container`:
-                                    createComponent(doc, body, `div`, { className: `container`, dataId: id, }, true);
-                                    break;
-                                case `item`:
-                                    createComponent(doc, body, `div`, { className: `item`, dataId: id, }, true);
-                                    break;
-                                case `ul`:
-                                    createComponent(doc, createComponent(doc, body, `ul`, { dataId: id, }, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: idExtra, }, true);
-                                    break;
-                                case `markdown`:
-                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, dataId: id, }, true);
-                                    break;
-                                case `rich-text`:
-                                    createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, dataId: id, }, true);
-                                    break;
-                                case `details`:
-                                    createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, dataId: idExtra, }, true);
-                                    break;
-                                case `img`:
-                                    createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, dataId: id, }, true);
-                                    break;
-                                case `video`:
-                                    alert(`This component is still in the works! Sorry.`);
-                                    break;
-                                case `audio`:
-                                    alert(`This component is still in the works! Sorry.`);
-                                    break;
-                                default:
-                                    // * This is the "catch-all" for creating any other kind of element:
-                                    createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, dataId: id, }, true);
-                            }
-                            try {
-                                moveComponent(doc, id, targetId, e.screenY);
-                            } catch (e) {
-                                console.log(`Non fatal error:`, e.message);
-                            }
-                        }
+                        moveComponent(doc, parseInt(dragged.getAttribute(`data-id`)), id, e.screenY);
+                        doc.activeElement.blur();
+                        dragged.click();
+                        dragged.focus();
                     }
+                } else if (tagName !== null) {
+                    // * A new element has been dropped:
+                    let targetId = -1;
+                    if (e.target.tagName !== `BODY`) {
+                        targetId = parseInt(e.target.getAttribute(`data-id`));
+                    }
+                    // * If the dropped element came from the sidebar:
+                    switch (tagName) {
+                        // * These are some special cases for creating "exception" elements:
+                        case `container`:
+                            createComponent(doc, body, `div`, { className: `container`, }, true);
+                            break;
+                        case `item`:
+                            createComponent(doc, body, `div`, { className: `item`, }, true);
+                            break;
+                        case `ul`:
+                            createComponent(doc, createComponent(doc, body, `ul`, {}, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
+                            break;
+                        case `markdown`:
+                            createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, }, true);
+                            break;
+                        case `rich-text`:
+                            createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, }, true);
+                            break;
+                        case `details`:
+                            createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, }, true);
+                            break;
+                        case `img`:
+                            createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, }, true);
+                            break;
+                        case `video`:
+                            alert(`This component is still in the works! Sorry.`);
+                            break;
+                        case `audio`:
+                            alert(`This component is still in the works! Sorry.`);
+                            break;
+                        default:
+                            // * This is the "catch-all" for creating any other kind of element:
+                            createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
+                    }
+                    moveComponent(doc, counter - 1, targetId, e.screenY);
                 }
             }
         }, false);
@@ -409,15 +398,8 @@
             }
         });
 
-        let generatedStyles = ``;
-        $css.generated.forEach((selector) => {
-            let rules = ``;
-            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
-            generatedStyles += `[data-id="${selector.id}"] { ${rules}}`;
-        });
-
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: generatedStyles.trim(), }, false);
-        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.custom.trim(), }, false);
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: ``, }, false);
+        createComponent(doc, body, `style`, { type: `text/css`, innerHTML: $css.trim(), }, false);
         createComponent(doc, body, `style`, { type: `text/css`, innerHTML: contextMenu.menuStyles.trim(), }, false);
         createComponent(doc, body, `nav`, { class: `append-contextMenu`, innerHTML: contextMenu.menuMarkup.trim(), }, false);
 
@@ -428,13 +410,13 @@
                 let newComponents = $components;
                 const componentIndex = newComponents.indexOf(newComponents.find((component) => component.id === selection));
                 if (componentIndex > -1) {
+                    doc.querySelector(`[data-id="${selection}"]`).blur();
+                    doc.querySelector(`[data-id="${selection}"]`).style.cursor = `pointer`;
+                    doc.querySelector(`[data-id="${selection}"]`).style.outline = ``;
+                    doc.querySelector(`[data-id="${selection}"]`).style.boxShadow = ``;
                     selection = -1;
-                    newComponents[componentIndex].element.blur();
                     newComponents[componentIndex].element.contentEditable !== `inherit` && (newComponents[componentIndex].element.contentEditable = false);
                     element.update(() => false);
-                    newComponents[componentIndex].element.style.cursor = `pointer`;
-                    newComponents[componentIndex].element.style.outline = ``;
-                    newComponents[componentIndex].element.style.boxShadow = ``;
                     components.update(() => newComponents);
                 }
             }
@@ -449,29 +431,34 @@
         ($websites.length > 0 && $website > -1 && $pages.length > -1 && $page > -1) && (components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components));
         let newComponents = $components;
         $components.forEach((component) => {
-            if (component.id === null) {
-                /*
-                TODO - omit? potentially redundant
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].id = counter;
-                $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components[$components.indexOf(component)].options.dataId = counter;
-                */
-                newComponents[newComponents.indexOf(component)].id = counter;
-                newComponents[newComponents.indexOf(component)].options.dataId = counter;
-                counter++;
-            }
+            // TODO cleanup
+            let componentId;
+            // * Here, we do not increment the counter. That is done inside createComponent, because component.id and component.el.getAttribute(`data-id`) should be the same.
+            // componentId = component.id === null ? counter : parseInt(component.id);
+            componentId = counter;
+            newComponents[newComponents.indexOf(component)].id = componentId;
             let options = component.options || {};
-            options.dataId = component.id;
             createComponent(doc, body, component.tag, options, false);
+            $components[$components.indexOf($components.find((e) => e.id === componentId))].element === null && (newComponents[newComponents.indexOf(newComponents.find((e) => e.id === componentId))].element = doc.querySelector(`[data-id="${componentId}"]`));
         });
         components.update(() => newComponents);
+        let generatedStyles = ``;
+        $components.forEach((component) => {
+            if (component.styles !== []) {
+                let rules = ``;
+                component.styles.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+                generatedStyles += `[data-id="${component.id}"] { ${rules}}`;
+            }
+        });
+        body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
         hasLoaded = true;
     };
 
     // * If changes have been made but not saved, alert the user before they close the page:
     const beforeunload = (e) => {
-        if (!!$isModified) return null;
+        if ($isModified === false) return null;
         e = e || window.event;
-        if (e) e.returnValue = `Are you sure?`;
+        e && (e.returnValue = `Are you sure?`);
         return `Are you sure?`;
     };
 
@@ -479,29 +466,32 @@
     const keyup = (e) => (e.keyCode === 27 && contextMenu.menu && contextMenu.menuVisible) && (contextMenu.hide());
 
     // * Automatically set the width of the iframe based on whether the left menu is expanded:
-    tab.subscribe((val) => classList = val !== false ? `shrink` : ``);
+    const tabUnsubscribe = tab.subscribe((val) => classList = val !== false ? `shrink` : ``);
 
-    // * Automatically update the iframe with user-generated custom CSS as it is being typed:
-    css.subscribe((val) => {
+    // * Automatically update the iframe with user-generated, custom CSS as it is being typed:
+    const cssUnsubscribe = css.subscribe((val) => body && (body.getElementsByTagName(`style`)[1].innerHTML = $css.trim()));
+
+    const componentsUnsubscribe = components.subscribe((val) => {
         let generatedStyles = ``;
-        $css.generated.forEach((selector) => {
-            let rules = ``;
-            selector.rules.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
-            generatedStyles += `[data-id="${selector.id}"] { ${rules}} `;
+        val.forEach((component) => {
+            if (component.styles !== []) {
+                let rules = ``;
+                component.styles.forEach((rule) => rules += `${rule.key}: ${rule.val}; `);
+                generatedStyles += `[data-id="${component.id}"] { ${rules}}`;
+            }
         });
-        if (body) {
-            body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
-            body.getElementsByTagName(`style`)[1].innerHTML = $css.custom.trim();
-        }
+        body && (body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim());
+        doc && (reactive());
     });
 
     // * Automatically update the page when it's been changed by another component:
-    page.subscribe((val) => {
+    const pageUnsubscribe = page.subscribe((val) => {
         if (doc) {
             if (currentPage !== val && canvas !== null) {
                 reactive();
                 element.update(() => false);
                 currentPage = val;
+                components.update(() => $pages[$pages.indexOf($pages.find((e) => e.id === currentPage))].components);
                 canvas.contentWindow.location.reload();
             }
         }
@@ -515,13 +505,24 @@
         const pageIndex = $pages.indexOf($pages.find((e) => e.id === currentPage));
         const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
         if (pageIndex !== -1 && websiteIndex !== -1) {
-            $pages[pageIndex].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
-            $pages[pageIndex].components = $components;
-            $websites[websiteIndex].pages = $pages;
-            $websites[websiteIndex].css = $css;
+            let newPages = $pages;
+            newPages[pageIndex].body = `<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML}`;
+            newPages[pageIndex].components = $components;
+            pages.update(() => newPages);
+            let newWebsites = $websites;
+            newWebsites[websiteIndex].pages = $pages;
+            newWebsites[websiteIndex].css = $css.trim();
+            websites.update(() => newWebsites);
             $isModified !== true && (isFirstLoad ? isModified.update(() => true) : isFirstLoad = true);
         }
     };
+
+    onDestroy(() => {
+        tabUnsubscribe();
+        cssUnsubscribe();
+        componentsUnsubscribe();
+        pageUnsubscribe();
+    });
 </script>
 
 <svelte:window on:sveltekit:start={start} on:beforeunload={beforeunload} on:keyup={keyup} />

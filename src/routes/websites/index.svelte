@@ -4,9 +4,15 @@
     import pages from '$lib/stores/pages';
     import page from '$lib/stores/page';
     import { goto } from '$app/navigation';
+    import { Web3Storage } from 'web3.storage';
+    import { onMount } from 'svelte';
+    import init from '$lib/stores/init';
 
     // * Determines whether a new website being created:
     let create = false;
+
+    // * The "Create" button element binding:
+    let button;
 
     // * Triggers when a website is selected:
     const editWebsite = (id) => {
@@ -31,17 +37,22 @@
         } catch (e) {}
     };
 
+    // * Alias for browser localStorage:
+    let ls;
+
     // * Triggers when a new website is created:
-    const newWebsite = () => {
+    const newWebsite = async () => {
         if (theme === `blank`) {
+            button.disabled = true;
+            button.innerText = `Creating...`;
             let newWebsites = $websites;
             newWebsites.push({
                 id: $websites.length,
                 title: value || `Unnamed Website`,
-                css: {
-                    custom: `html {\n    height: 100%;\n}\n\nbody {\n    font-family: "Segoe UI", Arial, sans-serif;\n    margin: 0;\n    min-height: 100%;\n}\n\n.container {\n    display: flex;\n    min-height: 40px;\n    width: 100%;\n}\n\n.item {\n    align-items: center;\n    display: flex;\n    height: 100%;\n    width: 100%;\n}`,
-                    generated: [],
-                },
+                css: `html {\n    height: 100%;\n}\n\nbody {\n    font-family: "Segoe UI", Arial, sans-serif;\n    margin: 0;\n    min-height: 100%;\n}\n\n.container {\n    display: flex;\n    min-height: 40px;\n    width: 100%;\n}\n\n.item {\n    align-items: center;\n    display: flex;\n    height: 100%;\n    width: 100%;\n}`,
+                template: ``,
+                templates: [],
+                globals: [],
                 pages: [
                     {
                         id: 0,
@@ -62,6 +73,8 @@
                                     contentEditable: true,
                                     textContent: `Hello World`,
                                 },
+                                styles: [],
+                                globals: [],
                             },
                             {
                                 id: null,
@@ -72,6 +85,8 @@
                                     contentEditable: true,
                                     textContent: `Welcome to YOUR very own unstoppable website.`,
                                 },
+                                styles: [],
+                                globals: [],
                             },
                             {
                                 id: null,
@@ -82,6 +97,8 @@
                                     contentEditable: true,
                                     textContent: `WARNING: Progress will not be saved (yet)!`,
                                 },
+                                styles: [],
+                                globals: [],
                             },
                             {
                                 id: null,
@@ -92,6 +109,8 @@
                                     contentEditable: true,
                                     textContent: `IMPORTANT: Please don't try to build a full site for now, because it may be a very frustrating experience. This is NOT a stable release, and this is just for testing purposes!`,
                                 },
+                                styles: [],
+                                globals: [],
                             },
                             {
                                 id: null,
@@ -102,6 +121,8 @@
                                     contentEditable: true,
                                     textContent: `Anyway, have fun playing with this!`,
                                 },
+                                styles: [],
+                                globals: [],
                             }
                         ],
                         mime: `text/html`,
@@ -189,67 +210,103 @@
                 ],
             });
             websites.update(() => newWebsites);
+            // * The below method is TEMPORARY. Yes, of course this is bad practice. If someone abuses the below API key before I switch to something else, I'll add a new default one ASAP.
+            const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGI0MEIzZGU3Y0Y2Mjk3MTZBNDM2NGQ2NWY2NTJBMzNCOTU5N2E0QzEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Mjc1OTAzMTc0MzMsIm5hbWUiOiJFVEhHbG9iYWwgVGVzdCJ9.wpGMGBuvu4n2f4hXTYyU7n13u-gMe6I_KOCTtHkQ280`;
+            const client = new Web3Storage({ token, });
+            const blob = new Blob([JSON.stringify($websites)], { type: `application/json`, });
+            const files = [new File([blob], `websites.json`)];
+            const cid = await client.put(files);
+            ls && (ls.setItem(`hash`, cid));
+            button.disabled = false;
+            button.innerText = `Create`;
             create = false;
         } else {
             alert(`Sorry, but that theme is still a work in progress. Please choose another in the meantime!`);
         }
     };
+
+    onMount(() => {
+        if ($init === false) {
+            if (typeof localStorage !== `undefined`) {
+                ls = localStorage;
+                if (ls.getItem(`hash`) !== null) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        websites.update(() => JSON.parse(xhr.response));
+                        init.update(() => true);
+                    };
+                    xhr.onerror = () => console.log(`Request failed.`);
+                    // ! Fallback gateways should be added in the future. This is a serious single point of failure.
+                    xhr.open(`GET`, `https://cloudflare-ipfs.com/ipfs/${ls.getItem(`hash`)}/websites.json`);
+                    xhr.send();
+                } else {
+                    init.update(() => true);
+                }
+            } else {
+                alert(`Your browser must support localStorage, and Append will not function properly otherwise.`);
+            }
+        }
+    });
 </script>
 
-{#if !create}
-    <h1>My Websites</h1>
-    <p>Append is currently in beta and progress is not yet saved. There are still some serious bugs. Use at your own risk. Have fun!</p>
-    <div class="grid">
-        {#each $websites as website}
-            <button class="website" tabindex="0" role="link" on:click={() => editWebsite(website.id)}>
-                <h2 class="website__title">{website.title}</h2>
+{#if $init === true}
+    {#if !create}
+        <h1>My Websites</h1>
+        <p>Append is currently in bet. There are still some serious bugs. Use at your own risk.</p>
+        <p><strong>You can save your progress, but currently, the method for doing so is very crude. Your progress may be lost.</strong></p>
+        <p><strong>Do not upload any private information, because data is currently unencrypted and pinned on IPFS.</strong></p>
+        <div class="grid">
+            {#each $websites as website}
+                <button class="website" tabindex="0" role="link" on:click={() => editWebsite(website.id)}>
+                    <h2 class="website__title">{website.title}</h2>
+                </button>
+            {/each}
+            <button class="website" on:click={() => create = true}>
+                <div class="flex">
+                    <svg version="1.1" x="0px" y="0px" width="122.881px" height="122.88px" viewBox="0 0 122.881 122.88" enable-background="new 0 0 122.881 122.88" xml:space="preserve">
+                        <g>
+                            <path fill="#f8f8f8" d="M56.573,4.868c0-0.655,0.132-1.283,0.37-1.859c0.249-0.6,0.61-1.137,1.056-1.583C58.879,0.545,60.097,0,61.44,0 c0.658,0,1.287,0.132,1.863,0.371c0.012,0.005,0.023,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.426,2.098,1.426,3.442c0,0.03-0.002,0.06-0.006,0.089v51.62l51.619,0c0.029-0.003,0.061-0.006,0.09-0.006 c0.656,0,1.285,0.132,1.861,0.371c0.014,0.005,0.025,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.428,2.098,1.428,3.441c0,0.654-0.133,1.283-0.371,1.859c-0.248,0.6-0.609,1.137-1.057,1.583 c-0.445,0.445-0.98,0.806-1.58,1.055v0.001c-0.576,0.238-1.205,0.37-1.861,0.37c-0.029,0-0.061-0.002-0.09-0.006l-51.619,0.001 v51.619c0.004,0.029,0.006,0.06,0.006,0.09c0,0.656-0.133,1.286-0.371,1.861c-0.006,0.014-0.012,0.025-0.018,0.037 c-0.248,0.584-0.602,1.107-1.037,1.543c-0.883,0.882-2.1,1.427-3.443,1.427c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.444-0.806-0.98-1.055-1.58h-0.001c-0.239-0.575-0.371-1.205-0.371-1.861 c0-0.03,0.002-0.061,0.006-0.09V66.303H4.958c-0.029,0.004-0.059,0.006-0.09,0.006c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.445-0.806-0.98-1.055-1.58H0.371C0.132,62.726,0,62.097,0,61.44 c0-0.655,0.132-1.283,0.371-1.859c0.249-0.6,0.61-1.137,1.056-1.583c0.881-0.881,2.098-1.426,3.442-1.426 c0.031,0,0.061,0.002,0.09,0.006l51.62,0l0-51.62C56.575,4.928,56.573,4.898,56.573,4.868L56.573,4.868z"></path>
+                        </g>
+                    </svg>
+                    <h2 class="website__title">&nbsp;&nbsp;Create New</h2>
+                </div>
             </button>
-        {/each}
-        <button class="website" on:click={() => create = true}>
-            <div class="flex">
-                <svg version="1.1" x="0px" y="0px" width="122.881px" height="122.88px" viewBox="0 0 122.881 122.88" enable-background="new 0 0 122.881 122.88" xml:space="preserve">
-                    <g>
-                        <path fill="#f8f8f8" d="M56.573,4.868c0-0.655,0.132-1.283,0.37-1.859c0.249-0.6,0.61-1.137,1.056-1.583C58.879,0.545,60.097,0,61.44,0 c0.658,0,1.287,0.132,1.863,0.371c0.012,0.005,0.023,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.426,2.098,1.426,3.442c0,0.03-0.002,0.06-0.006,0.089v51.62l51.619,0c0.029-0.003,0.061-0.006,0.09-0.006 c0.656,0,1.285,0.132,1.861,0.371c0.014,0.005,0.025,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.428,2.098,1.428,3.441c0,0.654-0.133,1.283-0.371,1.859c-0.248,0.6-0.609,1.137-1.057,1.583 c-0.445,0.445-0.98,0.806-1.58,1.055v0.001c-0.576,0.238-1.205,0.37-1.861,0.37c-0.029,0-0.061-0.002-0.09-0.006l-51.619,0.001 v51.619c0.004,0.029,0.006,0.06,0.006,0.09c0,0.656-0.133,1.286-0.371,1.861c-0.006,0.014-0.012,0.025-0.018,0.037 c-0.248,0.584-0.602,1.107-1.037,1.543c-0.883,0.882-2.1,1.427-3.443,1.427c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.444-0.806-0.98-1.055-1.58h-0.001c-0.239-0.575-0.371-1.205-0.371-1.861 c0-0.03,0.002-0.061,0.006-0.09V66.303H4.958c-0.029,0.004-0.059,0.006-0.09,0.006c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.445-0.806-0.98-1.055-1.58H0.371C0.132,62.726,0,62.097,0,61.44 c0-0.655,0.132-1.283,0.371-1.859c0.249-0.6,0.61-1.137,1.056-1.583c0.881-0.881,2.098-1.426,3.442-1.426 c0.031,0,0.061,0.002,0.09,0.006l51.62,0l0-51.62C56.575,4.928,56.573,4.898,56.573,4.868L56.573,4.868z"></path>
-                    </g>
-                </svg>
-                <h2 class="website__title">&nbsp;&nbsp;Create New</h2>
-            </div>
-        </button>
-    </div>
-{:else}
-    <h1>New Website</h1>
-    <label for="name">Name</label>
-    <input bind:value id="name" type="text" placeholder="My Epic Blog" autocomplete="off" autofocus required aria-placeholder="My Epic Blog" aria-required="true">
-    <fieldset>
-        <legend>Theme</legend>
-        <div class="grid grid--small">
-            <div class="theme" tabindex="0" role="radio" aria-checked="true" aria-label="Blank" data-id="blank" on:click={() => changeTheme(`blank`)}>
-                <p>Blank</p>
-            </div>
         </div>
-        <h2 class="small">Default Themes</h2>
-        <div class="grid grid--small">
-            <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Bio" data-id="bio" on:click={() => changeTheme(`bio`)}>
-                <p>Bio</p>
+    {:else}
+        <h1>New Website</h1>
+        <label for="name">Name</label>
+        <input bind:value id="name" type="text" placeholder="My Epic Blog" autocomplete="off" autofocus required aria-placeholder="My Epic Blog" aria-required="true">
+        <fieldset>
+            <legend>Theme</legend>
+            <div class="grid grid--small">
+                <div class="theme" tabindex="0" role="radio" aria-checked="true" aria-label="Blank" data-id="blank" on:click={() => changeTheme(`blank`)}>
+                    <p>Blank</p>
+                </div>
             </div>
-            <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Blog" data-id="blog" on:click={() => changeTheme(`blog`)}>
-                <p>Blog</p>
+            <h2 class="small">Default Themes</h2>
+            <div class="grid grid--small">
+                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Bio" data-id="bio" on:click={() => changeTheme(`bio`)}>
+                    <p>Bio</p>
+                </div>
+                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Blog" data-id="blog" on:click={() => changeTheme(`blog`)}>
+                    <p>Blog</p>
+                </div>
+                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Store" data-id="nft-store" on:click={() => changeTheme(`nft-store`)}>
+                    <p>NFT Store</p>
+                </div>
+                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Gallery" data-id="nft-gallery" on:click={() => changeTheme(`nft-gallery`)}>
+                    <p>NFT Gallery</p>
+                </div>
             </div>
-            <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Store" data-id="nft-store" on:click={() => changeTheme(`nft-store`)}>
-                <p>NFT Store</p>
-            </div>
-            <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Gallery" data-id="nft-gallery" on:click={() => changeTheme(`nft-gallery`)}>
-                <p>NFT Gallery</p>
-            </div>
+            <p><em>More are coming soon!</em></p>
+            <h2 class="small">Custom Themes</h2>
+            <p><em>Coming soon!</em></p>
+        </fieldset>
+        <div class="flex flex--start">
+            <button bind:this={button} class="submit" on:click={newWebsite}>Create</button>
+            <button class="cancel" on:click={() => create = false}>Cancel</button>
         </div>
-        <p><em>More are coming soon!</em></p>
-        <h2 class="small">Custom Themes</h2>
-        <p><em>Coming soon!</em></p>
-    </fieldset>
-    <div class="flex flex--start">
-        <button class="submit" on:click={newWebsite}>Create</button>
-        <button class="cancel" on:click={() => create = false}>Cancel</button>
-    </div>
+    {/if}
 {/if}
 
 <style>

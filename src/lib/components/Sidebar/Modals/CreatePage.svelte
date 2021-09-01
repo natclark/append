@@ -24,6 +24,9 @@
                     path: `${path.endsWith(`index.html`) ? path : `${path}index.html`}`,
                     file: `index.html`,
                     body: ``,
+                    template: ``,
+                    templates: [],
+                    globals: [],
                     components: [
                         {
                             id: null,
@@ -33,7 +36,9 @@
                             options: {
                                 contentEditable: true,
                                 textContent: title,
-                            }
+                            },
+                            styles: [],
+                            globals: [],
                         },
                         {
                             id: null,
@@ -43,13 +48,15 @@
                             options: {
                                 contentEditable: true,
                                 textContent: `This is some dummy text.`,
-                            }
+                            },
+                            styles: [],
+                            globals: [],
                         }
                     ],
                     mime: `text/html`,
                 });
                 pages.update(() => newPages);
-                page.update(() => $pages.indexOf($pages.find((e) => e.path === `${path}index.html`)));
+                page.update(() => $pages.indexOf($pages.find((e) => e.path === `${path.endsWith(`index.html`) ? path : `${path}index.html`}`)));
             } else {
                 alert(`There is already a page or redirect with that same path!`);
             }
