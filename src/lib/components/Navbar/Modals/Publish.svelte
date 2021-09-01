@@ -1,7 +1,3 @@
-<script context="module">
-    import { Resolution } from '@unstoppabledomains/resolution';
-</script>
-
 <script>
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import { Web3Storage } from 'web3.storage';

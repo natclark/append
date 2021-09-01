@@ -58,10 +58,13 @@
 
 <div class="container">
     <nav class="navbar">
-        <a class="navbar__logo" href="/" draggable="false" sveltekit:prefetch>
-            <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
-            <span>Append</span>
-        </a>
+        <div class="navbar__left">
+            <a class="navbar__logo" href="/" draggable="false" sveltekit:prefetch>
+                <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
+                <span>Append</span>
+            </a>
+            <a class="navbar__link" href="/docs/" draggable="false" sveltekit:prefetch>Docs</a>
+        </div>
         <button bind:this={walletButton} class="{$wallet.address === undefined ? `navbar__button` : `navbar__button navbar__button--success`}" draggable="false" on:click={click}>{typeof $wallet.address === `undefined` ? `Connect Wallet` : $wallet.address}</button>
     </nav>
     <slot />
@@ -92,14 +95,28 @@
         display: flex;
         height: 100px;
         justify-content: space-between;
-        .navbar__logo {
+        .navbar__left {
             align-items: center;
-            color: #000;
-            display: flex;
-            span {
-                color: #fff;
-                font-size: 18px;
-                margin-left: 8px;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            justify-content: flex-start;
+            .navbar__logo {
+                align-items: center;
+                color: #000;
+                display: flex;
+                span {
+                    color: #fff;
+                    font-size: 18px;
+                    margin-left: 8px;
+                }
+            }
+            .navbar__link {
+                color: #f8f8f8;
+                font-size: 15px;
+            }
+            a:hover {
+                opacity: .9;
             }
         }
         .navbar__button {
