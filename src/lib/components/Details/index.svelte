@@ -356,7 +356,7 @@
                     </div>
                     <div class="level">
                         <p class="normal">Font Family</p>
-                        <select value={attributes.font_family} on:change={fontFamilyChange}>
+                        <select value={attributes.font_family || `Segoe UI`} on:change={fontFamilyChange}>
                             <option value="Segoe UI">Segoe UI</option>
                             <option value="Arial">Arial</option>
                             <option value="Roboto">Roboto</option>
