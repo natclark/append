@@ -11,8 +11,11 @@
             <img src="/logo.svg" height="32px" width="32px" alt="Append" draggable="false">
             <span>Append</span>
         </a>
-        <a class="navbar__link" href="/docs/" draggable="false" sveltekit:prefetch>Docs</a>
-        <a class="navbar__button" href="/websites/" draggable="false" sveltekit:prefetch>Launch App</a>
+        <div class="navbar__right">
+            <a class="navbar__link" href="/docs/" draggable="false" sveltekit:prefetch>Docs</a>
+            <a class="navbar__link" href="/faq/" draggable="false" sveltekit:prefetch>FAQ</a>
+            <a class="navbar__button" href="/websites/" draggable="false" sveltekit:prefetch>Launch App</a>
+        </div>
     </nav>
     <slot />
     <footer aria-hidden="true"></footer>
@@ -50,21 +53,28 @@
                 margin-left: 8px;
             }
         }
-        .navbar__link {
-            color: #111;
-        }
-        a:hover {
-            opacity: .8;
-        }
-        .navbar__button {
-            background-color: rgba(65, 105, 225, .1);
-            border-radius: 1px;
-            color: #4169e1;
-            font-weight: 600;
-            line-height: 1.3;
-            padding: 10px 20px;
-            &:hover {
-                opacity: .9;
+        .navbar__right {
+            align-items: center;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            justify-content: flex-end;
+            .navbar__link {
+                color: #111;
+            }
+            a:hover {
+                opacity: .8;
+            }
+            .navbar__button {
+                background-color: rgba(65, 105, 225, .1);
+                border-radius: 1px;
+                color: #4169e1;
+                font-weight: 600;
+                line-height: 1.3;
+                padding: 10px 20px;
+                &:hover {
+                    opacity: .9;
+                }
             }
         }
     }

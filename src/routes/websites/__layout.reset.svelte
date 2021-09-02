@@ -64,6 +64,7 @@
                 <span>Append</span>
             </a>
             <a class="navbar__link" href="/docs/" draggable="false" sveltekit:prefetch>Docs</a>
+            <a class="navbar__link" href="/faq/" draggable="false" sveltekit:prefetch>FAQ</a>
         </div>
         <button bind:this={walletButton} class="{$wallet.address === undefined ? `navbar__button` : `navbar__button navbar__button--success`}" draggable="false" on:click={click}>{typeof $wallet.address === `undefined` ? `Connect Wallet` : $wallet.address}</button>
     </nav>
