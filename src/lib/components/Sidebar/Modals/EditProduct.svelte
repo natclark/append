@@ -5,6 +5,7 @@
     export let id;
 
     const product = $products[$products.indexOf($products.find((e) => e.id === id))];
+    let type = product.type;
     let title = product.title;
     let price = product.price;
     let description = product.description;
@@ -15,6 +16,7 @@
                 let newProducts = $products;
                 newProducts.splice(newProducts.indexOf(newProducts.find((e) => e.id === id)), 1);
                 newProducts.push({
+                    type,
                     id,
                     title,
                     price,
@@ -39,6 +41,13 @@
 
 <h2>Edit Product</h2>
 <form on:submit|preventDefault={submit}>
+    <div class="flex">
+        <label for="type">Type <span class="required">*</span></label>
+        <select bind:value={type} id="type" required aria-required="true">
+            <option value="nft">NFT</option>
+        </select>
+    </div>
+    <Breaker />
     <div class="flex">
         <label for="id">ID <span class="required">*</span></label>
         <input bind:value={id} {id} type="text" placeholder="green-vase" disabled aria-placeholder="green-vase">
@@ -72,7 +81,7 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
-        input[type="text"] {
+        input[type="text"], select {
             font-size: 18px;
             width: 50%;
         }

@@ -2,6 +2,7 @@
     import products from '$lib/stores/products';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
+    let type;
     let id;
     let title;
     let price;
@@ -12,6 +13,7 @@
             if ($products.indexOf($products.find((e) => e.id === id)) === -1) {
                 let newProducts = $products;
                 newProducts.push({
+                    type,
                     id,
                     title,
                     price,
@@ -30,8 +32,15 @@
 <h2>Create Product</h2>
 <form on:submit|preventDefault={submit}>
     <div class="flex">
+        <label for="type">Type <span class="required">*</span></label>
+        <select bind:value={type} id="type" required aria-required="true">
+            <option value="nft">NFT</option>
+        </select>
+    </div>
+    <Breaker />
+    <div class="flex">
         <label for="id">ID <span class="required">*</span></label>
-        <input bind:value={id} id="id" type="text" placeholder="green-vase" autofocus required aria-placeholder="green-vase" aria-required="true">
+        <input bind:value={id} {id} type="text" placeholder="green-vase" autofocus required aria-placeholder="green-vase" aria-required="true">
     </div>
     <Breaker />
     <div class="flex">
@@ -61,7 +70,7 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
-        input[type="text"] {
+        input[type="text"], select {
             font-size: 18px;
             width: 50%;
         }
