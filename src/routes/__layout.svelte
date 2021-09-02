@@ -80,7 +80,7 @@
     }
     section {
         h1 {
-            font-size: 48px;
+            font-size: 24px;
             line-height: 1.3;
             margin-bottom: 60px;
         }
@@ -88,20 +88,20 @@
             background-color: rgba(65, 105, 225, .1);
             border-radius: 1px;
             color: #4169e1;
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 600;
             line-height: 1.5;
-            padding: 18px 36px;
+            padding: 9px 18px;
             &:hover {
                 opacity: .9;
             }
         }
         h2 {
-            font-size: 36px;
+            font-size: 18px;
             margin-top: 60px;
         }
         p {
-            font-size: 18px;
+            font-size: 14px;
         }
         .wrapper {
             align-items: center;
@@ -113,10 +113,13 @@
             margin-top: 20px;
             max-width: 1000px;
         }
+        .social svg {
+            height: 96px;
+            width: 96px;
+        }
     }
     .columns {
-        display: flex;
-        justify-content: space-between;
+        display: block;
         .column {
             width: 100%;
             &.column--short {
@@ -129,6 +132,10 @@
         &.columns--reverse {
             flex-direction: reverse;
         }
+        &.columns--mobile {
+            display: flex;
+            justify-content: space-between;
+        }
     }
     .text-center {
         text-align: center;
@@ -136,5 +143,29 @@
     footer {
         margin-top: 200px;
     }
+    @media screen and (min-width:1024px) {
+        section {
+            h1 {
+                font-size: 48px;
+            }
+            .cta {
+                font-size: 22px;
+                padding: 18px 36px;
+            }
+            h2 {
+                font-size: 36px;
+            }
+            p {
+                font-size: 18px;
+            }
+            .social svg {
+                height: 192px;
+                width: 192px;
+            }
+        }
+        .columns {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
 </style>
-
