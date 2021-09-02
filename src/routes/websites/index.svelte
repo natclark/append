@@ -106,19 +106,7 @@
                                 tag: `p`,
                                 options: {
                                     contentEditable: true,
-                                    textContent: `WARNING: Progress will not be saved (yet)!`,
-                                },
-                                styles: [],
-                                globals: [],
-                            },
-                            {
-                                id: null,
-                                element: null,
-                                children: [],
-                                tag: `p`,
-                                options: {
-                                    contentEditable: true,
-                                    textContent: `IMPORTANT: Please don't try to build a full site for now, because it may be a very frustrating experience. This is NOT a stable release, and this is just for testing purposes!`,
+                                    textContent: `WARNING: Please don't try to build a full site for now, because it may be a very frustrating experience. This is NOT a stable release, and this is just for testing purposes!`,
                                 },
                                 styles: [],
                                 globals: [],
