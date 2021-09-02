@@ -1,5 +1,7 @@
 <script>
     import products from '$lib/stores/products';
+    import websites from '$lib/stores/websites';
+    import website from '$lib/stores/website';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
     export let id;
@@ -23,6 +25,9 @@
                     description,
                 });
                 products.update(() => newProducts);
+                let newWebsites = $websites;
+                newWebsites[newWebsites.indexOf(newWebsites.find((e) => e.id === $website))].products = $products;
+                websites.update(() => newWebsites);
             } else {
                 alert(`You cannot change your product's unique ID!`);
             }
@@ -50,7 +55,7 @@
     <Breaker />
     <div class="flex">
         <label for="id">ID <span class="required">*</span></label>
-        <input bind:value={id} {id} type="text" placeholder="green-vase" disabled aria-placeholder="green-vase">
+        <input bind:value={id} id="id" type="text" placeholder="green-vase" disabled aria-placeholder="green-vase">
     </div>
     <Breaker />
     <div class="flex">
@@ -60,7 +65,11 @@
     <Breaker />
     <div class="flex">
         <label for="price">Price <span class="required">*</span></label>
-        <input bind:value={price} id="price" type="text" placeholder="0.1" required aria-placeholder="0.1" aria-required="true">
+        <select bind:value={price} id="price" required aria-required="true">
+            {#each $prices as price}
+                <option value="{price.id}">{price.id}</option>
+            {/each}
+        </select>
     </div>
     <Breaker />
     <div class="flex">

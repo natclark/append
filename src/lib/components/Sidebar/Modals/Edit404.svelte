@@ -2,7 +2,11 @@
     import pages from '$lib/stores/pages';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
 
-    let value = $pages[$pages.indexOf($pages.find((e) => e.path === `/ipfs-404.html`))].to;
+    const index = $pages.indexOf($pages.find((e) => e.path === `/ipfs-404.html`));
+
+    let value = false;
+
+    index === 1 && (value = $pages[$pages.indexOf($pages.find((e) => e.path === `/ipfs-404.html`))].to);
 
     const update = () => {
         let newPages = $pages;
@@ -18,7 +22,7 @@
 </script>
 
 <h2>Edit IPFS 404</h2>
-<p>The <code>ipfs-404.html</code> is a partially recognized standard. If a user visits a page on your website that is not found, some IPFS gateways will redirect them to this "404" page. You currently only have the option to redirect this to another page. By default, we redirect it to your home page.</p>
+<p>The <code>ipfs-404.html</code> is a partially recognized standard. If a user visits a page on your website that is not found, some IPFS gateways will redirect them to this "404" page. You currently only have the option to redirect this to another page. By default, Append redirects it to your home page.</p>
 <div class="flex">
     <label for="to">Destination <span class="required">*</span></label>
     <input bind:value id="to" type="text" placeholder="http://example.com" autofocus required aria-placeholder="http://example.com" aria-required="true" on:change={update}>

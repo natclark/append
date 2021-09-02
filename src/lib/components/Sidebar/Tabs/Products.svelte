@@ -6,6 +6,9 @@
     import CreateProduct from '../Buttons/CreateProduct.svelte';
     import EditProduct from '../Buttons/EditProduct.svelte';
     import products from '$lib/stores/products';
+    import CreatePrice from '../Buttons/CreatePrice.svelte';
+    import EditPrice from '../Buttons/EditPrice.svelte';
+    import prices from '$lib/stores/prices';
 
     const viewPage = (id) => page.update(() => id);
 </script>
@@ -14,6 +17,13 @@
     <Center>
         <Modal>
             <CreateProduct />
+        </Modal>
+    </Center>
+</Dropdown>
+<Dropdown text="Create Price">
+    <Center>
+        <Modal>
+            <CreatePrice />
         </Modal>
     </Center>
 </Dropdown>
@@ -28,6 +38,23 @@
                 <div>
                     <Modal>
                         <EditProduct id={product.id} />
+                    </Modal>
+                </div>
+            </div>
+        </div>
+    {/each}
+</Dropdown>
+<Dropdown text="My Prices">
+    {#each $prices as price}
+        <div class="product">
+            <div class="flex">
+                <div>
+                    <p class="title">{price.price} {price.currency.toUpperCase()}</p>
+                    <p class="faint">{price.id}</p>
+                </div>
+                <div>
+                    <Modal>
+                        <EditPrice id={price.id} />
                     </Modal>
                 </div>
             </div>

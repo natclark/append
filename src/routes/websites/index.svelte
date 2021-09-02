@@ -16,9 +16,12 @@
 
     // * Triggers when a website is selected:
     const editWebsite = (id) => {
+        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
         website.update(() => id);
-        pages.update(() => $websites[$websites.indexOf($websites.find((e) => e.id === $website))].pages);
+        pages.update(() => $websites[websiteIndex].pages);
         page.update(() => 0);
+        products.update(() => $websites[websiteIndex].products);
+        prices.update(() => $websites[websiteIndex].prices);
         goto(`/editor/`);
     };
 
@@ -51,8 +54,12 @@
                 title: value || `Unnamed Website`,
                 css: `html {\n    height: 100%;\n}\n\nbody {\n    font-family: "Segoe UI", Arial, sans-serif;\n    margin: 0;\n    min-height: 100%;\n}\n\n.container {\n    display: flex;\n    min-height: 40px;\n    width: 100%;\n}\n\n.item {\n    align-items: center;\n    display: flex;\n    height: 100%;\n    width: 100%;\n}`,
                 template: ``,
-                templates: [],
+                products: [],
+                files: [],
                 globals: [],
+                prices: [],
+                plugins: [],
+                templates: [],
                 pages: [
                     {
                         id: 0,
