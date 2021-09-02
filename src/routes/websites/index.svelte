@@ -7,6 +7,7 @@
     import prices from '$lib/stores/prices';
     import { goto } from '$app/navigation';
     import { Web3Storage } from 'web3.storage';
+    import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
     import init from '$lib/stores/init';
 
@@ -230,6 +231,13 @@
             button.disabled = false;
             button.innerText = `Create`;
             create = false;
+            confetti({
+                origin: {
+                    y: .6,
+                },
+                particleCount: 100,
+                spread: 70,
+            });
         } else {
             alert(`Sorry, but that theme is still a work in progress. Please choose another in the meantime!`);
         }

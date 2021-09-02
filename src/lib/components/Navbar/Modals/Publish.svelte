@@ -6,6 +6,7 @@
     import pages from '$lib/stores/pages';
     import css from '$lib/stores/css';
     import redirects from '$lib/stores/redirects';
+    import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
 
     let domain;
@@ -114,6 +115,14 @@
             ls.setItem(`publications`, publications);
         }
         disabled = false;
+        confetti({
+            origin: {
+                y: .6,
+            },
+            particleCount: 100,
+            spread: 70,
+            zIndex: 1001,
+        });
     };
 
     onMount(() => {
