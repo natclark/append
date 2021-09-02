@@ -9,6 +9,7 @@
     import { onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
+    import Spacing from './Spacing.svelte';
 
     let currentTab;
     let classList;
@@ -87,9 +88,15 @@
         backgroundButton.style.backgroundColor = e.target.value;
     };
 
-    const marginChange = (e) => newStyle(`margin`, e.target.value);
+    const marginTopChange = (e) => newStyle(`margin-top`, e.target.value);
+    const marginRightChange = (e) => newStyle(`margin-right`, e.target.value);
+    const marginBottomChange = (e) => newStyle(`margin-bottom`, e.target.value);
+    const marginLeftChange = (e) => newStyle(`margin-left`, e.target.value);
 
-    const paddingChange = (e) => newStyle(`padding`, e.target.value);
+    const paddingTopChange = (e) => newStyle(`padding-top`, e.target.value);
+    const paddingRightChange = (e) => newStyle(`padding-right`, e.target.value);
+    const paddingBottomChange = (e) => newStyle(`padding-bottom`, e.target.value);
+    const paddingLeftChange = (e) => newStyle(`padding-left`, e.target.value);
 
     const textAlignChange = (e, alignment) => newStyle(`text-align`, alignment);
 
@@ -202,6 +209,14 @@
         justify_content: null,
         color: null,
         background_color: null,
+        margin_top: null,
+        margin_right: null,
+        margin_bottom: null,
+        margin_left: null,
+        padding_top: null,
+        padding_right: null,
+        padding_bottom: null,
+        padding_left: null,
         text_align: null,
         font_family: null,
         font_size: null,
@@ -297,12 +312,11 @@
             {/if}
             <Dropdown text="Spacing">
                 <div class="level">
-                    <p class="normal">Margin</p>
-                    <input type="text" value="{attributes.margin || `0px`}" on:change={marginChange}>
+                    <Spacing text="Margin" />
                 </div>
+                <Breaker />
                 <div class="level">
-                    <p class="normal">Padding</p>
-                    <input type="text" value="{attributes.padding || `0px`}" on:change={paddingChange}>
+                    <Spacing text="Padding" />
                 </div>
             </Dropdown>
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
