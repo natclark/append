@@ -3,6 +3,8 @@
     import website from '$lib/stores/website';
     import pages from '$lib/stores/pages';
     import page from '$lib/stores/page';
+    import products from '$lib/stores/products';
+    import prices from '$lib/stores/prices';
     import { goto } from '$app/navigation';
     import { Web3Storage } from 'web3.storage';
     import { onMount } from 'svelte';
@@ -16,8 +18,8 @@
 
     // * Triggers when a website is selected:
     const editWebsite = (id) => {
-        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
         website.update(() => id);
+        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
         pages.update(() => $websites[websiteIndex].pages);
         page.update(() => 0);
         products.update(() => $websites[websiteIndex].products);
