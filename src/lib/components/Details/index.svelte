@@ -477,6 +477,7 @@
                     position: fixed;
                     right: 22px;
                     width: 250px;
+                    z-index: 999;
                 }
                 .picker__input {
                     text-transform: uppercase;
