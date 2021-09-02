@@ -8,7 +8,6 @@
         "node": ">= 14.16.1"
     },
     "scripts": {
-        "prepare": "hardhat typechain",
         "dev": "svelte-kit dev",
         "build": "svelte-kit build",
         "preview": "svelte-kit preview",
