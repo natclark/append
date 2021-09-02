@@ -60,6 +60,7 @@
                 prices: [],
                 plugins: [],
                 templates: [],
+                metadata: [],
                 pages: [
                     {
                         id: 0,
