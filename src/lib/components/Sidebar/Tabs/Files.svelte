@@ -76,27 +76,27 @@
             {/if}
         {/each}
     </Grid>
-
-    <style>
-        p {
-            color: #f8f8f8;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 0 8px;
-            &:not(.normal) {
-                background-color: #333;
-                padding: 4px 8px;
-            }
-        }
-        .checkbox {
-            input {
-                filter: hue-rotate(340deg);
-            }
-            label {
-                color: #fafafa;
-                cursor: pointer;
-                
-            }
-        }
-    </style>
 </Dropdown>
+
+<style>
+    p {
+        color: #f8f8f8;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 0 8px;
+        &:not(.normal) {
+            background-color: #333;
+            padding: 4px 8px;
+        }
+    }
+    .checkbox {
+        input {
+            filter: hue-rotate(340deg);
+        }
+        label {
+            color: #fafafa;
+            cursor: pointer;
+            
+        }
+    }
+</style>
