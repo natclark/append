@@ -4,10 +4,16 @@
     "description": "Create a pixel-perfect Web 3.0 blog, store, or app.",
     "private": "true",
     "type": "module",
+    "engines": {
+        "node": ">= 14.16.1"
+    },
     "scripts": {
+        "prepare": "hardhat typechain",
         "dev": "svelte-kit dev",
         "build": "svelte-kit build",
         "preview": "svelte-kit preview",
+        "compile": "hardhat compile",
+        "deploy": "hardhat deploy",
         "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
         "format": "prettier --write --plugin-search-dir=. ."
     },

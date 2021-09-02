@@ -252,7 +252,7 @@
 {#if $init === true}
     {#if !create}
         <h1>My Websites</h1>
-        <p>Append is currently in bet. There are still some serious bugs. Use at your own risk.</p>
+        <p>Append is currently in beta. There are still some serious bugs. Use at your own risk.</p>
         <p><strong>You can save your progress, but currently, the method for doing so is very crude. Your progress may be lost.</strong></p>
         <p><strong>Do not upload any private information, because data is currently unencrypted and pinned on IPFS.</strong></p>
         <div class="grid">
