@@ -37,7 +37,7 @@
     };
 </script>
 
-<h2>Edit Page</h2>
+<h2>Edit Product</h2>
 <form on:submit|preventDefault={submit}>
     <div class="flex">
         <label for="id">ID <span class="required">*</span></label>
