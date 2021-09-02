@@ -234,7 +234,7 @@
 
     $: {
         (currentElement !== null && typeof currentElement.el !== `undefined`) && (Object.keys(attributes).forEach((key) => attributes[key] = getStyle(key.replaceAll(`_`, `-`))));
-        (color && background && colorModal && backgroundModal && !isMounted) && (mountPickers());
+        (!!color && !!background && !!colorModal && !!backgroundModal && !isMounted) && (mountPickers());
     }
 </script>
 
