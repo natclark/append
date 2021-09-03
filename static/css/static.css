@@ -8,6 +8,8 @@
 }
 
 @font-face {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-display: swap;
     font-family: 'Inter var';
     src: local('Inter var'), url('/fonts/Inter.var.woff2') format('woff2');
