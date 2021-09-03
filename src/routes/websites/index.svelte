@@ -17,6 +17,19 @@
     // * The "Create" button element binding:
     let button;
 
+    // * Renders a static preview of a given website:
+    const renderPreview = (id) => {
+        const parser = new DOMParser();
+        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === id));
+        let doc = parser.parseFromString($websites[websiteIndex].pages[0].body, `text/html`);
+        doc.querySelectorAll(`*`).forEach((el) => {
+            el.removeAttribute(`contenteditable`);
+            el.removeAttribute(`draggable`);
+            el.removeAttribute(`style`);
+        });
+        document.getElementById(id).contentWindow.document.write(`<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML.trim()}`);
+    };
+
     // * Triggers when a website is selected:
     const editWebsite = (id) => {
         website.update(() => id);
@@ -264,6 +277,14 @@
         <div class="grid">
             {#each $websites as website}
                 <button class="website" tabindex="0" role="link" on:click={() => editWebsite(website.id)}>
+                    <div class="website__preview">
+                        {#if $websites[$websites.indexOf($websites.find((e) => e.id === website.id))].pages[0].body !== ``}
+                            <iframe id="{website.id}" src="/preview.html" title="Preview of {website.title}" scrolling="no" on:load={() => renderPreview(website.id)} />
+                        {:else}
+                            <p>Preview currently unavailable.</p>
+                            <p>Once you've saved some changes to your site, it should appear.</p>
+                        {/if}
+                    </div>
                     <h2 class="website__title">{website.title}</h2>
                 </button>
             {/each}
@@ -330,11 +351,30 @@
     }
     .website {
         background-color: #000;
-        border: 1px solid #222;
-        border-radius: 6px;
+        border: 1px solid #444;
+        border-radius: .5rem;
         cursor: pointer;
+        padding: 0;
         text-align: center;
         text-decoration: none;
+        .website__preview {
+            background-color: #111;
+            height: 180px;
+            iframe {
+                background-color: #fff;
+                border-radius: .5rem .5rem 0 0;
+                border: 0;
+                color: #000;
+                height: 200%;
+                pointer-events: none;
+                transform: scale(.5);
+                transform-origin: top left;
+                width: 200%;
+            }
+            p {
+                margin: 0;
+            }
+        }
         .website__title {
             font-size: 16px;
             font-weight: 400;
@@ -344,7 +384,7 @@
             width: 18px;
         }
         &:hover {
-            border-color: #444;
+            border-color: #888;
         }
         &:focus {
             outline: 0;

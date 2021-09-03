@@ -537,6 +537,7 @@
 <style>
     iframe {
         background-color: #fff;
+        border: 0;
         color: #000;
         height: calc(100vh - 40px);
         max-width: calc(100vw - 20em - 40px);
