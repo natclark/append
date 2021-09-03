@@ -88,15 +88,7 @@
         backgroundButton.style.backgroundColor = e.target.value;
     };
 
-    const marginTopChange = (e) => newStyle(`margin-top`, e.target.value);
-    const marginRightChange = (e) => newStyle(`margin-right`, e.target.value);
-    const marginBottomChange = (e) => newStyle(`margin-bottom`, e.target.value);
-    const marginLeftChange = (e) => newStyle(`margin-left`, e.target.value);
-
-    const paddingTopChange = (e) => newStyle(`padding-top`, e.target.value);
-    const paddingRightChange = (e) => newStyle(`padding-right`, e.target.value);
-    const paddingBottomChange = (e) => newStyle(`padding-bottom`, e.target.value);
-    const paddingLeftChange = (e) => newStyle(`padding-left`, e.target.value);
+    const spacingChange = (e) => newStyle(`${e.detail.text.toLowerCase()}-${e.detail.direction}`, e.detail.value);
 
     const textAlignChange = (e, alignment) => newStyle(`text-align`, alignment);
 
@@ -139,7 +131,6 @@
 
     const mountPickers = () => {
         try {
-            isMounted = true;
             const colorPicker = new iro.ColorPicker(color, {
                 color: attributes.color || `#000000`,
                 layout: [
@@ -180,6 +171,7 @@
                 backgroundInput.value = color.hexString;
                 backgroundButton.style.backgroundColor = color.hexString;
             });
+            isMounted = true;
         } catch (e) {}
         colorModal.addEventListener(`click`, () => {
             backgroundModal.removeAttribute(`open`);
@@ -312,11 +304,11 @@
             {/if}
             <Dropdown text="Spacing">
                 <div class="level">
-                    <Spacing text="Margin" />
+                    <Spacing text="Margin" topValue={attributes.margin_top_value || `0px`} rightValue={attributes.margin_right_value || `0px`} bottomValue={attributes.margin_bottom_value || `0px`} leftValue={attributes.margin_left_value || `0px`} on:change={spacingChange} />
                 </div>
                 <Breaker />
                 <div class="level">
-                    <Spacing text="Padding" />
+                    <Spacing text="Margin" topValue={attributes.padding_top_value || `0px`} rightValue={attributes.padding_right_value || `0px`} bottomValue={attributes.padding_bottom_value || `0px`} leftValue={attributes.padding_left_value || `0px`} on:change={spacingChange} />
                 </div>
             </Dropdown>
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}

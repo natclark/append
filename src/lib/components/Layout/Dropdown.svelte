@@ -56,6 +56,7 @@
         justify-content: space-between;
         list-style: none;
         margin: 14px 0;
+        position: relative;
         p {
             color: #f8f8f8;
             font-size: 14px;
