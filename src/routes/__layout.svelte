@@ -5,6 +5,10 @@
     export const prerender = true;
 </script>
 
+<svelte:head>
+    <link rel="stylesheet" type="text/css" href="/css/static.css">
+</svelte:head>
+
 <div class="container">
     <nav class="navbar">
         <a class="navbar__logo" href="/" draggable="false" sveltekit:prefetch>
