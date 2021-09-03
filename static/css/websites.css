@@ -15,6 +15,13 @@
     src: local('Inter var'), url('/fonts/Inter.var.woff2') format('woff2');
 }
 
+@keyframes ripple {
+    100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
 html {
     overflow: hidden scroll;
 }
@@ -23,4 +30,19 @@ body {
     background-color: #000;
     font-family: 'Inter var', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, system-ui, sans-serif;
     margin: 0;
+}
+
+span.ripple {
+    background-color: rgba(255, 255, 255, .5);
+    border-radius: 50%;
+    height: 0;
+    opacity: 1;
+    position: absolute;
+    transform: scale(0);
+    width: 0;
+    will-change: opacity, transform;
+}
+
+.ripple {
+    animation: ripple .4s linear;
 }

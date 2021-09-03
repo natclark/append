@@ -1,4 +1,4 @@
-export default (e, dom) => {
+export default function(e, dom) {
     let width = e.target.offsetWidth;
     let height = e.target.offsetHeight;
 
@@ -11,5 +11,5 @@ export default (e, dom) => {
 
     ripple.classList.add(`ripple`);
 
-    setTimeout(() => e.target.removeChild(ripple), 700);
+    setTimeout(() => e.target.removeChild(ripple), 400);
 };
