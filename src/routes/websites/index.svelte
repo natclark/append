@@ -1,45 +1,16 @@
 <script>
     import websites from '$lib/stores/websites';
-    import website from '$lib/stores/website';
-    import pages from '$lib/stores/pages';
-    import page from '$lib/stores/page';
-    import products from '$lib/stores/products';
-    import prices from '$lib/stores/prices';
-    import { goto } from '$app/navigation';
     import { Web3Storage } from 'web3.storage';
     import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
     import init from '$lib/stores/init';
+    import Website from '$lib/components/Dashboard/Website.svelte';
 
     // * Determines whether a new website being created:
     let create = false;
 
     // * The "Create" button element binding:
     let button;
-
-    // * Renders a static preview of a given website:
-    const renderPreview = (id) => {
-        const parser = new DOMParser();
-        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === id));
-        let doc = parser.parseFromString($websites[websiteIndex].pages[0].body, `text/html`);
-        doc.querySelectorAll(`*`).forEach((el) => {
-            el.removeAttribute(`contenteditable`);
-            el.removeAttribute(`draggable`);
-            el.removeAttribute(`style`);
-        });
-        document.getElementById(id).contentWindow.document.write(`<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML.trim()}`);
-    };
-
-    // * Triggers when a website is selected:
-    const editWebsite = (id) => {
-        website.update(() => id);
-        const websiteIndex = $websites.indexOf($websites.find((e) => e.id === $website));
-        pages.update(() => $websites[websiteIndex].pages);
-        page.update(() => 0);
-        products.update(() => $websites[websiteIndex].products);
-        prices.update(() => $websites[websiteIndex].prices);
-        goto(`/editor/`);
-    };
 
     // * The title of the new website:
     let value;
@@ -274,30 +245,22 @@
         <p>Append is currently in beta. There are still some serious bugs. Use at your own risk.</p>
         <p><strong>You can save your progress, but currently, the method for doing so is very crude. Your progress may be lost.</strong></p>
         <p><strong>Do not upload any private information, because data is currently unencrypted and pinned on IPFS.</strong></p>
-        <div class="grid">
-            {#each $websites as website}
-                <button class="website" tabindex="0" role="link" on:click={() => editWebsite(website.id)}>
-                    <div class="website__preview">
-                        {#if $websites[$websites.indexOf($websites.find((e) => e.id === website.id))].pages[0].body !== ``}
-                            <iframe id="{website.id}" src="/preview.html" title="Preview of {website.title}" scrolling="no" on:load={() => renderPreview(website.id)} />
-                        {:else}
-                            <p>Preview currently unavailable.</p>
-                            <p>Once you've saved some changes to your site, it should appear.</p>
-                        {/if}
-                    </div>
-                    <h2 class="website__title">{website.title}</h2>
-                </button>
-            {/each}
-            <button class="website" on:click={() => create = true}>
+        <div class="flex flex--end">
+            <button class="create" on:click={() => create = true}>
                 <div class="flex">
                     <svg version="1.1" x="0px" y="0px" width="122.881px" height="122.88px" viewBox="0 0 122.881 122.88" enable-background="new 0 0 122.881 122.88" xml:space="preserve">
                         <g>
                             <path fill="#f8f8f8" d="M56.573,4.868c0-0.655,0.132-1.283,0.37-1.859c0.249-0.6,0.61-1.137,1.056-1.583C58.879,0.545,60.097,0,61.44,0 c0.658,0,1.287,0.132,1.863,0.371c0.012,0.005,0.023,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.426,2.098,1.426,3.442c0,0.03-0.002,0.06-0.006,0.089v51.62l51.619,0c0.029-0.003,0.061-0.006,0.09-0.006 c0.656,0,1.285,0.132,1.861,0.371c0.014,0.005,0.025,0.011,0.037,0.017c0.584,0.248,1.107,0.603,1.543,1.039 c0.881,0.88,1.428,2.098,1.428,3.441c0,0.654-0.133,1.283-0.371,1.859c-0.248,0.6-0.609,1.137-1.057,1.583 c-0.445,0.445-0.98,0.806-1.58,1.055v0.001c-0.576,0.238-1.205,0.37-1.861,0.37c-0.029,0-0.061-0.002-0.09-0.006l-51.619,0.001 v51.619c0.004,0.029,0.006,0.06,0.006,0.09c0,0.656-0.133,1.286-0.371,1.861c-0.006,0.014-0.012,0.025-0.018,0.037 c-0.248,0.584-0.602,1.107-1.037,1.543c-0.883,0.882-2.1,1.427-3.443,1.427c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.444-0.806-0.98-1.055-1.58h-0.001c-0.239-0.575-0.371-1.205-0.371-1.861 c0-0.03,0.002-0.061,0.006-0.09V66.303H4.958c-0.029,0.004-0.059,0.006-0.09,0.006c-0.654,0-1.283-0.132-1.859-0.371 c-0.6-0.248-1.137-0.609-1.583-1.056c-0.445-0.445-0.806-0.98-1.055-1.58H0.371C0.132,62.726,0,62.097,0,61.44 c0-0.655,0.132-1.283,0.371-1.859c0.249-0.6,0.61-1.137,1.056-1.583c0.881-0.881,2.098-1.426,3.442-1.426 c0.031,0,0.061,0.002,0.09,0.006l51.62,0l0-51.62C56.575,4.928,56.573,4.898,56.573,4.868L56.573,4.868z"></path>
                         </g>
                     </svg>
-                    <h2 class="website__title">&nbsp;&nbsp;Create New</h2>
+                    &nbsp;&nbsp;Create New
                 </div>
             </button>
+        </div>
+        <div class="grid">
+            {#each $websites as website}
+                <Website id={website.id} />
+            {/each}
         </div>
     {:else}
         <h1>New Website</h1>
@@ -337,8 +300,32 @@
 {/if}
 
 <style>
-    h1, .website, label, input, legend, .theme, p {
+    h1, p, .create, label, input, legend, .theme {
         color: #f8f8f8;
+    }
+    .flex {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        &.flex--start {
+            justify-content: flex-start;
+        }
+        &.flex--end {
+            justify-content: flex-end;
+        }
+    }
+    .create {
+        background-color: #111;
+        border: 1px solid #444;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 6px 16px;
+        svg {
+            height: 18px;
+            margin: 0;
+            width: 18px;
+        }
     }
     .grid {
         display: grid;
@@ -347,55 +334,6 @@
         &.grid--small {
             grid-gap: 12px;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        }
-    }
-    .website {
-        background-color: #000;
-        border: 1px solid #444;
-        border-radius: .5rem;
-        cursor: pointer;
-        padding: 0;
-        text-align: center;
-        text-decoration: none;
-        .website__preview {
-            background-color: #111;
-            height: 180px;
-            iframe {
-                background-color: #fff;
-                border-radius: .5rem .5rem 0 0;
-                border: 0;
-                color: #000;
-                height: 200%;
-                pointer-events: none;
-                transform: scale(.5);
-                transform-origin: top left;
-                width: 200%;
-            }
-            p {
-                margin: 0;
-            }
-        }
-        .website__title {
-            font-size: 16px;
-            font-weight: 400;
-        }
-        svg {
-            height: 18px;
-            width: 18px;
-        }
-        &:hover {
-            border-color: #888;
-        }
-        &:focus {
-            outline: 0;
-        }
-    }
-    .flex {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-        &.flex--start {
-            justify-content: flex-start;
         }
     }
     label, legend {
