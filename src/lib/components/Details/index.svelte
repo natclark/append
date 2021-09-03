@@ -406,7 +406,6 @@
 
 <style>
     aside {
-        align-items: center;
         background-color: #555;
         color: #fff;
         height: calc(100vh - 40px);
@@ -414,6 +413,10 @@
         padding: 0 0 24px 0;
         position: fixed;
         right: 0;
+        scrollbar-color: #999 #333;
+        scrollbar-face-color: #999;
+        scrollbar-track-color: #333;
+        scrollbar-width: thin;
         text-align: center;
         width: 20em;
         p {
@@ -508,6 +511,15 @@
                     background-color: #111;
                 }
             }
+        }
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-corner, &::-webkit-scrollbar-track {
+            background-color: #333;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #999;
         }
     }
 </style>

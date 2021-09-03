@@ -81,6 +81,10 @@
             overflow-y: auto;
             padding-bottom: 24px;
             position: fixed;
+            scrollbar-color: #999 #333;
+            scrollbar-face-color: #999;
+            scrollbar-track-color: #333;
+            scrollbar-width: thin;
             top: 40px;
             width: 20em;
             z-index: 2;
@@ -89,6 +93,15 @@
                 font-weight: 400;
                 margin: 0;
                 padding: 8px 8px 0 8px;
+            }
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+            &::-webkit-scrollbar-corner, &::-webkit-scrollbar-track {
+                background-color: #333;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: #999;
             }
         }
     }
