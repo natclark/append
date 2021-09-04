@@ -172,7 +172,7 @@
                 backgroundButton.style.backgroundColor = color.hexString;
             });
             isMounted = true;
-        } catch (e) {}
+        } catch (e) { alert(e.message); }
         colorModal.addEventListener(`click`, () => {
             backgroundModal.removeAttribute(`open`);
         });
@@ -308,7 +308,7 @@
                 </div>
                 <Breaker />
                 <div class="level">
-                    <Spacing text="Margin" topValue={attributes.padding_top_value || `0px`} rightValue={attributes.padding_right_value || `0px`} bottomValue={attributes.padding_bottom_value || `0px`} leftValue={attributes.padding_left_value || `0px`} on:change={spacingChange} />
+                    <Spacing text="Padding" topValue={attributes.padding_top_value || `0px`} rightValue={attributes.padding_right_value || `0px`} bottomValue={attributes.padding_bottom_value || `0px`} leftValue={attributes.padding_left_value || `0px`} on:change={spacingChange} />
                 </div>
             </Dropdown>
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
