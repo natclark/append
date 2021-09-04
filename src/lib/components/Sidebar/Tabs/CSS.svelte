@@ -32,9 +32,22 @@
         color: #fafafa;
         font-family: monospace, BlinkMacSystemFont, -apple-system, system-ui, sans-serif;
         font-size: 14px;
-        outline: 0;
         margin: 0 8px;
+        outline: 0;
+        scrollbar-color: #999 #333;
+        scrollbar-face-color: #999;
+        scrollbar-track-color: #333;
+        scrollbar-width: thin;
         width: 100%;
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-corner, &::-webkit-scrollbar-track {
+            background-color: #333;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #999;
+        }
     }
     .checkbox {
         input {
