@@ -304,11 +304,11 @@
             {/if}
             <Dropdown text="Spacing">
                 <div class="level">
-                    <Spacing text="Margin" topValue={attributes.margin_top_value || `0px`} rightValue={attributes.margin_right_value || `0px`} bottomValue={attributes.margin_bottom_value || `0px`} leftValue={attributes.margin_left_value || `0px`} on:change={spacingChange} />
+                    <Spacing text="Margin" topValue={attributes.margin_top || `0px`} rightValue={attributes.margin_right || `0px`} bottomValue={attributes.margin_bottom || `0px`} leftValue={attributes.margin_left || `0px`} on:change={spacingChange} />
                 </div>
                 <Breaker />
                 <div class="level">
-                    <Spacing text="Padding" topValue={attributes.padding_top_value || `0px`} rightValue={attributes.padding_right_value || `0px`} bottomValue={attributes.padding_bottom_value || `0px`} leftValue={attributes.padding_left_value || `0px`} on:change={spacingChange} />
+                    <Spacing text="Padding" topValue={attributes.padding_top || `0px`} rightValue={attributes.padding_right || `0px`} bottomValue={attributes.padding_bottom || `0px`} leftValue={attributes.padding_left || `0px`} on:change={spacingChange} />
                 </div>
             </Dropdown>
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}

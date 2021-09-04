@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher, onMount } from 'svelte';
+    import element from '$lib/stores/element';
 
     export let text;
     export let topValue;
@@ -30,7 +31,7 @@
     const dispatch = createEventDispatcher();
 
     const topChange = () => {
-        const value = `${topVal}${topUnit}` || `0px`;
+        const value = `${topVal || 0}${topUnit}`;
         dispatch(`change`, {
             direction: `top`,
             text,
@@ -39,7 +40,7 @@
     };
 
     const rightChange = () => {
-        const value = `${rightVal}${rightUnit}` || `0px`;
+        const value = `${rightVal || 0}${rightUnit}`;
         dispatch(`change`, {
             direction: `right`,
             text,
@@ -48,7 +49,7 @@
     };
 
     const bottomChange = () => {
-        const value = `${bottomVal}${bottomUnit}` || `0px`;
+        const value = `${bottomVal || 0}${bottomUnit}`;
         dispatch(`change`, {
             direction: `bottom`,
             text,
@@ -57,13 +58,27 @@
     };
 
     const leftChange = () => {
-        const value = `${leftVal}${leftUnit}` || `0px`;
+        const value = `${leftVal || 0}${leftUnit}`;
         dispatch(`change`, {
             direction: `left`,
             text,
             value,
         });
     };
+
+    element.subscribe((val) => {
+        topVal = topValue.replace(/[^\d.-]/g, ``);
+        topUnit = topValue.replace(/[0-9]/g, ``);
+
+        rightVal = rightValue.replace(/[^\d.-]/g, ``);
+        rightUnit = rightValue.replace(/[0-9]/g, ``);
+
+        bottomVal = bottomValue.replace(/[^\d.-]/g, ``);
+        bottomUnit = bottomValue.replace(/[0-9]/g, ``);
+
+        leftVal = leftValue.replace(/[^\d.-]/g, ``);
+        leftUnit = leftValue.replace(/[0-9]/g, ``);
+    });
 
     onMount(() => {
         const dropdowns = document.querySelectorAll(`.spacing__dropdowns`);
@@ -133,7 +148,7 @@
 <div class="spacing">
     <details bind:this={top} class="spacing__details">
         <summary bind:this={topToggle} class="spacing__input spacing__input--top">
-            <p>{topVal}{topUnit}</p>
+            <p>{topVal || 0}{topUnit}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Top {text}</p>
@@ -152,7 +167,7 @@
     </details>
     <details bind:this={right} class="spacing__details">
         <summary bind:this={rightToggle} class="spacing__input spacing__input--right">
-            <p>{rightVal}{rightUnit}</p>
+            <p>{rightVal || 0}{rightUnit}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Right {text}</p>
@@ -171,7 +186,7 @@
     </details>
     <details bind:this={bottom} class="spacing__details">
         <summary bind:this={bottomToggle} class="spacing__input spacing__input--bottom">
-            <p>{bottomVal}{bottomUnit}</p>
+            <p>{bottomVal || 0}{bottomUnit}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Bottom {text}</p>
@@ -190,7 +205,7 @@
     </details>
     <details bind:this={left} class="spacing__details">
         <summary bind:this={leftToggle} class="spacing__input spacing__input--left">
-            <p>{leftVal}{leftUnit}</p>
+            <p>{leftVal || 0}{leftUnit}</p>
         </summary>
         <div class="spacing__dropdown spacing__dropdown--left">
             <p>Left {text}</p>
@@ -207,7 +222,7 @@
             </select>
         </div>
     </details>
-    <p>{text}</p>
+    <p>{text} (WIP)</p>
 </div>
 
 <style>

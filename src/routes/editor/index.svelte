@@ -87,14 +87,16 @@
                 // * There is 100% a better way to do this. Not worries about optimizing everything right now.
                 const elStyle = el.currentStyle || window.frames[`canvas`].getComputedStyle(el);
                 el.style.boxShadow = ``;
-                elStyle.marginTop.slice(0, -2) > 0 && (el.style.boxShadow += `0 -${elStyle.marginTop} 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginRight.slice(0, -2) > 0 && (el.style.boxShadow += `${elStyle.marginRight} 0 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginBottom.slice(0, -2) > 0 && (el.style.boxShadow += `0 ${elStyle.marginBottom} 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.marginLeft.slice(0, -2) > 0 && (el.style.boxShadow += `-${elStyle.marginLeft} 0 0 rgba(255, 255, 0, 0.15)`);
-                elStyle.paddingTop.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 -${elStyle.paddingTop} 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingRight.slice(0, -2) > 0 && (el.style.boxShadow += `inset ${elStyle.paddingRight} 0 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingBottom.slice(0, -2) > 0 && (el.style.boxShadow += `inset 0 ${elStyle.paddingBottom} 0 rgba(128, 0, 128, 0.15)`);
-                elStyle.paddingLeft.slice(0, -2) > 0 && (el.style.boxShadow += `inset -${elStyle.paddingLeft} 0 0 rgba(128, 0, 128, 0.15)`);
+                /* TODO
+                elStyle.marginTop.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `0 -${elStyle.marginTop} 0 rgba(255, 255, 0, .15)`);
+                elStyle.marginRight.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `${elStyle.marginRight} 0 0 rgba(255, 255, 0, .15)`);
+                elStyle.marginBottom.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `0 ${elStyle.marginBottom} 0 rgba(255, 255, 0, .15)`);
+                elStyle.marginLeft.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `-${elStyle.marginLeft} 0 0 rgba(255, 255, 0, .15)`);
+                elStyle.paddingTop.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `inset 0 -${elStyle.paddingTop} 0 rgba(128, 0, 128, .15)`);
+                elStyle.paddingRight.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `inset ${elStyle.paddingRight} 0 0 rgba(128, 0, 128, .15)`);
+                elStyle.paddingBottom.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `inset 0 ${elStyle.paddingBottom} 0 rgba(128, 0, 128, .15)`);
+                elStyle.paddingLeft.replace(/[^\d.-]/g, ``) > 0 && (el.style.boxShadow += `inset -${elStyle.paddingLeft} 0 0 rgba(128, 0, 128, .15)`);
+                */
                 el.style.outline = `2px dotted #6fbcff`;
             }
         });
