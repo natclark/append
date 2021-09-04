@@ -6,6 +6,7 @@
     import init from '$lib/stores/init';
     import Button from '$lib/components/Dashboard/Button.svelte';
     import Website from '$lib/components/Dashboard/Website.svelte';
+    import Input from '$lib/components/Dashboard/Input.svelte';
     import Theme from '$lib/components/Dashboard/Theme.svelte';
 
     // * Determines whether a new website being created:
@@ -265,7 +266,7 @@
     {:else}
         <h1>New Website</h1>
         <label for="name">Name</label>
-        <input bind:value id="name" type="text" placeholder="My Epic Blog" autocomplete="off" autofocus required aria-placeholder="My Epic Blog" aria-required="true">
+        <Input bind:value placeholder="My Epic Blog" />
         <fieldset>
             <legend>Theme</legend>
             <div class="grid grid--small">
@@ -322,18 +323,6 @@
         font-size: 18px;
         margin-bottom: 12px;
     }
-    input {
-        background-color: #222;
-        border: 0;
-        border-radius: 4px;
-        font-size: 22px;
-        height: 48px;
-        margin-bottom: 18px;
-        padding: 0 4px;
-        &:focus {
-            outline: 0;
-        }
-    }
     fieldset {
         margin-bottom: 18px;
     }
@@ -344,7 +333,7 @@
         font-weight: 400;
         text-transform: uppercase;
     }
-    p:not(.theme > p) {
+    p {
         color: #ccc;
         margin-bottom: 18px;
     }

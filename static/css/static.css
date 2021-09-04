@@ -23,3 +23,8 @@ body {
     font-family: 'Inter var', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, system-ui, sans-serif;
     margin: 0;
 }
+
+::-moz-selection, ::selection {
+    background-color: #4169e1;
+    color: #fff;
+}

@@ -32,6 +32,11 @@ body {
     margin: 0;
 }
 
+::-moz-selection, ::selection {
+    background-color: #4169e1;
+    color: #fff;
+}
+
 span.ripple {
     background-color: rgba(255, 255, 255, .5);
     border-radius: 50%;

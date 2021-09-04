@@ -23,8 +23,8 @@
 <style>
     .theme {
         background-color: #000;
-        border: 1px solid #222;
-        border-radius: 6px;
+        border: 1px solid #333;
+        border-radius: .5rem;
         color: #f8f8f8;
         cursor: pointer;
         margin-bottom: 18px;

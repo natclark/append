@@ -13,6 +13,16 @@
 
     const websiteIndex = $websites.indexOf($websites.find((e) => e.id === id));
 
+    // * Triggers when a website is selected:
+    const editWebsite = () => {
+        website.update(() => id);
+        pages.update(() => $websites[websiteIndex].pages);
+        page.update(() => 0);
+        products.update(() => $websites[websiteIndex].products);
+        prices.update(() => $websites[websiteIndex].prices);
+        goto(`/editor/`);
+    };
+
     // * Renders a static preview of a given website:
     const renderPreview = () => {
         const parser = new DOMParser();
@@ -23,16 +33,6 @@
             el.removeAttribute(`style`);
         });
         document.getElementById(id).contentWindow.document.write(`<!DOCTYPE html>${doc.getElementsByTagName(`html`)[0].outerHTML.trim()}`);
-    };
-
-    // * Triggers when a website is selected:
-    const editWebsite = () => {
-        website.update(() => id);
-        pages.update(() => $websites[websiteIndex].pages);
-        page.update(() => 0);
-        products.update(() => $websites[websiteIndex].products);
-        prices.update(() => $websites[websiteIndex].prices);
-        goto(`/editor/`);
     };
 </script>
 
@@ -51,8 +51,9 @@
 <style>
     .website {
         background-color: #000;
-        border: 1px solid #444;
+        border: 1px solid #333;
         border-radius: .5rem;
+        color: #f8f8f8;
         cursor: pointer;
         padding: 0;
         text-align: center;
@@ -62,8 +63,8 @@
             height: 180px;
             iframe {
                 background-color: #fff;
-                border-radius: .5rem .5rem 0 0;
                 border: 0;
+                border-radius: .5rem .5rem 0 0;
                 color: #000;
                 height: 200%;
                 pointer-events: none;
@@ -76,14 +77,14 @@
             }
         }
         .website__title {
-            color: #f8f8f8;
             font-size: 16px;
             font-weight: 400;
         }
         &:hover {
-            border-color: #888;
+            border-color: #444;
         }
         &:focus {
+            border-color: #666;
             outline: 0;
         }
     }
