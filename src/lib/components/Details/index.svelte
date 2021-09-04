@@ -5,11 +5,18 @@
     import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
     import element from '$lib/stores/element';
-    import iro from '../../../../node_modules/@jaames/iro/dist/iro.es.js';
-    import { onDestroy } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
-    import Spacing from './Spacing.svelte';
+    import Spacing from './Properties/Spacing.svelte';
+    import Color from './Properties/Color.svelte';
+    import Alignment from './Properties/Alignment.svelte';
+    import FontFamily from './Properties/FontFamily.svelte';
+    import FontSize from './Properties/FontSize.svelte';
+    import FontWeight from './Properties/FontWeight.svelte';
+    import FontStyle from './Properties/FontStyle.svelte';
+    import LineHeight from './Properties/LineHeight.svelte';
+    import LetterSpacing from './Properties/LetterSpacing.svelte';
 
     let currentTab;
     let classList;
@@ -78,19 +85,15 @@
 
     const justifyContentChange = (e) => newStyle(`justify-content`, e.target.value);
 
-    const colorChange = (e) => {
-        newStyle(`color`, e.target.value);
-        colorButton.style.backgroundColor = e.target.value;
-    };
+    const colorChange = (e) => newStyle(`color`, e.detail.color);
 
-    const backgroundColorChange = (e) => {
-        newStyle(`background-color`, e.target.value);
-        backgroundButton.style.backgroundColor = e.target.value;
-    };
+    const backgroundColorChange = (e) => newStyle(`background-color`, e.detail.backgroundColor);
 
-    const spacingChange = (e) => newStyle(`${e.detail.text.toLowerCase()}-${e.detail.direction}`, e.detail.value);
+    const marginChange = (e) => newStyle(`margin-${e.detail.direction}`, e.detail.value);
 
-    const textAlignChange = (e, alignment) => newStyle(`text-align`, alignment);
+    const paddingChange = (e) => newStyle(`padding-${e.detail.direction}`, e.detail.value);
+
+    const textAlignChange = (e) => newStyle(`text-align`, e.detail.alignment);
 
     const fontFamilyChange = (e) => newStyle(`font-family`, e.target.value);
 
@@ -111,89 +114,13 @@
         $pages[$page].components = $components; // ? What other state changes from this componenet should this var be updated for?
         doc.querySelector(`[data-id="${currentElement.id}"]`).remove();
         currentElement = null;
-    }
+    };
 
     const tabUnsubscribe = tab.subscribe((val) => classList = val !== false ? `stretch` : ``);
 
     const iframeUnsubscribe = iframe.subscribe((val) => typeof val.document !== `undefined` && (doc = val.document));
 
     const elementUnsubscribe = element.subscribe((val) => typeof val !== `undefined` && (currentElement = val));
-
-    let colorModal = null;
-    let color = null;
-    let colorButton = null;
-    let colorInput = null;
-    let backgroundModal = null;
-    let background = null;
-    let backgroundButton = null;
-    let backgroundInput = null;
-    let isMounted = false;
-
-    const mountPickers = () => {
-        try {
-            const colorPicker = new iro.ColorPicker(color, {
-                color: attributes.color || `#000000`,
-                layout: [
-                    {
-                        component: iro.ui.Box,
-                    },
-                    {
-                        component: iro.ui.Slider,
-                        options: {
-                            sliderType: `hue`,
-                        },
-                    }
-                ],
-                width: 200,
-            });
-            colorPicker.on([`color:init`, `color:change`], (color) => {
-                newStyle(`color`, color.hexString);
-                colorInput.value = color.hexString;
-                colorButton.style.backgroundColor = color.hexString;
-            });
-            const backgroundPicker = new iro.ColorPicker(background, {
-                color: attributes.background_color || `#ffffff`,
-                layout: [
-                    {
-                        component: iro.ui.Box,
-                    },
-                    {
-                        component: iro.ui.Slider,
-                        options: {
-                            sliderType: `hue`,
-                        },
-                    }
-                ],
-                width: 200,
-            });
-            backgroundPicker.on([`color:init`, `color:change`], (color) => {
-                newStyle(`background-color`, color.hexString);
-                backgroundInput.value = color.hexString;
-                backgroundButton.style.backgroundColor = color.hexString;
-            });
-            isMounted = true;
-        } catch (e) {}
-        colorModal.addEventListener(`click`, () => {
-            backgroundModal.removeAttribute(`open`);
-        });
-        backgroundModal.addEventListener(`click`, () => {
-            colorModal.removeAttribute(`open`);
-        });
-        const pickers = document.querySelectorAll(`.picker`);
-        const contains = (child) => {
-            let res = false;
-            pickers.forEach((picker) => picker === child || picker.contains(child) && (res = true));
-            return res;
-        };
-        document.addEventListener(`click`, (e) => {
-            if (e.target.className !== `picker__modal` && !contains(e.target)) {
-                try {
-                    backgroundModal.removeAttribute(`open`);
-                    colorModal.removeAttribute(`open`);
-                } catch (e) {}
-            }
-        });
-    };
 
     let attributes = {
         type: null,
@@ -218,16 +145,29 @@
         letter_spacing: null,
     };
 
+    onMount(() => {
+        const pickers = document.querySelectorAll(`.picker`);
+        const contains = (child) => {
+            let res = false;
+            pickers.forEach((picker) => picker === child || picker.contains(child) && (res = true));
+            return res;
+        };
+        document.addEventListener(`click`, (e) => {
+            if (e.target.className !== `picker__modal` && !contains(e.target)) {
+                try {
+                    document.querySelectorAll(`.picker__dropdown`).forEach((dropdown) => dropdown.removeAttribute(`open`));
+                } catch (e) {}
+            }
+        });
+    });
+
     onDestroy(() => {
         tabUnsubscribe();
         iframeUnsubscribe();
         elementUnsubscribe();
     });
 
-    $: {
-        (currentElement !== null && typeof currentElement.el !== `undefined`) && (Object.keys(attributes).forEach((key) => attributes[key] = getStyle(key.replaceAll(`_`, `-`))));
-        (!!color && !!background && !!colorModal && !!backgroundModal && !isMounted) && (mountPickers());
-    }
+    $: (currentElement !== null && typeof currentElement.el !== `undefined`) && (Object.keys(attributes).forEach((key) => attributes[key] = getStyle(key.replaceAll(`_`, `-`))));
 </script>
 
 <aside class={classList}>
@@ -281,115 +221,50 @@
             {:else if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
                 <Dropdown text="Color">
                     <div class="level">
-                        <p class="normal">Text Color</p>
-                        <div class="flex picker">
-                            <details bind:this={colorModal}>
-                                <summary class="picker__toggle"><div bind:this={colorButton} class="picker__button" style="background-color: {attributes.color || `#000000`};"></div></summary>
-                                <div bind:this={color} class="picker__modal"></div>
-                            </details>
-                            <input bind:this={colorInput} class="picker__input" type="text" value={attributes.color || `#000000`} on:change={colorChange}>
-                        </div>
+                        <Color {attributes} text="Color" on:change={colorChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Background</p>
-                        <div class="flex picker">
-                            <details bind:this={backgroundModal}>
-                                <summary class="picker__toggle"><div bind:this={backgroundButton} class="picker__button" style="background-color: {attributes.background_color || `#ffffff`};"></div></summary>
-                                <div bind:this={background} class="picker__modal" value={attributes.color || `#000000`}></div>
-                            </details>
-                            <input bind:this={backgroundInput} class="picker__input" type="text" value={attributes.background_color || `#ffffff`} on:change={backgroundColorChange}>
-                        </div>
+                        <Color {attributes} text="Background" on:change={backgroundColorChange} />
                     </div>
                 </Dropdown>
             {/if}
             <Dropdown text="Spacing">
                 <div class="level">
+                    <Spacing {attributes} text="Margin" on:change={marginChange} />
+                    <!--
                     <Spacing text="Margin" topValue={attributes.margin_top || `0px`} rightValue={attributes.margin_right || `0px`} bottomValue={attributes.margin_bottom || `0px`} leftValue={attributes.margin_left || `0px`} on:change={spacingChange} />
+                    -->
                 </div>
                 <Breaker />
                 <div class="level">
+                    <Spacing {attributes} text="Padding" on:change={paddingChange} />
+                    <!--
                     <Spacing text="Padding" topValue={attributes.padding_top || `0px`} rightValue={attributes.padding_right || `0px`} bottomValue={attributes.padding_bottom || `0px`} leftValue={attributes.padding_left || `0px`} on:change={spacingChange} />
+                    -->
                 </div>
             </Dropdown>
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
                 <Dropdown text="Typography">
                     <div class="level">
-                        <p class="normal">Alignment</p>
-                        <div class="flex">
-                            <button class={attributes.text_align === `left` || attributes.text_align === null ? `selected` : ``} on:click={(e) => textAlignChange(e, `left`)}>
-                                <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-                                    <g>
-                                        <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M6.12,36.61C2.74,36.61,0,33.87,0,30.49c0-3.38,2.74-6.12,6.12-6.12H76.5c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,36.61z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M6.12,85.36C2.74,85.36,0,82.63,0,79.25 c0-3.38,2.74-6.12,6.12-6.12H76.5c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,85.36z"></path>
-                                    </g>
-                                </svg>
-                            </button>
-                            <button class={attributes.text_align === `center` ? `selected` : ``} on:click={(e) => textAlignChange(e, `center`)}>
-                                <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-                                    <g>
-                                        <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M26.25,85.36c-3.38,0-6.12-2.74-6.12-6.12c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H26.25L26.25,85.36z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M26.25,36.61c-3.38,0-6.12-2.74-6.12-6.12 c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H26.25L26.25,36.61z"></path>
-                                    </g>
-                                </svg>
-                            </button>
-                            <button class={attributes.text_align === `right` ? `selected` : ``} on:click={(e) => textAlignChange(e, `right`)}>
-                                <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-                                    <g>
-                                        <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M46.38,85.36c-3.38,0-6.12-2.74-6.12-6.12c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H46.38L46.38,85.36z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M46.38,36.61c-3.38,0-6.12-2.74-6.12-6.12 c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H46.38L46.38,36.61z"></path>
-                                    </g>
-                                </svg>
-                            </button>
-                            <button class={attributes.text_align === `justify` ? `selected` : ``} on:click={(e) => textAlignChange(e, `justify`)}>
-                                <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.32" style="enable-background:new 0 0 122.88 85.32" xml:space="preserve">
-                                    <g>
-                                        <path fill="#ddd" d="M6.15,12.23c-3.38,0-6.11-2.74-6.11-6.11S2.77,0,6.15,0h110.59c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.15 L6.15,12.23z M6.11,85.32C2.74,85.32,0,82.58,0,79.2c0-3.38,2.74-6.11,6.11-6.11h110.65c3.38,0,6.11,2.74,6.11,6.11 c0,3.38-2.74,6.11-6.11,6.11H6.11L6.11,85.32z M6.15,60.95c-3.38,0-6.11-2.74-6.11-6.11s2.74-6.11,6.11-6.11h110.59 c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.15L6.15,60.95z M6.11,36.59C2.74,36.59,0,33.85,0,30.48s2.74-6.11,6.11-6.11 h110.65c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.11L6.11,36.59z"></path>
-                                    </g>
-                                </svg>
-                            </button>
-                        </div>
+                        <Alignment {attributes} on:change={textAlignChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Font Family</p>
-                        <select value={attributes.font_family || `Segoe UI`} on:change={fontFamilyChange}>
-                            <option value="Segoe UI">Segoe UI</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Roboto">Roboto</option>
-                            <option value="Verdana">Verdana</option>
-                            <option value="sans-serif">sans-serif</option>
-                        </select>
+                        <FontFamily {attributes} on:change={fontFamilyChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Font Size</p>
-                        <input type="text" value={attributes.font_size} on:change={fontSizeChange}>
+                        <FontSize {attributes} on:change={fontSizeChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Font Weight</p>
-                        <select value={attributes.font_weight || `400`} on:change={fontWeightChange}>
-                            <option value="inherit">Inherit</option>
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                            <option value="300">300</option>
-                            <option value="400">400 (Normal)</option>
-                            <option value="500">500</option>
-                            <option value="600">600</option>
-                            <option value="700">700 (Bold)</option>
-                            <option value="800">800</option>
-                            <option value="900">900</option>
-                        </select>
+                        <FontWeight {attributes} on:change={fontWeightChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Font Style</p>
-                        <select value={attributes.font_style || `normal`} on:change={fontStyleChange}>
-                            <option value="normal">Normal</option>
-                            <option value="italic">Italic</option>
-                            <option value="oblique">Oblique</option>
-                        </select>
+                        <FontStyle {attributes} on:change={fontStyleChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Line Height</p>
-                        <input type="text" value={attributes.line_height || `1`} on:change={lineHeightChange}>
+                        <LineHeight {attributes} on:change={lineHeightChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Letter Spacing</p>
-                        <input type="text" value={attributes.letter_spacing} on:change={letterSpacingChange}>
+                        <LetterSpacing {attributes} on:change={letterSpacingChange} />
                     </div>
                 </Dropdown>
             {/if}
@@ -437,80 +312,6 @@
             justify-content: space-between;
             padding: 4px 8px;
             width: 100%;
-            p {
-                font-size: 16px;
-                padding: 0;
-                text-align: left;
-            }
-            .picker {
-                .picker__toggle {
-                    height: 100%;
-                    list-style-type: none;
-                    .picker__button {
-                        background-color: #000;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        display: block;
-                        height: 23px;
-                        margin-right: -1px;
-                        width: 20px;
-                    }
-                    &::-webkit-details-marker {
-                        display: none;
-                    }
-                    &:focus {
-                        outline: none;
-                    }
-                }
-                .picker__modal {
-                    background-color: #181818;
-                    border: 1px solid #000;
-                    border-radius: 6px;
-                    box-shadow: rgba(0, 0, 0, .25) 0 54px 55px, rgba(0, 0, 0, .12) 0 -12px 30px, rgba(0, 0, 0, .12) 0 4px 6px, rgba(0, 0, 0, .17) 0 12px 13px, rgba(0, 0, 0, .09) 0 -3px 5px;
-                    height: 300px;
-                    padding: 25px;
-                    position: fixed;
-                    right: 22px;
-                    width: 250px;
-                    z-index: 999;
-                }
-                .picker__input {
-                    text-transform: uppercase;
-                }
-            }
-            select, input {
-                background-color: #444;
-                border: 1px solid #222;
-                border-radius: 4px;
-                color: #fff;
-                font-size: 16px;
-                width: 100%;
-                &:hover {
-                    border-color: #000;
-                }
-                &:focus {
-                    outline: 2px solid #40c9ff;
-                }
-            }
-            .flex {
-                align-items: center;
-                display: flex;
-                width: 100%;
-                button {
-                    padding-top: 3px;
-                    width: 25%;
-                    svg {
-                        height: 24px;
-                        width: 24px;
-                    }
-                    &:hover {
-                        background-color: #333;
-                    }
-                }
-                button.selected {
-                    background-color: #111;
-                }
-            }
         }
         &::-webkit-scrollbar {
             width: 8px;
@@ -521,5 +322,37 @@
         &::-webkit-scrollbar-thumb {
             background-color: #999;
         }
+    }
+    :global(aside .level p) {
+        color: #f8f8f8;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 0 8px;
+        width: 100%;
+    }
+    :global(aside .level > p) {
+        font-size: 16px;
+        padding: 0;
+        text-align: left;
+    }
+    :global(aside .level > input), :global(aside .level > select), :global(aside .level > .flex > input), :global(aside .level > .flex > select) {
+        background-color: #444;
+        border: 1px solid #222;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 16px;
+        justify-content: center;
+        width: 100%;
+        &:hover {
+            border-color: #000;
+        }
+        &:focus {
+            outline: 2px solid #40c9ff;
+        }
+    }
+    :global(aside .level .flex) {
+        align-items: center;
+        display: flex;
+        width: 100%;
     }
 </style>

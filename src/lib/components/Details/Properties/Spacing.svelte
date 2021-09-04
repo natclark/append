@@ -1,84 +1,64 @@
 <script>
     import { createEventDispatcher, onMount } from 'svelte';
-    import element from '$lib/stores/element';
 
+    export let attributes;
     export let text;
-    export let topValue;
-    export let rightValue;
-    export let bottomValue;
-    export let leftValue;
+
+    const attribute = text === `Margin` ? `margin_` : `padding_`;
 
     let top = null;
     let topToggle = null;
-    let topVal = topValue.replace(/[^\d.-]/g, ``);
-    let topUnit = topValue.replace(/[0-9]/g, ``);
+    let topInput = null;
+    let topSelect = null;
 
     let right = null;
     let rightToggle = null;
-    let rightVal = rightValue.replace(/[^\d.-]/g, ``);
-    let rightUnit = rightValue.replace(/[0-9]/g, ``);
+    let rightInput = null;
+    let rightSelect = null;
 
     let bottom = null;
     let bottomToggle = null;
-    let bottomVal = bottomValue.replace(/[^\d.-]/g, ``);
-    let bottomUnit = bottomValue.replace(/[0-9]/g, ``);
+    let bottomInput = null;
+    let bottomSelect = null;
 
     let left = null;
     let leftToggle = null;
-    let leftVal = leftValue.replace(/[^\d.-]/g, ``);
-    let leftUnit = leftValue.replace(/[0-9]/g, ``);
+    let leftInput = null;
+    let leftSelect = null;
 
     const dispatch = createEventDispatcher();
 
     const topChange = () => {
-        const value = `${topVal || 0}${topUnit}`;
+        const value = `${topInput.value ? topInput.value.replace(/[^\d.-]/g, ``) : `0`}${topSelect.value !== null ? topSelect.value.replace(/[0-9]/g, ``) : `px`}`;
         dispatch(`change`, {
             direction: `top`,
-            text,
             value,
         });
     };
 
     const rightChange = () => {
-        const value = `${rightVal || 0}${rightUnit}`;
+        const value = `${rightInput.value ? rightInput.value.replace(/[^\d.-]/g, ``) : `0`}${rightSelect.value !== null ? rightSelect.value.replace(/[0-9]/g, ``) : `px`}`;
         dispatch(`change`, {
             direction: `right`,
-            text,
             value,
         });
     };
 
     const bottomChange = () => {
-        const value = `${bottomVal || 0}${bottomUnit}`;
+        const value = `${bottomInput.value ? bottomInput.value.replace(/[^\d.-]/g, ``) : `0`}${bottomSelect.value !== null ? bottomSelect.value.replace(/[0-9]/g, ``) : `px`}`;
         dispatch(`change`, {
             direction: `bottom`,
-            text,
             value,
         });
     };
 
     const leftChange = () => {
-        const value = `${leftVal || 0}${leftUnit}`;
+        const value = `${leftInput.value ? leftInput.value.replace(/[^\d.-]/g, ``) : `0`}${leftSelect.value !== null ? leftSelect.value.replace(/[0-9]/g, ``) : `px`}`;
         dispatch(`change`, {
             direction: `left`,
-            text,
             value,
         });
     };
-
-    element.subscribe((val) => {
-        topVal = topValue.replace(/[^\d.-]/g, ``);
-        topUnit = topValue.replace(/[0-9]/g, ``);
-
-        rightVal = rightValue.replace(/[^\d.-]/g, ``);
-        rightUnit = rightValue.replace(/[0-9]/g, ``);
-
-        bottomVal = bottomValue.replace(/[^\d.-]/g, ``);
-        bottomUnit = bottomValue.replace(/[0-9]/g, ``);
-
-        leftVal = leftValue.replace(/[^\d.-]/g, ``);
-        leftUnit = leftValue.replace(/[0-9]/g, ``);
-    });
 
     onMount(() => {
         const dropdowns = document.querySelectorAll(`.spacing__dropdowns`);
@@ -148,12 +128,12 @@
 <div class="spacing">
     <details bind:this={top} class="spacing__details">
         <summary bind:this={topToggle} class="spacing__input spacing__input--top">
-            <p>{topVal || 0}{topUnit}</p>
+            <p>{attributes[`${attribute}top`] !== null ? attributes[`${attribute}top`].replace(/[^\d.-]/g, ``) : `0`}{attributes[`${attribute}top`] !== null ? attributes[`${attribute}top`].replace(/[0-9]/g, ``) : `px`}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Top {text}</p>
-            <input bind:value={topVal} type="number" on:change={topChange}>
-            <select bind:value={topUnit} on:change={topChange}>
+            <input bind:this={topInput} type="number" value={attributes[`${attribute}top`] !== null ? attributes[`${attribute}top`].replace(/[^\d.-]/g, ``) : `0`} on:change={topChange}>
+            <select bind:this={topSelect} value={attributes[`${attribute}top`] !== null ? attributes[`${attribute}top`].replace(/[0-9]/g, ``) : `px`} on:change={topChange}>
                 <option value="px">px</option>
                 <option value="%">%</option>
                 <option value="em">em</option>
@@ -167,12 +147,12 @@
     </details>
     <details bind:this={right} class="spacing__details">
         <summary bind:this={rightToggle} class="spacing__input spacing__input--right">
-            <p>{rightVal || 0}{rightUnit}</p>
+            <p>{attributes[`${attribute}right`] !== null ? attributes[`${attribute}right`].replace(/[^\d.-]/g, ``) : `0`}{attributes[`${attribute}right`] !== null ? attributes[`${attribute}right`].replace(/[0-9]/g, ``) : `px`}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Right {text}</p>
-            <input bind:value={rightVal} type="number" on:change={rightChange}>
-            <select bind:value={rightUnit} on:change={rightChange}>
+            <input bind:this={rightInput} type="number" value={attributes[`${attribute}right`] !== null ? attributes[`${attribute}right`].replace(/[^\d.-]/g, ``) : `0`} on:change={rightChange}>
+            <select bind:this={rightSelect} value={attributes[`${attribute}right`] !== null ? attributes[`${attribute}right`].replace(/[0-9]/g, ``) : `px`} on:change={rightChange}>
                 <option value="px">px</option>
                 <option value="%">%</option>
                 <option value="em">em</option>
@@ -186,12 +166,12 @@
     </details>
     <details bind:this={bottom} class="spacing__details">
         <summary bind:this={bottomToggle} class="spacing__input spacing__input--bottom">
-            <p>{bottomVal || 0}{bottomUnit}</p>
+            <p>{attributes[`${attribute}bottom`] !== null ? attributes[`${attribute}bottom`].replace(/[^\d.-]/g, ``) : `0`}{attributes[`${attribute}bottom`] !== null ? attributes[`${attribute}bottom`].replace(/[0-9]/g, ``) : `px`}</p>
         </summary>
         <div class="spacing__dropdown">
             <p>Bottom {text}</p>
-            <input bind:value={bottomVal} type="number" on:change={bottomChange}>
-            <select bind:value={bottomUnit} on:change={bottomChange}>
+            <input bind:this={bottomInput} type="number" value={attributes[`${attribute}bottom`] !== null ? attributes[`${attribute}bottom`].replace(/[^\d.-]/g, ``) : `0`} on:change={bottomChange}>
+            <select bind:this={bottomSelect} value={attributes[`${attribute}bottom`] !== null ? attributes[`${attribute}bottom`].replace(/[0-9]/g, ``) : `px`} on:change={bottomChange}>
                 <option value="px">px</option>
                 <option value="%">%</option>
                 <option value="em">em</option>
@@ -205,12 +185,12 @@
     </details>
     <details bind:this={left} class="spacing__details">
         <summary bind:this={leftToggle} class="spacing__input spacing__input--left">
-            <p>{leftVal || 0}{leftUnit}</p>
+            <p>{attributes[`${attribute}left`] !== null ? attributes[`${attribute}left`].replace(/[^\d.-]/g, ``) : `0`}{attributes[`${attribute}left`] !== null ? attributes[`${attribute}left`].replace(/[0-9]/g, ``) : `px`}</p>
         </summary>
         <div class="spacing__dropdown spacing__dropdown--left">
             <p>Left {text}</p>
-            <input bind:value={leftVal} type="number" on:change={leftChange}>
-            <select bind:value={leftUnit} on:change={leftChange}>
+            <input bind:this={leftInput} type="number" value={attributes[`${attribute}left`] !== null ? attributes[`${attribute}left`].replace(/[^\d.-]/g, ``) : `0`} on:change={leftChange}>
+            <select bind:this={leftSelect} value={attributes[`${attribute}left`] !== null ? attributes[`${attribute}left`].replace(/[0-9]/g, ``) : `px`} on:change={leftChange}>
                 <option value="px">px</option>
                 <option value="%">%</option>
                 <option value="em">em</option>
@@ -222,7 +202,7 @@
             </select>
         </div>
     </details>
-    <p>{text} (WIP)</p>
+    <p>{text}</p>
 </div>
 
 <style>
