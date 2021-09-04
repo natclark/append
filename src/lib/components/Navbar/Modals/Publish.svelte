@@ -186,6 +186,10 @@
     .container {
         height: 300px;
         overflow: hidden scroll;
+        scrollbar-color: #999 #333;
+        scrollbar-face-color: #999;
+        scrollbar-track-color: #333;
+        scrollbar-width: thin;
         table {
             border: 1px solid #111;
             border-collapse: collapse;
@@ -212,6 +216,15 @@
                     max-width: 100px;
                 }
             }
+        }
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-corner, &::-webkit-scrollbar-track {
+            background-color: #333;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #999;
         }
     }
 </style>
