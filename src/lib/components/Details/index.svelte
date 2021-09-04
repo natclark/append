@@ -172,7 +172,7 @@
                 backgroundButton.style.backgroundColor = color.hexString;
             });
             isMounted = true;
-        } catch (e) { alert(e.message); }
+        } catch (e) {}
         colorModal.addEventListener(`click`, () => {
             backgroundModal.removeAttribute(`open`);
         });
