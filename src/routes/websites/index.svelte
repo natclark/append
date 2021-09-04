@@ -6,6 +6,7 @@
     import init from '$lib/stores/init';
     import Button from '$lib/components/Dashboard/Button.svelte';
     import Website from '$lib/components/Dashboard/Website.svelte';
+    import Theme from '$lib/components/Dashboard/Theme.svelte';
 
     // * Determines whether a new website being created:
     let create = false;
@@ -268,24 +269,14 @@
         <fieldset>
             <legend>Theme</legend>
             <div class="grid grid--small">
-                <div class="theme" tabindex="0" role="radio" aria-checked="true" aria-label="Blank" data-id="blank" on:click={() => changeTheme(`blank`)}>
-                    <p>Blank</p>
-                </div>
+                <Theme text="Blank" on:click={() => changeTheme(`blank`)} />
             </div>
             <h2 class="small">Default Themes</h2>
             <div class="grid grid--small">
-                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Bio" data-id="bio" on:click={() => changeTheme(`bio`)}>
-                    <p>Bio</p>
-                </div>
-                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="Blog" data-id="blog" on:click={() => changeTheme(`blog`)}>
-                    <p>Blog</p>
-                </div>
-                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Store" data-id="nft-store" on:click={() => changeTheme(`nft-store`)}>
-                    <p>NFT Store</p>
-                </div>
-                <div class="theme" tabindex="0" role="radio" aria-checked="false" aria-label="NFT Gallery" data-id="nft-gallery" on:click={() => changeTheme(`nft-gallery`)}>
-                    <p>NFT Gallery</p>
-                </div>
+                <Theme text="Bio" on:click={() => changeTheme(`bio`)} />
+                <Theme text="Blog" on:click={() => changeTheme(`blog`)} />
+                <Theme text="NFT Store" on:click={() => changeTheme(`nft-store`)} />
+                <Theme text="NFT Gallery" on:click={() => changeTheme(`nft-gallery`)} />
             </div>
             <p><em>More are coming soon!</em></p>
             <h2 class="small">Custom Themes</h2>
@@ -314,9 +305,9 @@
         }
     }
     svg {
-        height: 18px;
-        margin: 0;
-        width: 18px;
+        height: 18px !important;
+        margin: 0 !important;
+        width: 18px !important;
     }
     .grid {
         display: grid;
@@ -346,28 +337,6 @@
     fieldset {
         margin-bottom: 18px;
     }
-    .theme {
-        background-color: #000;
-        border: 1px solid #222;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-bottom: 18px;
-        text-align: center;
-        text-decoration: none;
-        p {
-            font-size: 16px;
-            font-weight: 400;
-        }
-        &[aria-checked="true"] {
-            border-color: #4169e1 !important;
-        }
-        &:hover {
-            border-color: #444;
-        }
-        &:focus {
-            outline: 0;
-        }
-    }
     h2.small {
         color: #eee;
         letter-spacing: 1px;
@@ -382,7 +351,7 @@
     button.submit, button.cancel {
         border: 0;
         border-radius: 4px;
-        cursor: pointer;
+        cursor: pointer !important;
         font-size: 16px;
         padding: 6px 16px;
         &:focus {

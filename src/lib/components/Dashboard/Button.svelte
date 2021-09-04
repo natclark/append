@@ -1,6 +1,6 @@
 <script>
-    import ripple from '$lib/services/ripple';
     import { createEventDispatcher, onMount } from 'svelte';
+    import ripple from '$lib/services/ripple';
 
     export let callback;
 
@@ -27,7 +27,7 @@
         border: 0;
         border-radius: .5rem;
         color: #f8f8f8;
-        cursor: pointer;
+        cursor: pointer !important;
         display: flex;
         font-size: 16px;
         justify-content: center;
