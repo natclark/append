@@ -51,6 +51,7 @@
                 plugins: [],
                 templates: [],
                 metadata: [],
+                publications: [],
                 pages: [
                     {
                         id: 0,
@@ -202,7 +203,7 @@
             const blob = new Blob([JSON.stringify($websites)], { type: `application/json`, });
             const files = [new File([blob], `websites.json`)];
             const cid = await client.put(files);
-            ls && (ls.setItem(`hash`, cid));
+            ls && (ls.setItem(`append::v0`, cid));
             button.disabled = false;
             button.innerText = `Create`;
             create = false;
@@ -222,7 +223,7 @@
         if ($init === false) {
             if (typeof localStorage !== `undefined`) {
                 ls = localStorage;
-                if (ls.getItem(`hash`) !== null) {
+                if (ls.getItem(`append::v0`) !== null) {
                     const xhr = new XMLHttpRequest();
                     xhr.onload = () => {
                         websites.update(() => JSON.parse(xhr.response));
@@ -230,7 +231,7 @@
                     };
                     xhr.onerror = () => console.log(`Request failed.`);
                     // ! Fallback gateways should be added in the future. This is a serious single point of failure.
-                    xhr.open(`GET`, `https://cloudflare-ipfs.com/ipfs/${ls.getItem(`hash`)}/websites.json`);
+                    xhr.open(`GET`, `https://cloudflare-ipfs.com/ipfs/${ls.getItem(`append::v0`)}/websites.json`);
                     xhr.send();
                 } else {
                     init.update(() => true);

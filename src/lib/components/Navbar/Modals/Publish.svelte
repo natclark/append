@@ -6,6 +6,8 @@
     import pages from '$lib/stores/pages';
     import css from '$lib/stores/css';
     import redirects from '$lib/stores/redirects';
+    import websites from '$lib/stores/websites';
+    import website from '$lib/stores/website';
     import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
 
@@ -107,13 +109,19 @@
             files.push(new File([blob]), page.file);
         });
         const cid = await client.put(files);
-        if (ls) {
-            ls.getItem(`publications`) === null && (ls.setItem(`publications`, ``));
-            let newPublications = ls.getItem(`publications`).split(`,`);
-            newPublications.push(`${cid};${null};${new Date().toUTCString().replace(`,`, ``)}`); // TODO sanitize in case domain has semicolons
-            publications = newPublications.join(`,`);
-            ls.setItem(`publications`, publications);
-        }
+        let newWebsites = $websites;
+        const date = new Date();
+        newWebsites[newWebsites.indexOf(newWebsites.find((e) => e.id === $website))].publications.push({
+            cid,
+            domains: [],
+            date: date.toUTCString(),
+            timestamp: date.getTime(),
+        });
+        websites.update(() => newWebsites);
+        const blob = new Blob([JSON.stringify($websites)], { type: `application/json`, });
+        const newFiles = [new File([blob], `websites.json`)];
+        const newCid = await client.put(newFiles);
+        ls && (ls.setItem(`append::v0`, newCid));
         disabled = false;
         confetti({
             origin: {
@@ -125,13 +133,7 @@
         });
     };
 
-    onMount(() => {
-        if (typeof localStorage !== `undefined`) {
-            ls = localStorage;
-            ls.getItem(`publications`) === null && (ls.setItem(`publications`, ``));
-            publications = ls.getItem(`publications`).split(`,`).reverse();
-        }
-    });
+    onMount(() => typeof localStorage !== `undefined` && (ls = localStorage));
 </script>
 
 <h2>Publish Site</h2>
@@ -159,12 +161,12 @@
             </tr>
         </thead>
         <tbody>
-            {#each publications as pub}
+            {#each $websites[$websites.indexOf($websites.find((e) => e.id === $website))].publications as pub}
                 {#if pub !== ``}
                     <tr>
-                        <td><a class="link" href="https://gateway.ipfs.io/ipfs/{pub.split(`;`)[0]}" rel="external noopener nofollow" target="_blank">{pub.split(`;`)[0]}</a></td>
-                        <td>{pub.split(`;`)[1]}</td>
-                        <td>{pub.split(`;`)[2]}</td>
+                        <td><a class="link" href="https://cloudflare-ipfs.com/ipfs/{pub.cid}" rel="external noopener nofollow" target="_blank">{pub.cid}</a></td>
+                        <td>{pub.domains.length > 0 ? pub.domains[0] : `Not yet published to a domain.`}</td>
+                        <td>{pub.date}</td>
                     </tr>
                 {/if}
             {/each}

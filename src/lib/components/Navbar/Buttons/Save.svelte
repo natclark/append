@@ -20,7 +20,7 @@
         const blob = new Blob([JSON.stringify($websites)], { type: `application/json`, });
         const files = [new File([blob], `websites.json`)];
         const cid = await client.put(files);
-        ls && (ls.setItem(`hash`, cid));
+        ls && (ls.setItem(`append::v0`, cid));
         await tick();
         button.innerText = `Save`;
         button.disabled = false;
