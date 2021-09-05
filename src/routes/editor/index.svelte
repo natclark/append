@@ -14,6 +14,7 @@
     import ContextMenu from '$lib/editor/ContextMenu';
     import ShortcutMenu from '$lib/editor/ShortcutMenu';
     import { onDestroy } from 'svelte';
+    import { Circle } from 'svelte-loading-spinners';
 
     // * If no website is selected or if there are no websites, then redirect back to the dashboard:
     const start = () => {
@@ -241,8 +242,12 @@
     // * Returns whether the iframe been loaded once yet:
     let hasLoaded = false;
 
+    // * Is something currently loading:
+    let loading = false;
+
     // * Actions to perform once the iframe has loaded:
     const load = (e) => {
+        loading = true;
         selection = -1;
         counter = 0;
         iframe.update(() => window.frames[`canvas`]);
@@ -453,6 +458,7 @@
             }
         });
         body.getElementsByTagName(`style`)[0].innerHTML = generatedStyles.trim();
+        loading = false;
         hasLoaded = true;
     };
 
@@ -536,6 +542,12 @@
 
 <iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load} />
 
+{#if loading}
+    <div class="loader">
+        <Circle size="60" color="#4169e1" unit="px" duration="600ms"></Circle>
+    </div>
+{/if}
+
 <style>
     iframe {
         background-color: #fff;
@@ -544,6 +556,12 @@
         height: calc(100vh - 40px);
         max-width: calc(100vw - 20em - 40px);
         width: 100%;
+    }
+    .loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 9999;
     }
     :global {
         .shrink {
