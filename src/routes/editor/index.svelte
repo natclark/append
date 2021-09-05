@@ -110,7 +110,10 @@
         el.addEventListener(`dragstart`, (e) => {
             e.dataTransfer.setData(`text/plain`, null);
         });
-        el.addEventListener(`click`, () => {
+        el.addEventListener(`click`, (e) => {
+            if (tag === `a`) {
+                e.preventDefault();
+            }
             selection = parseInt(el.getAttribute(`data-id`));
             const obj = { id: selection, el, };
             element.update(() => obj);
@@ -157,11 +160,13 @@
             }
         });
         el.addEventListener(`focusout`, () => {
-            editable && (el.contentEditable = false);
-            element.update(() => false);
-            el.style.cursor = `pointer`;
-            el.style.outline = ``;
-            el.style.boxShadow = ``;
+            if (tag !== `a`) {
+                editable && (el.contentEditable = false);
+                element.update(() => false);
+                el.style.cursor = `pointer`;
+                el.style.outline = ``;
+                el.style.boxShadow = ``;
+            }
         });
         el.addEventListener(`input`, () => {
             if (push) {
@@ -367,6 +372,9 @@
                             break;
                         case `item`:
                             createComponent(doc, body, `div`, { className: `item`, }, true);
+                            break;
+                        case `a`:
+                            createComponent(doc, body, `a`, { contentEditable: true, href: `/`, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `ul`:
                             createComponent(doc, createComponent(doc, body, `ul`, {}, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);

@@ -8,8 +8,9 @@
     import { onMount, onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
-    import Spacing from './Properties/Spacing.svelte';
     import Color from './Properties/Color.svelte';
+    import Href from './Properties/Href.svelte';
+    import Spacing from './Properties/Spacing.svelte';
     import Alignment from './Properties/Alignment.svelte';
     import FontFamily from './Properties/FontFamily.svelte';
     import FontSize from './Properties/FontSize.svelte';
@@ -77,6 +78,13 @@
         return ruleIndex !== -1 ? generated[ruleIndex].val : null;
     };
 
+    const newAttribute = (key, val) => {
+        let newComponents = $components;
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[key] = val;
+        components.update(() => newComponents);
+        currentElement.el.setAttribute(key, val);
+    };
+
     const typeChange = (e) => {
         // TODO
     };
@@ -88,6 +96,8 @@
     const colorChange = (e) => newStyle(`color`, e.detail.color);
 
     const backgroundColorChange = (e) => newStyle(`background-color`, e.detail.backgroundColor);
+
+    const hrefChange = (e) => newAttribute(`href`, e.target.value);
 
     const marginChange = (e) => newStyle(`margin-${e.detail.direction}`, e.detail.value);
 
@@ -225,6 +235,12 @@
                     </div>
                     <div class="level">
                         <Color {attributes} text="Background" on:change={backgroundColorChange} />
+                    </div>
+                </Dropdown>
+            {:else if currentElement.el.tagName === `A`}
+                <Dropdown text="Hyperlink">
+                    <div class="level">
+                        <Href href={currentElement.el.getAttribute(`href`)} on:change={hrefChange} />
                     </div>
                 </Dropdown>
             {/if}
