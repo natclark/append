@@ -34,8 +34,9 @@
         overflow: hidden;
         padding: 12px 20px;
         position: relative;
-        transition: .06s all;
+        transition: all .06s;
         width: 100%;
+        will-change: background-color, opacity;
         &:hover {
             background-color: #333;
             opacity: .95;

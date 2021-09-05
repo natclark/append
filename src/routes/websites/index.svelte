@@ -9,6 +9,7 @@
     import Website from '$lib/components/Dashboard/Website.svelte';
     import Input from '$lib/components/Dashboard/Input.svelte';
     import Theme from '$lib/components/Dashboard/Theme.svelte';
+    import ripple from '$lib/services/ripple';
 
     // * Determines whether a new website being created:
     let create = false;
@@ -314,8 +315,8 @@
             <p><em>Coming soon!</em></p>
         </fieldset>
         <div class="flex flex--start">
-            <button bind:this={button} class="submit" on:click={newWebsite}>Create</button>
-            <button class="cancel" on:click={() => create = false}>Cancel</button>
+            <button bind:this={button} class="submit" on:mousedown={(e) => ripple(e, document)} on:click={newWebsite}>Create</button>
+            <button class="cancel" on:mousedown={(e) => ripple(e, document)} on:click={() => create = false}>Cancel</button>
         </div>
     {/if}
 {/if}
@@ -373,19 +374,31 @@
         border-radius: 4px;
         cursor: pointer !important;
         font-size: 16px;
+        overflow: hidden;
         padding: 6px 16px;
+        position: relative;
+        transition: all .06s;
+        will-change: background-color, opacity;
         &:focus {
             outline: 0;
         }
     }
     button.submit {
-        background-color: #333;
+        background-color: #222;
         color: #f8f8f8;
         margin-right: 8px;
+        &:hover {
+            background-color: #333;
+            opacity: .95;
+        }
     }
     button.cancel {
         background-color: inherit;
         color: #f8f8f8;
+        &:hover {
+            background-color: #111;
+            opacity: .95;
+        }
     }
     @media screen and (min-width: 768px) {
         .flex.flex--between {
