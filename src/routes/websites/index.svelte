@@ -263,6 +263,14 @@
             {#each $websites as website}
                 <Website id={website.id} />
             {/each}
+            <!--
+                * These divs add an invisible row so that the grid's height can be increased to n + 1 rows.
+                * It ensures that tooltips which overflow beyond their grid item do not get cut off.
+                * There is likely a better way to do this.
+            -->
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
     {:else}
         <h1>New Website</h1>

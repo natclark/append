@@ -148,7 +148,6 @@
                 margin-left: 8px;
                 .website__dropdown {
                     position: relative;
-                    z-index: 1;
                     p {
                         background-color: #111;
                         border-radius: 6px;
