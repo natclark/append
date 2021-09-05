@@ -6,6 +6,7 @@
     import products from '$lib/stores/products';
     import prices from '$lib/stores/prices';
     import { goto } from '$app/navigation';
+    import { Circle } from 'svelte-loading-spinners';
 
     export let id;
 
@@ -13,8 +14,11 @@
 
     const websiteIndex = $websites.indexOf($websites.find((e) => e.id === id));
 
+    let loading = false;
+
     // * Triggers when a website is selected:
     const editWebsite = () => {
+        loading = true;
         website.update(() => id);
         pages.update(() => $websites[websiteIndex].pages);
         page.update(() => 0);
@@ -53,6 +57,11 @@
     <div class="website__preview" on:click={editWebsite}>
         {#if $websites[websiteIndex].pages[0].body !== ``}
             <iframe {id} src="/preview.html" title="Preview of {title}" scrolling="no" on:load={renderPreview} />
+            {#if loading}
+                <div class="website__loader">
+                    <Circle size="60" color="#4169e1" unit="px" duration="600ms"></Circle>
+                </div>
+            {/if}
         {:else}
             <br>
             <p><em>Preview currently unavailable.</em></p>
@@ -116,6 +125,15 @@
                 transform: scale(.5);
                 transform-origin: top left;
                 width: 200%;
+            }
+            .website__loader {
+                align-items: center;
+                display: flex;
+                height: 100%;
+                justify-content: center;
+                position: relative;
+                top: -365px;
+                z-index: 999;
             }
             p {
                 font-size: 16px;
