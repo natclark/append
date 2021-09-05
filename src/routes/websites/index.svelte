@@ -4,6 +4,7 @@
     import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
     import init from '$lib/stores/init';
+    import Tabs from '$lib/components/Dashboard/Tabs.svelte';
     import Button from '$lib/components/Dashboard/Button.svelte';
     import Website from '$lib/components/Dashboard/Website.svelte';
     import Input from '$lib/components/Dashboard/Input.svelte';
@@ -219,6 +220,14 @@
         }
     };
 
+    // * The current tab:
+    let tab = `websites`;
+
+    // * A new tab has been selected:
+    const changeTab = (e) => {
+        tab = e.detail.text;
+    };
+
     onMount(() => {
         if ($init === false) {
             if (typeof localStorage !== `undefined`) {
@@ -249,7 +258,8 @@
         <p>Append is currently in beta. There are still some serious bugs. Use at your own risk.</p>
         <p><strong>You can save your progress, but currently, the method for doing so is very crude. Your progress may be lost.</strong></p>
         <p><strong>Do not upload any private information, because data is currently unencrypted and pinned on IPFS.</strong></p>
-        <div class="flex flex--end">
+        <div class="flex flex--between">
+            <Tabs tabs={[`Websites`, `Domains`, `Analytics`, `Settings`]} on:change={changeTab} />
             <Button on:click={() => create = true}>
                 <svg version="1.1" x="0px" y="0px" width="18px" height="18px" viewBox="0 0 122.881 122.88" enable-background="new 0 0 122.881 122.88" xml:space="preserve">
                     <g>
@@ -259,19 +269,30 @@
                 &nbsp;&nbsp;Create New
             </Button>
         </div>
-        <div class="grid">
-            {#each $websites as website}
-                <Website id={website.id} />
-            {/each}
-            <!--
-                * These divs add an invisible row so that the grid's height can be increased to n + 1 rows.
-                * It ensures that tooltips which overflow beyond their grid item do not get cut off.
-                * There is likely a better way to do this.
-            -->
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
+        {#if tab === `websites`}
+            <div class="grid">
+                {#each $websites as website}
+                    <Website id={website.id} />
+                {/each}
+                <!--
+                    * These divs add an invisible row so that the grid's height can be increased to n + 1 rows.
+                    * It ensures that tooltips which overflow beyond their grid item do not get cut off.
+                    * There is likely a better way to do this.
+                -->
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        {:else if tab === `domains`}
+            <p>Register, renew, and manage blockchain domains with no markup or extra fees!</p>
+            <p><em>Coming soon!</em></p>
+        {:else if tab === `analytics`}
+            <p>Track sales and manage orders across your websites.</p>
+            <p><em>Coming soon!</em></p>
+        {:else if tab === `settings`}
+            <p>You can set various preferences here.</p>
+            <p><em>Coming soon!</em></p>
+        {/if}
     {:else}
         <h1>New Website</h1>
         <label for="name">Name</label>
@@ -307,11 +328,12 @@
         align-items: center;
         display: flex;
         justify-content: center;
+        &.flex--between {
+            display: block;
+            margin-bottom: 24px;
+        }
         &.flex--start {
             justify-content: flex-start;
-        }
-        &.flex--end {
-            justify-content: flex-end;
         }
     }
     svg {
@@ -364,5 +386,11 @@
     button.cancel {
         background-color: inherit;
         color: #f8f8f8;
+    }
+    @media screen and (min-width: 768px) {
+        .flex.flex--between {
+            display: flex;
+            justify-content: space-between;
+        }
     }
 </style>

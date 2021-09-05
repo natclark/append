@@ -35,12 +35,18 @@
         padding: 12px 20px;
         position: relative;
         transition: .06s all;
+        width: 100%;
         &:hover {
             background-color: #333;
             opacity: .95;
         }
         &:focus {
             outline: 0;
+        }
+    }
+    @media screen and (min-width: 768px) {
+        button {
+            width: auto;
         }
     }
 </style>

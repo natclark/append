@@ -147,7 +147,7 @@
     footer {
         margin-top: 200px;
     }
-    @media screen and (min-width:1024px) {
+    @media screen and (min-width: 1024px) {
         section {
             h1 {
                 font-size: 48px;
