@@ -7,4 +7,6 @@
     <option value="center">Center</option>
     <option value="flex-start">Left</option>
     <option value="flex-end">Right</option>
+    <option value="space-between">Space Between</option>
+    <option value="space-around">Space Around</option>
 </select>
