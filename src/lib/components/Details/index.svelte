@@ -270,7 +270,7 @@
                     <Spacing {attributes} text="Padding" on:change={paddingChange} />
                 </div>
             </Dropdown>
-            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
+            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI` || (currentElement.el.tagName === `DIV` && currentElement.el.className === `markdown`)}
                 <Dropdown text="Typography">
                     <div class="level">
                         <TextAlign {attributes} on:change={textAlignChange} />
