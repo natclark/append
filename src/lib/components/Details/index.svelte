@@ -4,6 +4,7 @@
     import page from '$lib/stores/page';
     import components from '$lib/stores/components';
     import iframe from '$lib/stores/iframe';
+    import marked from 'marked';
     import element from '$lib/stores/element';
     import { onMount, onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
@@ -12,6 +13,7 @@
     import Justification from './Properties/Justification.svelte';
     import Color from './Properties/Color.svelte';
     import Href from './Properties/Href.svelte';
+    import Markdown from './Properties/Markdown.svelte';
     import Spacing from './Properties/Spacing.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import TextAlign from './Properties/TextAlign.svelte';
@@ -92,17 +94,28 @@
         currentElement.el.setAttribute(key, val);
     };
 
+    const newHtml = (html) => {
+        let newComponents = $components;
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`innerHTML`] = marked(html);
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`data-markdown`] = html;
+        components.update(() => newComponents);
+        currentElement.el.innerHTML = marked(html);
+        currentElement.el.setAttribute(`data-markdown`, html);
+    };
+
     const structureChange = (e) => newStyle(`display`, e.target.value);
 
     const alignItemsChange = (e) => newStyle(`align-items`, e.target.value);
 
     const justifyContentChange = (e) => newStyle(`justify-content`, e.target.value);
 
-    const colorChange = (e) => newStyle(`color`, e.detail.color);
+    const colorChange = (e) => newStyle(`color`, typeof e.detail !== `undefined` ? e.detail.color : e.target.value);
 
-    const backgroundColorChange = (e) => newStyle(`background-color`, e.detail.backgroundColor);
+    const backgroundColorChange = (e) => newStyle(`background-color`, typeof e.detail !== `undefined` ? e.detail.backgroundColor : e.target.value);
 
     const hrefChange = (e) => newAttribute(`href`, e.target.value);
+
+    const markdownChange = (e) => newHtml(e.target.value);
 
     const marginChange = (e) => newStyle(`margin-${e.detail.direction}`, e.detail.value);
 
@@ -236,6 +249,12 @@
                 <Dropdown text="Hyperlink">
                     <div class="level">
                         <Href href={currentElement.el.getAttribute(`href`)} on:change={hrefChange} />
+                    </div>
+                </Dropdown>
+            {:else if currentElement.el.tagName === `DIV` && currentElement.el.className === `markdown`}
+                <Dropdown text="Content">
+                    <div class="level">
+                        <Markdown content={currentElement.el.getAttribute(`data-markdown`)} on:change={markdownChange} on:keydown={markdownChange} />
                     </div>
                 </Dropdown>
             {/if}

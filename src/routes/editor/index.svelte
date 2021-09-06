@@ -64,6 +64,7 @@
     const createComponent = (dom, parent, tag, options, push) => {
         let el = dom.createElement(tag);
         Object.keys(options).forEach((key) => el[key] = options[key]);
+        console.log(el);
         let editable = el.contentEditable === `inherit` ? false : true;
         editable && (el.contentEditable = false);
         el.setAttribute(`data-id`, counter);
@@ -393,7 +394,10 @@
                             createComponent(doc, createComponent(doc, body, `ul`, {}, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `markdown`:
-                            createComponent(doc, targetEl, `div`, { contentEditable: true, className: `markdown`, }, true);
+                            let options = { contentEditable: true, className: `markdown`, innerHTML: `<h1 id="hello-world">Hello world</h1><p>This is some dummy text.</p>`, };
+                            //options[`data-markdown`] = `# Hello world\nThis is some dummy text.`;
+                            const md = createComponent(doc, targetEl, `div`, options, true);
+                            doc.querySelector(`[data-id="${md.getAttribute(`data-id`)}"]`).setAttribute(`data-markdown`, `# Hello world\n\nThis is some dummy text.`);
                             break;
                         case `rich-text`:
                             createComponent(doc, targetEl, `div`, { contentEditable: true, className: `rich-text`, }, true);
