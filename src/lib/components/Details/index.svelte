@@ -236,7 +236,8 @@
                         <Justification {attributes} on:change={justifyContentChange} />
                     </div>
                 </Dropdown>
-            {:else if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
+            {/if}
+            {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI` || (currentElement.el.tagName === `DIV` && currentElement.el.className === `markdown`)}
                 <Dropdown text="Color">
                     <div class="level">
                         <Color {attributes} text="Color" on:change={colorChange} />
@@ -245,16 +246,18 @@
                         <Color {attributes} text="Background" on:change={backgroundColorChange} />
                     </div>
                 </Dropdown>
-            {:else if currentElement.el.tagName === `A`}
+            {/if}
+            {#if currentElement.el.tagName === `A`}
                 <Dropdown text="Hyperlink">
                     <div class="level">
                         <Href href={currentElement.el.getAttribute(`href`)} on:change={hrefChange} />
                     </div>
                 </Dropdown>
-            {:else if currentElement.el.tagName === `DIV` && currentElement.el.className === `markdown`}
+            {/if}
+            {#if currentElement.el.tagName === `DIV` && currentElement.el.className === `markdown`}
                 <Dropdown text="Content">
                     <div class="level">
-                        <Markdown content={currentElement.el.getAttribute(`data-markdown`)} on:change={markdownChange} on:keydown={markdownChange} />
+                        <Markdown content={currentElement.el.getAttribute(`data-markdown`)} on:change={markdownChange} on:keyup={markdownChange} />
                     </div>
                 </Dropdown>
             {/if}

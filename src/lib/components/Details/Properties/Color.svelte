@@ -57,7 +57,7 @@
         </summary>
         <div bind:this={color} class="picker__modal"></div>
     </details>
-    <input bind:this={colorInput} class="picker__input" type="text" value={attributes[attribute] || (text === `Color` ? `#FFFFFF` : `#000000`)} on:change>
+    <input bind:this={colorInput} class="picker__input" type="text" value={attributes[attribute] || (text === `Color` ? `#000000` : `#FFFFFF`)} on:change>
 </div>
 
 <style>

@@ -2,7 +2,7 @@
     export let content;
 </script>
 
-<textarea class="editor" rows="32" wrap="off" on:change on:keydown>{content}</textarea>
+<textarea class="editor" rows="32" wrap="off" on:change on:keyup>{content}</textarea>
 
 <style>
     textarea.editor {
