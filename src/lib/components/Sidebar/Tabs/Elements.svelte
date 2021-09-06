@@ -88,7 +88,7 @@
                 <path fill="#ddd" fill-rule="evenodd" d="M14.48,0H108.4a14.63,14.63,0,0,1,14.48,14.69V69A14.63,14.63,0,0,1,108.4,83.68H14.48A14.62,14.62,0,0,1,0,69V14.69A14.62,14.62,0,0,1,14.48,0Zm.28,7.59h93.36a7.27,7.27,0,0,1,7.25,7.24v54a7.27,7.27,0,0,1-7.25,7.25H14.76a7.27,7.27,0,0,1-7.25-7.25v-54a7.27,7.27,0,0,1,7.25-7.24Z"></path>
             </svg>
         </Element>
-        <Element text="Dropdown" element="details" disabled>
+        <Element text="Dropdown" element="details">
             <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 63.9" style="enable-background:new 0 0 122.88 63.9" xml:space="preserve">
                 <g>
                     <polygon fill="#ddd" fill-rule="evenodd" clip-rule="evenodd" points="61.44,63.9 122.88,0 0,0 61.44,63.9"></polygon>

@@ -162,8 +162,9 @@
             }
         });
         el.addEventListener(`focusout`, () => {
-            if (tag !== `a`) {
+            if (tag !== `a` && tag !== `details` && tag !== `summary`) {
                 editable && (el.contentEditable = false);
+                console.log($element);
                 element.update(() => false);
                 el.style.cursor = `pointer`;
                 el.style.outline = ``;
@@ -184,7 +185,7 @@
             newComponents.push({ id: parseInt(el.getAttribute(`data-id`)), element: el, parent, tag, options, styles: [], globals: [], });
             components.update(() => newComponents);
         }
-        parent.appendChild(el);
+        (parent || body).appendChild(el); // This is a temporary solution to creating components where parent is null...
         return el;
     };
 
@@ -237,7 +238,13 @@
     // * Remove a component:
     const unsetComponent = (dom, id) => {
         let newComponents = $components;
+        newComponents.forEach((newComponent) => {
+            if (newComponent.parent === newComponents[newComponents.indexOf(newComponents.find((e) => e.id === id))]) {
+                newComponents.splice(newComponents.indexOf(newComponent), 1);
+            }
+        });
         newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id === id)), 1);
+        element.update(() => false);
         components.update(() => newComponents);
         reactive();
         dom.querySelector(`[data-id="${id}"]`).remove();
@@ -366,7 +373,7 @@
                     if (e.target.tagName !== `BODY`) {
                         targetId = parseInt(e.target.getAttribute(`data-id`));
                     }
-                    const targetEl = e.target.tagName === `DIV` && e.target.className === `item` ? e.target : body;
+                    let targetEl = e.target.tagName === `DIV` && e.target.className === `item` ? e.target : body;
                     // * If the dropped element came from the sidebar:
                     switch (tagName) {
                         // * These are some special cases for creating "exception" elements:
@@ -393,7 +400,9 @@
                             createComponent(doc, targetEl, `div`, { contentEditable: true, className: `rich-text`, }, true);
                             break;
                         case `details`:
-                            createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, }, true);
+                            targetEl = createComponent(doc, body, `details`, {}, true);
+                            createComponent(doc, targetEl, `summary`, { contentEditable: true, textContent: `Dropdown`, }, true);
+                            createComponent(doc, targetEl, `p`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `img`:
                             createComponent(doc, targetEl, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, }, true);

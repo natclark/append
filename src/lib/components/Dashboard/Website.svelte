@@ -67,6 +67,11 @@
             <p><em>Preview currently unavailable.</em></p>
             <br>
             <p>Once you've saved some changes to your site, a preview should appear here.</p>
+            {#if loading}
+                <div class="website__loader website__loader--natural">
+                    <Circle size="60" color="#4169e1" unit="px" duration="600ms"></Circle>
+                </div>
+            {/if}
         {/if}
     </div>
     <div class="website__details">
@@ -134,6 +139,9 @@
                 position: relative;
                 top: -365px;
                 z-index: 999;
+                &.website__loader--natural {
+                    top: -87px;
+                }
             }
             p {
                 font-size: 16px;

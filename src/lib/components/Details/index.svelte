@@ -120,10 +120,16 @@
 
     const unsetComponent = () => {
         let newComponents = $components;
+        newComponents.forEach((newComponent) => {
+            if (newComponent.parent === newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].element) {
+                newComponents.splice(newComponents.indexOf(newComponent), 1);
+            }
+        });
         newComponents.splice(newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id)), 1);
-        components.update(() => newComponents);
-        $pages[$page].components = $components; // ? What other state changes from this componenet should this var be updated for?
         doc.querySelector(`[data-id="${currentElement.id}"]`).remove();
+        element.update(() => false);
+        components.update(() => newComponents);
+        $pages[$page].components = $components; // ? What other state changes from this component should this var be updated for?
         currentElement = null;
     };
 
