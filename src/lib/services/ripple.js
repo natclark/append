@@ -11,5 +11,9 @@ export default function(e, dom) {
 
     ripple.classList.add(`ripple`);
 
-    setTimeout(() => e.target.removeChild(ripple), 400);
+    setTimeout(() => {
+        try {
+            e.target.removeChild(ripple);
+        } catch (e) {}
+    }, 400);
 };

@@ -44,7 +44,7 @@
             newWebsites.push({
                 id: $websites.length,
                 title: value || `Unnamed Website`,
-                css: `html {\n    height: 100%;\n}\n\nbody {\n    font-family: "Segoe UI", Arial, sans-serif;\n    margin: 0;\n    min-height: 100%;\n}\n\n.container {\n    display: flex;\n    min-height: 40px;\n    width: 100%;\n}\n\n.item {\n    align-items: center;\n    display: flex;\n    height: 100%;\n    width: 100%;\n}`,
+                css: `html {\n    height: 100%;\n}\n\nbody {\n    font-family: "Segoe UI", Arial, sans-serif;\n    margin: 0;\n    min-height: 100%;\n}\n\n.container {\n    display: flex;\n    min-height: 40px;\n    padding: 8px 0;\n    width: 100%;\n}\n\n.item {\n    min-height: 100%;\n    width: 100%;\n}`,
                 template: ``,
                 products: [],
                 files: [],
@@ -68,7 +68,7 @@
                             {
                                 id: null,
                                 element: null,
-                                children: [],
+                                parent: null,
                                 tag: `h1`,
                                 options: {
                                     contentEditable: true,
@@ -80,7 +80,7 @@
                             {
                                 id: null,
                                 element: null,
-                                children: [],
+                                parent: null,
                                 tag: `p`,
                                 options: {
                                     contentEditable: true,
@@ -92,7 +92,7 @@
                             {
                                 id: null,
                                 element: null,
-                                children: [],
+                                parent: null,
                                 tag: `p`,
                                 options: {
                                     contentEditable: true,
@@ -104,7 +104,7 @@
                             {
                                 id: null,
                                 element: null,
-                                children: [],
+                                parent: null,
                                 tag: `p`,
                                 options: {
                                     contentEditable: true,

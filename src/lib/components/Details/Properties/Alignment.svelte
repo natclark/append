@@ -1,62 +1,11 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-
     export let attributes;
-
-    const dispatch = createEventDispatcher();
-
-    const textAlignChange = (alignment) => {
-        dispatch(`change`, {
-            alignment,
-        });
-    };
 </script>
 
 <p class="normal">Alignment</p>
-<div class="flex">
-    <button class={attributes.text_align === `left` || attributes.text_align === null ? `selected` : ``} on:click={() => textAlignChange(`left`)}>
-        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-            <g>
-                <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M6.12,36.61C2.74,36.61,0,33.87,0,30.49c0-3.38,2.74-6.12,6.12-6.12H76.5c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,36.61z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M6.12,85.36C2.74,85.36,0,82.63,0,79.25 c0-3.38,2.74-6.12,6.12-6.12H76.5c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,85.36z"></path>
-            </g>
-        </svg>
-    </button>
-    <button class={attributes.text_align === `center` ? `selected` : ``} on:click={() => textAlignChange(`center`)}>
-        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-            <g>
-                <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M26.25,85.36c-3.38,0-6.12-2.74-6.12-6.12c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H26.25L26.25,85.36z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M26.25,36.61c-3.38,0-6.12-2.74-6.12-6.12 c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H26.25L26.25,36.61z"></path>
-            </g>
-        </svg>
-    </button>
-    <button class={attributes.text_align === `right` ? `selected` : ``} on:click={() => textAlignChange(`right`)}>
-        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.36" style="enable-background:new 0 0 122.88 85.36" xml:space="preserve">
-            <g>
-                <path fill="#ddd" d="M6.12,12.23C2.74,12.23,0,9.49,0,6.12C0,2.74,2.74,0,6.12,0h110.65c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12 H6.12L6.12,12.23z M46.38,85.36c-3.38,0-6.12-2.74-6.12-6.12c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12 c0,3.38-2.74,6.12-6.12,6.12H46.38L46.38,85.36z M6.12,60.99C2.74,60.99,0,58.25,0,54.87c0-3.38,2.74-6.12,6.12-6.12h110.65 c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H6.12L6.12,60.99z M46.38,36.61c-3.38,0-6.12-2.74-6.12-6.12 c0-3.38,2.74-6.12,6.12-6.12h70.38c3.38,0,6.12,2.74,6.12,6.12c0,3.38-2.74,6.12-6.12,6.12H46.38L46.38,36.61z"></path>
-            </g>
-        </svg>
-    </button>
-    <button class={attributes.text_align === `justify` ? `selected` : ``} on:click={() => textAlignChange(`justify`)}>
-        <svg version="1.1" x="0px" y="0px" viewBox="0 0 122.88 85.32" style="enable-background:new 0 0 122.88 85.32" xml:space="preserve">
-            <g>
-                <path fill="#ddd" d="M6.15,12.23c-3.38,0-6.11-2.74-6.11-6.11S2.77,0,6.15,0h110.59c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.15 L6.15,12.23z M6.11,85.32C2.74,85.32,0,82.58,0,79.2c0-3.38,2.74-6.11,6.11-6.11h110.65c3.38,0,6.11,2.74,6.11,6.11 c0,3.38-2.74,6.11-6.11,6.11H6.11L6.11,85.32z M6.15,60.95c-3.38,0-6.11-2.74-6.11-6.11s2.74-6.11,6.11-6.11h110.59 c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.15L6.15,60.95z M6.11,36.59C2.74,36.59,0,33.85,0,30.48s2.74-6.11,6.11-6.11 h110.65c3.38,0,6.11,2.74,6.11,6.11s-2.74,6.11-6.11,6.11H6.11L6.11,36.59z"></path>
-            </g>
-        </svg>
-    </button>
-</div>
-
-<style>
-    button {
-        padding-top: 3px;
-        width: 25%;
-        svg {
-            height: 24px;
-            width: 24px;
-        }
-        &:hover {
-            background-color: #333;
-        }
-        &.selected {
-            background-color: #111;
-        }
-    }
-</style>
+<select value={attributes.align_items || `stretch` } on:change>
+    <option value="center">Center</option>
+    <option value="flex-start">Top</option>
+    <option value="flex-end">Bottom</option>
+    <option value="stretch">Stretch</option>
+</select>

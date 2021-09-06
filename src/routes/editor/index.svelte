@@ -100,7 +100,7 @@
                 */
                 el.style.outline = `2px dotted #6fbcff`;
             }
-        });
+        }, true);
         el.addEventListener(`mouseout`, () => {
             if (el !== dom.activeElement && selection != el.getAttribute(`data-id`)) {
                 el.style.outline = ``;
@@ -131,25 +131,27 @@
             components.update(() => newComponents);
             el.style.outline = `2px solid #08f`;
             el.style.boxShadow = boxShadow;
-        });
+        }, true);
         el.addEventListener(`dblclick`, () => {
-            editable && (el.contentEditable = true);
-            selection = parseInt(el.getAttribute(`data-id`));
-            const obj = { id: selection, el, };
-            element.update(() => obj);
-            el.focus();
-            editable && (el.style.cursor = `text`);
-            const boxShadow = el.style.boxShadow;
-            let newComponents = $components;
-            $components.forEach((component) => {
-                try {
-                    newComponents[newComponents.indexOf(component)].element.style.outline = ``;
-                    newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
-                } catch (e) {}
-            });
-            components.update(() => newComponents);
-            el.style.outline = `2px solid #08f`;
-            el.style.boxShadow = boxShadow;
+            if (tag !== `div`) {
+                editable && (el.contentEditable = true);
+                selection = parseInt(el.getAttribute(`data-id`));
+                const obj = { id: selection, el, };
+                element.update(() => obj);
+                el.focus();
+                editable && (el.style.cursor = `text`);
+                const boxShadow = el.style.boxShadow;
+                let newComponents = $components;
+                $components.forEach((component) => {
+                    try {
+                        newComponents[newComponents.indexOf(component)].element.style.outline = ``;
+                        newComponents[newComponents.indexOf(component)].element.style.boxShadow = ``;
+                    } catch (e) {}
+                });
+                components.update(() => newComponents);
+                el.style.outline = `2px solid #08f`;
+                el.style.boxShadow = boxShadow;
+            }
         });
         el.addEventListener(`keydown`, (e) => { // TODO - fix two bugs related to this function
             if (e.keyCode === 46 && el === dom.activeElement && el.contentEditable === true) {
@@ -179,7 +181,7 @@
         });
         if (push) {
             let newComponents = $components;
-            newComponents.push({ id: parseInt(el.getAttribute(`data-id`)), element: el, children: [], tag, options, styles: [], globals: [], });
+            newComponents.push({ id: parseInt(el.getAttribute(`data-id`)), element: el, parent, tag, options, styles: [], globals: [], });
             components.update(() => newComponents);
         }
         parent.appendChild(el);
@@ -364,32 +366,37 @@
                     if (e.target.tagName !== `BODY`) {
                         targetId = parseInt(e.target.getAttribute(`data-id`));
                     }
+                    const targetEl = e.target.tagName === `DIV` && e.target.className === `item` ? e.target : body;
                     // * If the dropped element came from the sidebar:
                     switch (tagName) {
                         // * These are some special cases for creating "exception" elements:
                         case `container`:
-                            createComponent(doc, body, `div`, { className: `container`, }, true);
+                            createComponent(doc, targetEl, `div`, { className: `container`, }, true);
                             break;
                         case `item`:
-                            createComponent(doc, body, `div`, { className: `item`, }, true);
+                            if (e.target.tagName === `DIV` && e.target.className === `container`) {
+                                createComponent(doc, e.target, `div`, { className: `item`, }, true);
+                            } else {
+                                alert(`An item must be a direct descendant of a container!`);
+                            }
                             break;
                         case `a`:
-                            createComponent(doc, body, `a`, { contentEditable: true, href: `/`, textContent: `This is some dummy text.`, }, true);
+                            createComponent(doc, targetEl, `a`, { contentEditable: true, href: `/`, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `ul`:
                             createComponent(doc, createComponent(doc, body, `ul`, {}, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `markdown`:
-                            createComponent(doc, body, `div`, { contentEditable: true, classList: `markdown`, }, true);
+                            createComponent(doc, targetEl, `div`, { contentEditable: true, className: `markdown`, }, true);
                             break;
                         case `rich-text`:
-                            createComponent(doc, body, `div`, { contentEditable: true, classList: `rich-text`, }, true);
+                            createComponent(doc, targetEl, `div`, { contentEditable: true, className: `rich-text`, }, true);
                             break;
                         case `details`:
                             createComponent(doc, createComponent(doc, body, `details`, { contentEditable: true, textContent: `This is some dummy text.`, }, true), `summary`, { contentEditable: true, textContent: `Dropdown`, }, true);
                             break;
                         case `img`:
-                            createComponent(doc, body, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, }, true);
+                            createComponent(doc, targetEl, `img`, { alt: `Undescribed image`, height: `100%`, src: ``, width: `100%`, }, true);
                             break;
                         case `video`:
                             alert(`This component is still in the works! Sorry.`);
@@ -399,7 +406,7 @@
                             break;
                         default:
                             // * This is the "catch-all" for creating any other kind of element:
-                            createComponent(doc, body, tagName, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
+                            createComponent(doc, targetEl, tagName, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
                     }
                     moveComponent(doc, counter - 1, targetId, e.screenY);
                 }
@@ -453,7 +460,7 @@
             componentId = counter;
             newComponents[newComponents.indexOf(component)].id = componentId;
             let options = component.options || {};
-            createComponent(doc, body, component.tag, options, false);
+            createComponent(doc, (component.parent !== null && component.parent.tagName !== `BODY`) ? doc.querySelector(`[data-id="${component.parent.getAttribute(`data-id`)}"]`) : body, component.tag, options, false);
             $components[$components.indexOf($components.find((e) => e.id === componentId))].element === null && (newComponents[newComponents.indexOf(newComponents.find((e) => e.id === componentId))].element = doc.querySelector(`[data-id="${componentId}"]`));
         });
         components.update(() => newComponents);

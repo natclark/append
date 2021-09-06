@@ -7,11 +7,14 @@
     import element from '$lib/stores/element';
     import { onMount, onDestroy } from 'svelte';
     import Dropdown from '$lib/components/Layout/Dropdown.svelte';
-    import Breaker from '$lib/components/Layout/Breaker.svelte';
+    import Structure from './Properties/Structure.svelte';
+    import Alignment from './Properties/Alignment.svelte';
+    import Justification from './Properties/Justification.svelte';
     import Color from './Properties/Color.svelte';
     import Href from './Properties/Href.svelte';
     import Spacing from './Properties/Spacing.svelte';
-    import Alignment from './Properties/Alignment.svelte';
+    import Breaker from '$lib/components/Layout/Breaker.svelte';
+    import TextAlign from './Properties/TextAlign.svelte';
     import FontFamily from './Properties/FontFamily.svelte';
     import FontSize from './Properties/FontSize.svelte';
     import FontWeight from './Properties/FontWeight.svelte';
@@ -85,9 +88,7 @@
         currentElement.el.setAttribute(key, val);
     };
 
-    const typeChange = (e) => {
-        // TODO
-    };
+    const structureChange = (e) => newStyle(`display`, e.target.value);
 
     const alignItemsChange = (e) => newStyle(`align-items`, e.target.value);
 
@@ -133,7 +134,7 @@
     const elementUnsubscribe = element.subscribe((val) => typeof val !== `undefined` && (currentElement = val));
 
     let attributes = {
-        type: null,
+        display: null,
         align_items: null,
         justify_content: null,
         color: null,
@@ -200,32 +201,16 @@
                 </div>
             </Dropdown>
             -->
-            {#if currentElement.el.tagName === `DIV`}
+            {#if currentElement.el.tagName === `DIV` && currentElement.el.className === `container`}
                 <Dropdown text="Type">
                     <div class="level">
-                        <p class="normal">Type</p>
-                        <select value={attributes.type || `columns`} on:change={typeChange}>
-                            <option value="wrapper">Wrapper</option>
-                            <option value="columns">Columns</option>
-                            <option value="grid">Grid</option>
-                        </select>
+                        <Structure {attributes} on:change={structureChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Alignment</p>
-                        <select value={attributes.align_items || `stretch` } on:change={alignItemsChange}>
-                            <option value="center">Center</option>
-                            <option value="flex-start">Top</option>
-                            <option value="flex-end">Bottom</option>
-                            <option value="stretch">Stretch</option>
-                        </select>
+                        <Alignment {attributes} on:change={alignItemsChange} />
                     </div>
                     <div class="level">
-                        <p class="normal">Justification</p>
-                        <select value={attributes.justify_content || `flex-start`} on:change={justifyContentChange}>
-                            <option value="center">Center</option>
-                            <option value="flex-start">Left</option>
-                            <option value="flex-end">Right</option>
-                        </select>
+                        <Justification {attributes} on:change={justifyContentChange} />
                     </div>
                 </Dropdown>
             {:else if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
@@ -256,7 +241,7 @@
             {#if currentElement.el.tagName === `H1` || currentElement.el.tagName === `H2` || currentElement.el.tagName === `H3` || currentElement.el.tagName === `H4` || currentElement.el.tagName === `H5` || currentElement.el.tagName === `H6` || currentElement.el.tagName === `P` || currentElement.el.tagName === `LI`}
                 <Dropdown text="Typography">
                     <div class="level">
-                        <Alignment {attributes} on:change={textAlignChange} />
+                        <TextAlign {attributes} on:change={textAlignChange} />
                     </div>
                     <div class="level">
                         <FontFamily {attributes} on:change={fontFamilyChange} />
