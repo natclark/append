@@ -76,9 +76,13 @@
     };
 
     const getStyle = (key) => {
-        let generated = $components[$components.indexOf($components.find((e) => e.id === currentElement.id))].styles;
-        const ruleIndex = generated.indexOf(generated.find((e) => e.key === key));
-        return ruleIndex !== -1 ? generated[ruleIndex].val : null;
+        if (currentElement !== false) {
+            let generated = $components[$components.indexOf($components.find((e) => e.id === currentElement.id))].styles;
+            const ruleIndex = generated.indexOf(generated.find((e) => e.key === key));
+            return ruleIndex !== -1 ? generated[ruleIndex].val : null;
+        } else {
+            return null;
+        }
     };
 
     const newAttribute = (key, val) => {

@@ -162,9 +162,8 @@
             }
         });
         el.addEventListener(`focusout`, () => {
-            if (tag !== `a` && tag !== `details` && tag !== `summary`) {
+            if (tag !== `div` && tag !== `a` && tag !== `details` && tag !== `summary`) {
                 editable && (el.contentEditable = false);
-                console.log($element);
                 element.update(() => false);
                 el.style.cursor = `pointer`;
                 el.style.outline = ``;
