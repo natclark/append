@@ -393,13 +393,13 @@
                             createComponent(doc, createComponent(doc, body, `ul`, {}, true), `li`, { contentEditable: true, textContent: `This is some dummy text.`, }, true);
                             break;
                         case `markdown`:
-                            let options = { contentEditable: true, className: `markdown`, innerHTML: `<h1 id="hello-world">Hello world</h1><p>This is some dummy text.</p>`, };
+                            let options = { contentEditable: true, className: `markdown`, innerHTML: `<h1 id="hello-world">Hello World</h1><p>This is some dummy text.</p>`, };
                             //options[`data-markdown`] = `# Hello world\nThis is some dummy text.`;
                             const md = createComponent(doc, targetEl, `div`, options, true);
                             doc.querySelector(`[data-id="${md.getAttribute(`data-id`)}"]`).setAttribute(`data-markdown`, `# Hello world\n\nThis is some dummy text.`);
                             break;
                         case `rich-text`:
-                            createComponent(doc, targetEl, `div`, { contentEditable: true, className: `rich-text`, }, true);
+                            createComponent(doc, targetEl, `div`, { contentEditable: true, className: `rich-text`, innerHTML: `<div align="left"><h1>Hello World<br></h1></div><div align="left">This is some dummy text.<br></div>` }, true);
                             break;
                         case `details`:
                             targetEl = createComponent(doc, body, `details`, {}, true);
