@@ -56,6 +56,7 @@
         "@jaames/iro": "^5.5.2",
         "@unstoppabledomains/resolution": "^5.0.1",
         "canvas-confetti": "^1.4.0",
+        "cl-editor": "^2.2.2",
         "dotenv": "^10.0.0",
         "file-saver": "^2.0.5",
         "jszip": "^3.7.1",

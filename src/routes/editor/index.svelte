@@ -64,7 +64,6 @@
     const createComponent = (dom, parent, tag, options, push) => {
         let el = dom.createElement(tag);
         Object.keys(options).forEach((key) => el[key] = options[key]);
-        console.log(el);
         let editable = el.contentEditable === `inherit` ? false : true;
         editable && (el.contentEditable = false);
         el.setAttribute(`data-id`, counter);

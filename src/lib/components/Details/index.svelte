@@ -14,6 +14,7 @@
     import Color from './Properties/Color.svelte';
     import Href from './Properties/Href.svelte';
     import Markdown from './Properties/Markdown.svelte';
+    import RichText from './Properties/RichText.svelte';
     import Spacing from './Properties/Spacing.svelte';
     import Breaker from '$lib/components/Layout/Breaker.svelte';
     import TextAlign from './Properties/TextAlign.svelte';
@@ -94,13 +95,20 @@
         currentElement.el.setAttribute(key, val);
     };
 
-    const newHtml = (html) => {
+    const newMarkdown = (markdown) => {
         let newComponents = $components;
-        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`innerHTML`] = marked(html);
-        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`data-markdown`] = html;
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`innerHTML`] = marked(markdown);
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`data-markdown`] = markdown;
         components.update(() => newComponents);
-        currentElement.el.innerHTML = marked(html);
-        currentElement.el.setAttribute(`data-markdown`, html);
+        currentElement.el.innerHTML = marked(markdown);
+        currentElement.el.setAttribute(`data-markdown`, markdown);
+    };
+
+    const newRichText = (richText) => {
+        let newComponents = $components;
+        newComponents[newComponents.indexOf(newComponents.find((e) => e.id === currentElement.id))].options[`innerHTML`] = richText;
+        components.update(() => newComponents);
+        currentElement.el.innerHTML = richText;
     };
 
     const structureChange = (e) => newStyle(`display`, e.target.value);
@@ -115,7 +123,9 @@
 
     const hrefChange = (e) => newAttribute(`href`, e.target.value);
 
-    const markdownChange = (e) => newHtml(e.target.value);
+    const markdownChange = (e) => newMarkdown(e.target.value);
+
+    const richTextChange = (e) => newRichText(e.detail);
 
     const marginChange = (e) => newStyle(`margin-${e.detail.direction}`, e.detail.value);
 
@@ -207,7 +217,7 @@
 <aside class={classList}>
     {#if currentElement !== null && typeof currentElement.el !== `undefined`}
         {#if elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName)) !== -1 || currentElement.el.tagName === `DIV`}
-            <h2>{currentElement.el.tagName !== `DIV` ? elements[elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName))].name : `${currentElement.el.className.substring(0, 1).toUpperCase()}${currentElement.el.className.slice(1)}`}</h2>
+            <h2>{currentElement.el.tagName !== `DIV` ? elements[elements.indexOf(elements.find((e) => e.tag === currentElement.el.tagName))].name : `${currentElement.el.className.substring(0, 1).toUpperCase()}${currentElement.el.className.slice(1).replaceAll(`-`, ` `)}`}</h2>
             <!--
             TODO: Allow for changing header level
             <Dropdown text="Level">
@@ -260,6 +270,11 @@
                         <Markdown content={currentElement.el.getAttribute(`data-markdown`)} on:change={markdownChange} on:keyup={markdownChange} />
                     </div>
                 </Dropdown>
+            {/if}
+            {#if currentElement.el.tagName === `DIV` && currentElement.el.className === `rich-text`}
+            <Dropdown text="Content">
+                <RichText html={currentElement.el.innerHTML} on:change={richTextChange} on:keyup={richTextChange} />
+            </Dropdown>
             {/if}
             <Dropdown text="Spacing">
                 <div class="level">
