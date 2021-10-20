@@ -36,6 +36,8 @@
                         el.removeAttribute(`draggable`);
                         el.removeAttribute(`style`);
                     });
+                    const title = doc.querySelector(`title`);
+                    title.innerText = page.title;
                     const styles = doc.querySelectorAll(`style`);
                     styles[1].remove();
                     styles[2].remove();

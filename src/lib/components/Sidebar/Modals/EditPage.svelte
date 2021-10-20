@@ -24,18 +24,27 @@
     const submit = () => {
         if (title.length > 0 && path.length > 0) { // TODO: Warn when (title.length > 70)
             path[0] !== `/` && (path = `/${path}`);
+            !!path.endsWith(`/index.html`) && (path = path.slice(0, -10));
             path[path.length + 1] !== `/` && (path = `${path}/`);
             path = path.replace(/\/+/g, `/`); // * Replaces multiple consecutive slashes (2 or more) with a single slash
-            if ($pages.indexOf($pages.find((e) => e.path === `${path}index.html`)) === -1 && $redirects.indexOf($redirects.find((e) => e.file === `${path}index.html`)) === -1) {
+            if (
+                (
+                    $pages.indexOf($pages.find((e) => e.path === `${path}index.html`)) === -1
+                    || `${path}index.html` === oldPath
+                )
+                && $redirects.indexOf($redirects.find((e) => e.file === `${path}index.html`)) === -1
+            ) {
                 let newPages = $pages;
-                newPages.splice(newPages.indexOf(newPages.find((e) => e.path === oldPath)), 1);
+                const oldIndex = newPages.indexOf(newPages.find((e) => e.path === oldPath));
+                const oldId = newPages[oldIndex].id;
+                newPages.splice(oldIndex, 1);
                 newPages.push({
-                    id: newPages.length,
+                    id: oldId,
                     type: `page`,
                     title,
                     description,
-                    canonical: `${path}`,
-                    path: `${path.endsWith(`index.html`) ? path : `${path}index.html`}`,
+                    canonical: path,
+                    path: `${path}index.html`,
                     file: `index.html`,
                     body,
                     components,

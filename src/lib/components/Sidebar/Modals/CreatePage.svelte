@@ -31,6 +31,7 @@
                         {
                             id: null,
                             element: null,
+                            parent: null,
                             children: [],
                             tag: `h1`,
                             options: {
@@ -43,6 +44,7 @@
                         {
                             id: null,
                             element: null,
+                            parent: null,
                             children: [],
                             tag: `p`,
                             options: {

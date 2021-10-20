@@ -568,7 +568,7 @@
 
 <iframe bind:this={canvas} id={name} class={classList} {name} {src} title={name} on:load={load} />
 
-{#if loading}
+{#if !!loading}
     <div class="loader">
         <Circle size="60" color="#4169e1" unit="px" duration="600ms"></Circle>
     </div>

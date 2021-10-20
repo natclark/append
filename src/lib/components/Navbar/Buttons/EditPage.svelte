@@ -19,10 +19,11 @@
 <style>
     button {
         height: 18px;
-        margin-left: 8px;
+        margin-left: 16px;
         width: 18px;
         svg {
             height: 18px;
+            margin: 0;
             width: 18px;
         }
         &:hover svg path {
